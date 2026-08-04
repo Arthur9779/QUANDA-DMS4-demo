@@ -1,0 +1,12 @@
+/node_modules/
+/.next/
+/.vinext/
+/dist/
+/.wrangler/
+/public/quanda.html
+/public/app.js
+/public/original.css
+/public/styles.css
+/public/assets/
+*.log
+.env*
