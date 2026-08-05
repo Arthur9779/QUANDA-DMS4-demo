@@ -2,6 +2,7 @@
 /.next/
 /.vinext/
 /dist/
+/work/
 /.wrangler/
 /public/quanda.html
 /public/app.js

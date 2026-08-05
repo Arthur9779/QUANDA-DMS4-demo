@@ -361,10 +361,11 @@ function renderRoadmap() {
       appendFact(details, c.softwareVersion, tutorial.version);
       appendFact(details, c.tutorialLanguage, currentLanguage === "vi" ? tutorial.languageVi : tutorial.language);
       appendFact(details, "", `${tutorial.minutes} ${currentLanguage === "vi" ? "phút" : "min"}`, "clock");
-      const watchLink = make("a", "tutorial-link", c.watchYoutube);
+      const watchLink = make("a", "tutorial-link");
       watchLink.href = url;
       watchLink.target = "_blank";
       watchLink.rel = "noreferrer";
+      watchLink.append(document.createTextNode(c.watchYoutube), make("span", "tutorial-link-icon", "↗"));
       tutorialCard.append(thumbnail, topLine, make("h5", "", tutorial.title), make("p", "", tutorial.author), details, watchLink);
       tutorialList.append(tutorialCard);
     });
