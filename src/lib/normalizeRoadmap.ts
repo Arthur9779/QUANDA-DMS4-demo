@@ -1,4 +1,4 @@
-import { applications } from "@/src/data/applications";
+import { applications, isSupportedApplicationId } from "@/src/data/applications";
 import {
   calculateAvailableMinutes,
   getDaysRemaining,
@@ -18,7 +18,7 @@ export function normalizeRoadmap(
   request: RoadmapRequest,
 ): RoadmapResponse {
   const requestedApplicationIds = new Set(
-    request.requiredApplications.filter((id) => applicationIds.has(id)),
+    request.requiredApplications.filter(isSupportedApplicationId),
   );
   const allowedApplicationIds =
     requestedApplicationIds.size > 0 ? requestedApplicationIds : applicationIds;

@@ -616,6 +616,11 @@ a:focus-visible {
   margin-top: 12px;
 }
 
+.other-application-field {
+  max-width: 620px;
+  margin-top: 16px;
+}
+
 .check-pill,
 .choice-card {
   position: relative;

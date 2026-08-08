@@ -11,7 +11,11 @@ import type {
   RoadmapStage,
 } from "@/src/types";
 import { fillTutorialIds } from "@/src/lib/tutorialMatcher";
-import { applicationById } from "@/src/data/applications";
+import {
+  getApplicationDefinition,
+  getApplicationName,
+  isSupportedApplicationId,
+} from "@/src/data/applications";
 
 type SampleKind = "blender" | "figma" | "davinci" | "generic";
 
@@ -102,7 +106,7 @@ function stage(
 }
 
 function fallbackApplicationIds(request: RoadmapRequest): string[] {
-  const selected = request.requiredApplications.filter((id) => applicationById[id]);
+  const selected = request.requiredApplications.filter(isSupportedApplicationId);
   if (selected.length > 0) return [...new Set(selected)].slice(0, 5);
 
   const inferredByOutput: Partial<Record<RoadmapRequest["outputType"], string>> = {
@@ -122,8 +126,8 @@ function createGenericStages(
   locale: Locale,
 ): RoadmapStage[] {
   const applicationIds = fallbackApplicationIds(request);
-  const firstApplication = applicationById[applicationIds[0]];
-  const lastApplication = applicationById[applicationIds.at(-1)!];
+  const firstApplication = getApplicationDefinition(applicationIds[0])!;
+  const lastApplication = getApplicationDefinition(applicationIds.at(-1)!)!;
   const result: RoadmapStage[] = [];
 
   const addStage = (
@@ -172,7 +176,7 @@ function createGenericStages(
     );
 
     applicationIds.forEach((applicationId) => {
-      const application = applicationById[applicationId];
+      const application = getApplicationDefinition(applicationId)!;
       addStage(
         `build-${application.id}`,
         `Tạo phần chính bằng ${application.name}`,
@@ -238,7 +242,7 @@ function createGenericStages(
     );
 
     applicationIds.forEach((applicationId) => {
-      const application = applicationById[applicationId];
+      const application = getApplicationDefinition(applicationId)!;
       addStage(
         `build-${application.id}`,
         `Build the core work in ${application.name}`,
@@ -345,13 +349,13 @@ export function createSampleRoadmap(request: RoadmapRequest): RoadmapResponse {
       blender: "20-second product animation roadmap",
       figma: "Mobile app prototype roadmap",
       davinci: "Short video editing roadmap",
-      generic: `${applicationById[fallbackApplicationIds(request)[0]].name} project roadmap`,
+      generic: `${getApplicationName(fallbackApplicationIds(request)[0])} project roadmap`,
     },
     vi: {
       blender: "Lộ trình làm hoạt hình sản phẩm 20 giây",
       figma: "Lộ trình làm bản mẫu ứng dụng di động",
       davinci: "Lộ trình dựng video ngắn",
-      generic: `Lộ trình dự án với ${applicationById[fallbackApplicationIds(request)[0]].name}`,
+      generic: `Lộ trình dự án với ${getApplicationName(fallbackApplicationIds(request)[0])}`,
     },
   };
   const summaries = {

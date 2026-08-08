@@ -78,6 +78,61 @@ describe("tutorial catalogue matching", () => {
     expect(ids.every((id) => id.startsWith("blender-"))).toBe(true);
   });
 
+  it("does not recommend Fairlight for video editing and colour correction", () => {
+    const davinciStage: RoadmapStage = {
+      ...stage,
+      id: "davinci-edit-colour",
+      applicationId: "davinci-resolve",
+      title: "Build the core video",
+      goal: "Create a complete edited draft with consistent colour.",
+      skillToLearn: "Video editing and colour correction",
+      tasks: ["Trim the timeline", "Correct exposure and white balance"],
+      tutorialIds: ["davinci-fairlight-en"],
+    };
+
+    const matches = fillTutorialIds(davinciStage, "en");
+
+    expect(matches).not.toContain("davinci-fairlight-en");
+    expect(matches).toContain("davinci-color-en");
+    expect(matches.every((id) => id.startsWith("davinci-"))).toBe(true);
+  });
+
+  it("uses the Fairlight tutorial for an audio-specific DaVinci stage", () => {
+    const audioStage: RoadmapStage = {
+      ...stage,
+      id: "davinci-audio",
+      applicationId: "davinci-resolve",
+      title: "Clean dialogue and sound",
+      goal: "Make dialogue clear and balance the audio mix.",
+      skillToLearn: "Fairlight audio cleanup and mixing",
+      tasks: ["Reduce noise", "Balance dialogue levels"],
+      tutorialIds: [],
+    };
+
+    const matches = fillTutorialIds(audioStage, "en");
+
+    expect(matches).toContain("davinci-fairlight-en");
+    expect(matches).not.toContain("davinci-color-en");
+  });
+
+  it("shows no tutorial for a broad quality review when the catalogue lacks one", () => {
+    const reviewStage: RoadmapStage = {
+      ...stage,
+      id: "davinci-quality-review",
+      applicationId: "davinci-resolve",
+      title: "Refine and quality-check the draft",
+      goal: "Fix issues against every submission criterion.",
+      skillToLearn: "Quality review in DaVinci Resolve",
+      tasks: [
+        "Compare the draft with every required criterion",
+        "Recheck the relevant colour, sound, or motion",
+      ],
+      tutorialIds: ["davinci-color-en"],
+    };
+
+    expect(fillTutorialIds(reviewStage, "en")).toEqual([]);
+  });
+
   it("does not create search links when no verified video matches", () => {
     const unsupportedStage = {
       ...stage,

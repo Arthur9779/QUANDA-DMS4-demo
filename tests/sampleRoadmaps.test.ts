@@ -3,6 +3,10 @@ import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import { normalizeRoadmap } from "@/src/lib/normalizeRoadmap";
 import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import type { RoadmapRequest } from "@/src/types";
+import {
+  createCustomApplicationId,
+  getApplicationName,
+} from "@/src/data/applications";
 
 function illustratorRequest(): RoadmapRequest {
   return {
@@ -63,5 +67,29 @@ describe("application-aware roadmaps", () => {
         requiredApplications: ["unknown-editor"],
       }).success,
     ).toBe(false);
+  });
+
+  it("accepts a named Other application without substituting another tool", () => {
+    const customApplicationId = createCustomApplicationId("Cinema 4D");
+    const request = {
+      ...illustratorRequest(),
+      projectBrief:
+        "Create a short product animation in Cinema 4D for a university assignment.",
+      requiredApplications: [customApplicationId],
+      outputType: "3d" as const,
+    };
+
+    expect(RoadmapRequestSchema.safeParse(request).success).toBe(true);
+    expect(getApplicationName(customApplicationId)).toBe("Cinema 4D");
+
+    const roadmap = createSampleRoadmap(request);
+    expect(roadmap.title).toContain("Cinema 4D");
+    expect(
+      roadmap.stages
+        .map((roadmapStage) => roadmapStage.applicationId)
+        .filter(Boolean),
+    ).toEqual(expect.arrayContaining([customApplicationId]));
+    expect(roadmap.stages.flatMap((roadmapStage) => roadmapStage.tutorialIds))
+      .toEqual([]);
   });
 });

@@ -5,7 +5,7 @@ import type { Translation } from "@/src/i18n/translations";
 import type { RoadmapStage } from "@/src/types";
 import type { TutorialRecommendation } from "@/src/lib/tutorialMatcher";
 import { TutorialCard } from "./TutorialCard";
-import { applicationById } from "@/src/data/applications";
+import { getApplicationName } from "@/src/data/applications";
 
 interface RoadmapStageCardProps {
   stage: RoadmapStage;
@@ -87,7 +87,7 @@ export function RoadmapStageCard({
             <dt><Box aria-hidden="true" size={15} />{t.results.application}</dt>
             <dd>
               {stage.applicationId
-                ? applicationById[stage.applicationId]?.name ?? stage.applicationId
+                ? getApplicationName(stage.applicationId)
                 : "—"}
             </dd>
           </div>

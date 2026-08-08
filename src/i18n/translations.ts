@@ -44,6 +44,9 @@ export interface Translation {
     tutorialLanguage: string;
     applications: string;
     noApplication: string;
+    otherApplication: string;
+    otherApplicationLabel: string;
+    otherApplicationPlaceholder: string;
     outputType: string;
     targetQuality: string;
     submit: string;
@@ -58,6 +61,7 @@ export interface Translation {
       currentExperience: string;
       hoursPerDay: string;
       daysPerWeek: string;
+      requiredApplications: string;
       generic: string;
     };
     tutorialOptions: LabelOption[];
@@ -196,6 +200,9 @@ const en: Translation = {
     tutorialLanguage: "Preferred tutorial language",
     applications: "Required application(s)",
     noApplication: "No required application",
+    otherApplication: "Other",
+    otherApplicationLabel: "Other application, tool, or platform",
+    otherApplicationPlaceholder: "For example: Cinema 4D, Canva, Unity, or CapCut",
     outputType: "Desired output type",
     targetQuality: "Target quality",
     submit: "Generate my roadmap",
@@ -211,6 +218,7 @@ const en: Translation = {
       currentExperience: "Tell us briefly what you already know.",
       hoursPerDay: "Hours per day must be between 0.5 and 12.",
       daysPerWeek: "Days per week must be between 1 and 7.",
+      requiredApplications: "Enter the other application, tool, or platform you need to use.",
       generic: "Check this field and try again.",
     },
     tutorialOptions: [
@@ -388,6 +396,9 @@ const vi: Translation = {
     tutorialLanguage: "Ngôn ngữ video hướng dẫn ưu tiên",
     applications: "Ứng dụng bắt buộc",
     noApplication: "Không yêu cầu ứng dụng",
+    otherApplication: "Khác",
+    otherApplicationLabel: "Ứng dụng, công cụ hoặc nền tảng khác",
+    otherApplicationPlaceholder: "Ví dụ: Cinema 4D, Canva, Unity hoặc CapCut",
     outputType: "Loại sản phẩm mong muốn",
     targetQuality: "Mức chất lượng",
     submit: "Tạo lộ trình cho tôi",
@@ -403,6 +414,7 @@ const vi: Translation = {
       currentExperience: "Hãy mô tả ngắn gọn những gì bạn đã biết.",
       hoursPerDay: "Số giờ mỗi ngày phải từ 0,5 đến 12.",
       daysPerWeek: "Số ngày mỗi tuần phải từ 1 đến 7.",
+      requiredApplications: "Hãy nhập ứng dụng, công cụ hoặc nền tảng bạn cần sử dụng.",
       generic: "Hãy kiểm tra trường này và thử lại.",
     },
     tutorialOptions: [
