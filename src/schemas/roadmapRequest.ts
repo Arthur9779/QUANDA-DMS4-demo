@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { applicationById } from "@/src/data/applications";
+import { isSupportedApplicationId } from "@/src/data/applications";
 
 export const RoadmapRequestSchema = z.object({
   interfaceLanguage: z.enum(["en", "vi"]),
@@ -18,10 +18,10 @@ export const RoadmapRequestSchema = z.object({
   daysPerWeek: z.coerce.number().int().min(1).max(7),
   tutorialLanguage: z.enum(["en", "vi", "either"]),
   requiredApplications: z
-    .array(z.string())
-    .max(10)
+    .array(z.string().max(80))
+    .max(11)
     .refine(
-      (ids) => ids.every((id) => Boolean(applicationById[id])),
+      (ids) => ids.every(isSupportedApplicationId),
       "applications",
     ),
   outputType: z.enum(["video", "3d", "graphic", "uiux", "audio", "photo", "other"]),

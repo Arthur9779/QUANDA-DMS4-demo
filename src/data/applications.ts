@@ -82,3 +82,38 @@ export const applications: ApplicationDefinition[] = [
 export const applicationById = Object.fromEntries(
   applications.map((application) => [application.id, application]),
 ) as Record<string, ApplicationDefinition>;
+
+export const CUSTOM_APPLICATION_PREFIX = "custom:";
+
+export function createCustomApplicationId(name: string): string {
+  return `${CUSTOM_APPLICATION_PREFIX}${name.trim().replace(/\s+/g, " ")}`;
+}
+
+export function isCustomApplicationId(id: string): boolean {
+  return id.startsWith(CUSTOM_APPLICATION_PREFIX) &&
+    id.slice(CUSTOM_APPLICATION_PREFIX.length).trim().length >= 2;
+}
+
+export function isSupportedApplicationId(id: string): boolean {
+  return Boolean(applicationById[id]) || isCustomApplicationId(id);
+}
+
+export function getApplicationName(id: string): string {
+  return applicationById[id]?.name ??
+    (isCustomApplicationId(id)
+      ? id.slice(CUSTOM_APPLICATION_PREFIX.length).trim()
+      : id);
+}
+
+export function getApplicationDefinition(id: string): ApplicationDefinition | null {
+  if (applicationById[id]) return applicationById[id];
+  if (!isCustomApplicationId(id)) return null;
+
+  return {
+    id,
+    name: getApplicationName(id),
+    category: "graphics",
+    commonUses: ["core workflow", "project production"],
+    commonExportFormats: [],
+  };
+}

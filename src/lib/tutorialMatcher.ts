@@ -1,5 +1,5 @@
 import tutorialsData from "@/src/data/tutorials.json";
-import { applicationById } from "@/src/data/applications";
+import { getApplicationName } from "@/src/data/applications";
 import type {
   Locale,
   RoadmapRequest,
@@ -65,13 +65,157 @@ export const tutorials = (tutorialsData as Tutorial[]).filter(isDirectYouTubeVid
 
 const tutorialById = new Map(tutorials.map((tutorial) => [tutorial.id, tutorial]));
 
+const TOKEN_ALIASES: Record<string, string> = {
+  basics: "setup",
+  beginner: "setup",
+  bins: "setup",
+  import: "setup",
+  interface: "setup",
+  media: "setup",
+  organisation: "setup",
+  organization: "setup",
+  setup: "setup",
+  workspace: "setup",
+  colour: "color",
+  correction: "color",
+  exposure: "color",
+  grade: "color",
+  grading: "color",
+  matching: "color",
+  audio: "audio",
+  dialogue: "audio",
+  fairlight: "audio",
+  noise: "audio",
+  sound: "audio",
+  edit: "editing",
+  editing: "editing",
+  footage: "editing",
+  timeline: "editing",
+  trim: "editing",
+  trimming: "editing",
+  cut: "editing",
+  codec: "export",
+  deliver: "export",
+  delivery: "export",
+  export: "export",
+  h264: "export",
+  render: "export",
+  rendering: "export",
+  criteria: "quality",
+  criterion: "quality",
+  errors: "quality",
+  inspection: "quality",
+  issues: "quality",
+  quality: "quality",
+  refine: "quality",
+  review: "quality",
+  troubleshoot: "quality",
+  troubleshooting: "quality",
+  verify: "quality",
+  verification: "quality",
+  model: "modeling",
+  modeling: "modeling",
+  modelling: "modeling",
+  geometry: "modeling",
+  material: "materials",
+  shading: "materials",
+  texture: "materials",
+  textures: "materials",
+  light: "lighting",
+  animation: "animation",
+  animate: "animation",
+  keyframes: "animation",
+  prototype: "prototype",
+  prototyping: "prototype",
+  wireframe: "layout",
+  wireframes: "layout",
+  layout: "layout",
+  components: "components",
+  component: "components",
+  vector: "vector",
+  logo: "vector",
+  logos: "vector",
+  icon: "vector",
+  icons: "vector",
+  illustration: "illustration",
+  painting: "painting",
+  sketching: "painting",
+  recording: "recording",
+  mixing: "mixing",
+  music: "music",
+  beat: "music",
+};
+
+const CONCEPT_TOKENS = new Set([
+  "setup", "color", "audio", "editing", "export", "quality", "modeling",
+  "materials", "lighting", "animation", "prototype", "layout", "components",
+  "vector", "illustration", "painting", "recording", "mixing", "music",
+]);
+
 function tokenize(value: string): string[] {
-  return value
+  const normalized = value
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\b(?:sound|audio) editing\b/g, " audio ")
+    .replace(/\bvideo editing\b/g, " editing ")
+    .replace(/\bcolou?r (?:correction|grading)\b/g, " color ")
+    .replace(/\bwhite balance\b/g, " color ")
     .split(/[^a-z0-9]+/)
     .filter((token) => token.length > 2);
+
+  return normalized
+    .map((token) => TOKEN_ALIASES[token] ?? token);
+}
+
+function tutorialTokens(tutorial: Tutorial): Set<string> {
+  return new Set(tokenize([
+    tutorial.title.en,
+    tutorial.title.vi,
+    ...tutorial.topics,
+  ].join(" ")));
+}
+
+function isBroadQualityReview(stageText: string): boolean {
+  const normalized = stageText
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ");
+  const qualityReview =
+    /\bquality (?:check|control|review)\b/.test(normalized) ||
+    /\b(?:review|check)\b.{0,50}\b(?:criteria|criterion|issues?)\b/.test(normalized) ||
+    /\b(?:kiem tra|kiem soat|ra soat) chat luong\b/.test(normalized);
+  const delivery = /\b(?:export|delivery|deliver|xuat|ban giao)\b/.test(normalized);
+  return qualityReview && !delivery;
+}
+
+function tutorialRelevanceScore(stage: RoadmapStage, tutorial: Tutorial): number {
+  const stageText = `${stage.title} ${stage.goal} ${stage.skillToLearn} ${stage.tasks.join(" ")}`;
+  const stageTokens = new Set(tokenize(stageText));
+  const candidateTokens = tutorialTokens(tutorial);
+
+  if (isBroadQualityReview(stageText) && !candidateTokens.has("quality")) return 0;
+
+  const stageConcepts = new Set(
+    [...stageTokens].filter((token) => CONCEPT_TOKENS.has(token)),
+  );
+  const tutorialConcepts = new Set(
+    [...candidateTokens].filter((token) => CONCEPT_TOKENS.has(token)),
+  );
+  if (
+    stageConcepts.size > 0 &&
+    tutorialConcepts.size > 0 &&
+    ![...stageConcepts].some((concept) => tutorialConcepts.has(concept))
+  ) {
+    return 0;
+  }
+
+  return tutorial.topics.reduce(
+    (score, topic) =>
+      score + tokenize(topic).filter((token) => stageTokens.has(token)).length * 2,
+    0,
+  );
 }
 
 function languageMatches(
@@ -149,10 +293,6 @@ export function matchTutorialsForStage(
   limit = 3,
   excludedIds: ReadonlySet<string> = new Set(),
 ): Tutorial[] {
-  const stageTokens = new Set(
-    tokenize(`${stage.title} ${stage.goal} ${stage.skillToLearn} ${stage.tasks.join(" ")}`),
-  );
-
   const scored = tutorials
     .filter(
       (tutorial) =>
@@ -160,21 +300,11 @@ export function matchTutorialsForStage(
         languageMatches(tutorial, preference) &&
         !excludedIds.has(tutorial.id),
     )
-    .map((tutorial) => {
-      let score = 0;
-      for (const topic of tutorial.topics) {
-        for (const token of tokenize(topic)) {
-          if (stageTokens.has(token)) score += 2;
-        }
-      }
-      return { tutorial, score };
-    })
+    .map((tutorial) => ({ tutorial, score: tutorialRelevanceScore(stage, tutorial) }))
     .sort((a, b) => b.score - a.score || a.tutorial.id.localeCompare(b.tutorial.id));
   const relevant = scored.filter(({ score }) => score > 0);
 
-  return (relevant.length > 0 ? relevant : scored)
-    .slice(0, limit)
-    .map(({ tutorial }) => tutorial);
+  return relevant.slice(0, limit).map(({ tutorial }) => tutorial);
 }
 
 export function fillTutorialIds(
@@ -189,7 +319,8 @@ export function fillTutorialIds(
         tutorial &&
         tutorial.applicationId === stage.applicationId &&
         languageMatches(tutorial, preference) &&
-        !excludedIds.has(id),
+        !excludedIds.has(id) &&
+        tutorialRelevanceScore(stage, tutorial) > 0,
     );
   });
   const matched = matchTutorialsForStage(
@@ -213,8 +344,7 @@ function toRecommendation(
     url: tutorial.url,
     thumbnailUrl: `https://i.ytimg.com/vi/${tutorial.youtubeVideoId}/hqdefault.jpg`,
     language: tutorial.language,
-    applicationName:
-      applicationById[tutorial.applicationId]?.name ?? tutorial.applicationId,
+    applicationName: getApplicationName(tutorial.applicationId),
     level: tutorial.level,
     durationMinutes: tutorial.durationMinutes,
     versionLabel: tutorial.versionLabel,
