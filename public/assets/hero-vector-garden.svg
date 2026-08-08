@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract green garden</title>
+  <desc id="desc">Minimal vector leaves, bell flowers and sparkles on a green field.</desc>
+  <rect width="1600" height="900" fill="#527938"/>
+  <circle cx="1430" cy="110" r="260" fill="#6f9650" opacity=".55"/>
+  <circle cx="130" cy="780" r="330" fill="#40652f" opacity=".72"/>
+  <path d="M1190 900C1195 665 1248 535 1358 392C1430 297 1465 203 1447 72" fill="none" stroke="#263f21" stroke-width="34" stroke-linecap="round"/>
+  <path d="M1358 392c-88-94-169-111-241-50M1319 447c88-44 174-35 249 30M1408 269c-71-50-124-55-186-18" fill="none" stroke="#315228" stroke-width="22" stroke-linecap="round"/>
+  <g fill="#dcebb4">
+    <path d="M1084 280c52-51 122-42 150 20c13 31 4 76-36 108c-39 31-93 26-118-11c-28-42-20-88 4-117Z"/>
+    <path d="M1400 424c43-55 113-58 151-6c20 27 20 75-13 113c-32 38-86 44-117 13c-36-35-39-81-21-120Z"/>
+    <path d="M1182 611c61-53 139-31 157 39c9 35-8 82-56 108c-48 26-105 12-125-31c-23-48-8-94 24-116Z"/>
+  </g>
+  <g fill="#ef8f5c">
+    <ellipse cx="1125" cy="402" rx="10" ry="22"/><ellipse cx="1153" cy="409" rx="10" ry="22"/>
+    <ellipse cx="1450" cy="540" rx="10" ry="22"/><ellipse cx="1478" cy="534" rx="10" ry="22"/>
+    <ellipse cx="1235" cy="752" rx="10" ry="22"/><ellipse cx="1264" cy="756" rx="10" ry="22"/>
+  </g>
+  <g fill="#83a961">
+    <path d="M1176 898C1006 780 916 778 816 835c104 5 170 30 232 63Z"/>
+    <path d="M1193 900c82-153 189-207 300-189c-104 50-171 115-211 189Z"/>
+    <path d="M1292 900c88-109 185-133 280-92c-86 17-151 49-206 92Z"/>
+  </g>
+  <g fill="#edf5cf">
+    <path d="m974 118 14 38 38 14-38 14-14 38-14-38-38-14 38-14Z"/>
+    <path d="m1510 165 9 25 25 9-25 9-9 25-9-25-25-9 25-9Z"/>
+    <path d="m1055 505 10 27 27 10-27 10-10 27-10-27-27-10 27-10Z"/>
+  </g>
+  <g opacity=".13" fill="#f7f8df"><circle cx="180" cy="180" r="5"/><circle cx="260" cy="120" r="4"/><circle cx="380" cy="210" r="6"/><circle cx="710" cy="115" r="4"/><circle cx="850" cy="240" r="5"/><circle cx="580" cy="690" r="6"/></g>
+</svg>

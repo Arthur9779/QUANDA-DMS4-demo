@@ -1,0 +1,611 @@
+[
+  {
+    "id": "blender-2026-course-en",
+    "title": { "en": "Beginner Blender Tutorial (2026)", "vi": "Khóa Blender cho người mới (2026)" },
+    "creator": "Blender Guru",
+    "url": "https://www.youtube.com/watch?v=z-Xl9tGqH14",
+    "youtubeVideoId": "z-Xl9tGqH14",
+    "language": "en", "applicationId": "blender",
+    "topics": ["basics", "navigation", "modeling", "materials", "animation", "rendering", "cơ bản", "điều hướng", "dựng hình", "mô hình", "vật liệu", "chuyển động", "kết xuất"],
+    "level": "beginner", "durationMinutes": 260, "publishedAt": "2026-01-14", "versionLabel": "Blender 5.x", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "blender-2026-beginner-en",
+    "title": { "en": "Blender 5.0 Beginner Tutorial", "vi": "Hướng dẫn Blender 5.0 cho người mới" },
+    "creator": "Polygon Runway",
+    "url": "https://www.youtube.com/watch?v=K7__BjW4UWE",
+    "youtubeVideoId": "K7__BjW4UWE",
+    "language": "en", "applicationId": "blender",
+    "topics": ["basics", "navigation", "modeling", "product", "lighting", "cơ bản", "điều hướng", "dựng hình", "mô hình", "sản phẩm", "ánh sáng", "máy quay"],
+    "level": "beginner", "durationMinutes": 72, "publishedAt": "2026-01-08", "versionLabel": "Blender 5.0", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "blender-materials-en",
+    "title": { "en": "Add Color and Basic Textures in Blender", "vi": "Thêm màu và họa tiết cơ bản trong Blender" },
+    "creator": "SpaceCat 3D",
+    "url": "https://www.youtube.com/watch?v=KMjTLE0z80k",
+    "youtubeVideoId": "KMjTLE0z80k",
+    "language": "en", "applicationId": "blender",
+    "topics": ["materials", "textures", "shading", "color", "roughness", "vật liệu", "họa tiết", "màu", "độ nhám"],
+    "level": "beginner", "durationMinutes": 7, "publishedAt": "2025-07-20", "versionLabel": "Blender 4.x–5.x", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "blender-intro-vi",
+    "title": { "en": "Download and Get Familiar with Blender", "vi": "Tập 1: Tải và làm quen với Blender" },
+    "creator": "Dstudioooo",
+    "url": "https://www.youtube.com/watch?v=zNPhUvszRi4",
+    "youtubeVideoId": "zNPhUvszRi4",
+    "language": "vi", "applicationId": "blender",
+    "topics": ["basics", "navigation", "interface", "cơ bản", "giao diện", "khung nhìn", "điều hướng", "biến đổi"],
+    "level": "beginner", "durationMinutes": 9, "publishedAt": "2025-09-02", "versionLabel": "Blender 4.x–5.x", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "blender-texture-fixes-vi",
+    "title": { "en": "Five Common Blender Texture Errors and Fixes", "vi": "5 lỗi họa tiết thường gặp trong Blender và cách sửa" },
+    "creator": "Blender Player",
+    "url": "https://www.youtube.com/watch?v=vamZ-hAQQnY",
+    "youtubeVideoId": "vamZ-hAQQnY",
+    "language": "vi", "applicationId": "blender",
+    "topics": ["materials", "textures", "shading", "họa tiết", "vật liệu", "sửa lỗi"],
+    "level": "beginner", "durationMinutes": 4, "publishedAt": "2025-09-23", "versionLabel": "Blender 4.x–5.x", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "blender-animation-vi",
+    "title": { "en": "Animate a Vietnamese Flag in Blender", "vi": "Làm lá cờ Việt Nam tung bay bằng Blender 3D" },
+    "creator": "Đình Văn Media",
+    "url": "https://www.youtube.com/watch?v=pRnDdRzVz6k",
+    "youtubeVideoId": "pRnDdRzVz6k",
+    "language": "vi", "applicationId": "blender",
+    "topics": ["animation", "keyframes", "cloth", "chuyển động", "khung hình chính"],
+    "level": "beginner", "durationMinutes": 11, "publishedAt": "2025-08-28", "versionLabel": "Blender 4.x–5.x", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "figma-2026-course-en",
+    "title": { "en": "Free Figma Crash Course for Beginners 2026", "vi": "Khóa Figma cấp tốc cho người mới 2026" },
+    "creator": "DesignWithArash",
+    "url": "https://www.youtube.com/watch?v=1SNZRCVNizg",
+    "youtubeVideoId": "1SNZRCVNizg",
+    "language": "en", "applicationId": "figma",
+    "topics": ["basics", "ui", "layout", "components", "prototype", "design system"],
+    "level": "beginner", "durationMinutes": 90, "publishedAt": "2025-02-24", "versionLabel": "Figma 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "figma-auto-layout-en",
+    "title": { "en": "Figma Auto Layout Tutorial for Beginners", "vi": "Auto Layout trong Figma cho người mới" },
+    "creator": "Aliena Cai",
+    "url": "https://www.youtube.com/watch?v=WxSYc5afjDY",
+    "youtubeVideoId": "WxSYc5afjDY",
+    "language": "en", "applicationId": "figma",
+    "topics": ["auto layout", "responsive", "spacing", "ui", "layout"],
+    "level": "beginner", "durationMinutes": 9, "publishedAt": "2025-08-04", "versionLabel": "Figma 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "figma-prototyping-en",
+    "title": { "en": "Figma Prototyping in Five Minutes", "vi": "Tạo bản mẫu Figma trong năm phút" },
+    "creator": "Design Bites",
+    "url": "https://www.youtube.com/watch?v=-op0gbWrmCY",
+    "youtubeVideoId": "-op0gbWrmCY",
+    "language": "en", "applicationId": "figma",
+    "topics": ["prototype", "interactions", "user flow", "testing", "navigation"],
+    "level": "beginner", "durationMinutes": 6, "publishedAt": "2026-05-01", "versionLabel": "Figma 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "figma-auto-layout-vi",
+    "title": { "en": "Learn Figma UI/UX: Auto Layout", "vi": "Tự học Figma UI/UX: Auto Layout" },
+    "creator": "Xuân Hoàng Designer",
+    "url": "https://www.youtube.com/watch?v=QQa3gsrvrqY",
+    "youtubeVideoId": "QQa3gsrvrqY",
+    "language": "vi", "applicationId": "figma",
+    "topics": ["auto layout", "responsive", "spacing", "bố cục", "khoảng cách"],
+    "level": "beginner", "durationMinutes": 35, "publishedAt": "2025-09-07", "versionLabel": "Figma 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "figma-prototype-vi",
+    "title": { "en": "Basic Figma Prototyping", "vi": "Hướng dẫn tạo bản mẫu Figma cơ bản" },
+    "creator": "Tt Learning",
+    "url": "https://www.youtube.com/watch?v=f4GqHv8Qx04",
+    "youtubeVideoId": "f4GqHv8Qx04",
+    "language": "vi", "applicationId": "figma",
+    "topics": ["prototype", "interactions", "user flow", "bản mẫu", "tương tác", "điều hướng"],
+    "level": "beginner", "durationMinutes": 31, "publishedAt": "2025-01-03", "versionLabel": "Figma 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "figma-components-vi",
+    "title": { "en": "Buttons and Components in Figma", "vi": "Tạo nút và thành phần trong Figma" },
+    "creator": "kaorumap",
+    "url": "https://www.youtube.com/watch?v=wA5dZVHS0mM",
+    "youtubeVideoId": "wA5dZVHS0mM",
+    "language": "vi", "applicationId": "figma",
+    "topics": ["components", "buttons", "design system", "thành phần", "nút", "hệ thống thiết kế"],
+    "level": "beginner", "durationMinutes": 10, "publishedAt": "2023-06-22", "versionLabel": "Quy trình Figma hiện hành", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "photoshop-2026-course-en",
+    "title": { "en": "Photoshop 2026 Full Course", "vi": "Khóa Photoshop 2026 đầy đủ" },
+    "creator": "Supercreator",
+    "url": "https://www.youtube.com/watch?v=wj0EdUa1MmE",
+    "youtubeVideoId": "wj0EdUa1MmE",
+    "language": "en", "applicationId": "photoshop",
+    "topics": ["basics", "layers", "selections", "masks", "retouching", "export"],
+    "level": "beginner", "durationMinutes": 123, "publishedAt": "2026-05-15", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "photoshop-selections-2026-en",
+    "title": { "en": "How to Make Selections in Photoshop (2026)", "vi": "Cách tạo vùng chọn trong Photoshop (2026)" },
+    "creator": "Everyday Photoshop",
+    "url": "https://www.youtube.com/watch?v=4s0gapmwVRg",
+    "youtubeVideoId": "4s0gapmwVRg",
+    "language": "en", "applicationId": "photoshop",
+    "topics": ["selections", "masking", "compositing", "editing"],
+    "level": "beginner", "durationMinutes": 11, "publishedAt": "2026-03-04", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "photoshop-masks-2026-en",
+    "title": { "en": "How to Use Layer Masks in Photoshop", "vi": "Cách dùng mặt nạ lớp trong Photoshop" },
+    "creator": "Shortcut Academy",
+    "url": "https://www.youtube.com/watch?v=E1dTbVLMHm8",
+    "youtubeVideoId": "E1dTbVLMHm8",
+    "language": "en", "applicationId": "photoshop",
+    "topics": ["layers", "layer masks", "masking", "non-destructive editing"],
+    "level": "beginner", "durationMinutes": 3, "publishedAt": "2025-12-28", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "photoshop-2026-course-vi",
+    "title": { "en": "Learn Photoshop 2026 from A to Z", "vi": "Học Photoshop 2026 từ A đến Z" },
+    "creator": "DN Graphics",
+    "url": "https://www.youtube.com/watch?v=Us0PzrRhx8k",
+    "youtubeVideoId": "Us0PzrRhx8k",
+    "language": "vi", "applicationId": "photoshop",
+    "topics": ["basics", "layers", "selections", "masks", "cơ bản", "lớp", "vùng chọn"],
+    "level": "beginner", "durationMinutes": 95, "publishedAt": "2025-12-13", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "photoshop-2026-intensive-vi",
+    "title": { "en": "Photoshop 2026 in Two Hours", "vi": "Học Photoshop 2026 trong hai tiếng" },
+    "creator": "Vũ Xuân Cường",
+    "url": "https://www.youtube.com/watch?v=NBr0b-SNYg0",
+    "youtubeVideoId": "NBr0b-SNYg0",
+    "language": "vi", "applicationId": "photoshop",
+    "topics": ["basics", "editing", "compositing", "retouching", "chỉnh sửa", "ghép ảnh"],
+    "level": "beginner", "durationMinutes": 139, "publishedAt": "2025-11-20", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "photoshop-2026-features-vi",
+    "title": { "en": "Photoshop 2026 New Features", "vi": "Các tính năng mới của Photoshop 2026" },
+    "creator": "Quạ HD",
+    "url": "https://www.youtube.com/watch?v=gFLwxiGOj3A",
+    "youtubeVideoId": "gFLwxiGOj3A",
+    "language": "vi", "applicationId": "photoshop",
+    "topics": ["new features", "editing", "generative tools", "tính năng mới", "chỉnh sửa"],
+    "level": "intermediate", "durationMinutes": 9, "publishedAt": "2025-11-26", "versionLabel": "Photoshop 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "illustrator-2026-course-en",
+    "title": { "en": "Illustrator 2026 Four-Hour Crash Course", "vi": "Khóa Illustrator 2026 cấp tốc trong bốn giờ" },
+    "creator": "GraphicMade",
+    "url": "https://www.youtube.com/watch?v=VPDVq892DzE",
+    "youtubeVideoId": "VPDVq892DzE",
+    "language": "en", "applicationId": "illustrator",
+    "topics": ["basics", "vector", "shapes", "pen tool", "typography", "export"],
+    "level": "beginner", "durationMinutes": 246, "publishedAt": "2026-01-06", "versionLabel": "Illustrator 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "illustrator-2025-beginner-en",
+    "title": { "en": "Adobe Illustrator Beginner Tutorial 2025", "vi": "Illustrator 2025 cho người mới" },
+    "creator": "Will Paterson",
+    "url": "https://www.youtube.com/watch?v=h7komjsQq50",
+    "youtubeVideoId": "h7komjsQq50",
+    "language": "en", "applicationId": "illustrator",
+    "topics": ["basics", "vector", "shapes", "illustration", "workspace"],
+    "level": "beginner", "durationMinutes": 70, "publishedAt": "2025-05-08", "versionLabel": "Illustrator 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "illustrator-pen-tool-en",
+    "title": { "en": "Master the Pen Tool in Illustrator", "vi": "Làm chủ công cụ Pen trong Illustrator" },
+    "creator": "Andy Tells Things",
+    "url": "https://www.youtube.com/watch?v=Rk-JGsriJ4o",
+    "youtubeVideoId": "Rk-JGsriJ4o",
+    "language": "en", "applicationId": "illustrator",
+    "topics": ["pen tool", "paths", "vector", "drawing", "bezier"],
+    "level": "beginner", "durationMinutes": 15, "publishedAt": "2023-02-12", "versionLabel": "Quy trình Illustrator hiện hành", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "illustrator-2026-course-vi",
+    "title": { "en": "Learn Illustrator 2026 from A to Z", "vi": "Học Illustrator 2026 từ A đến Z" },
+    "creator": "DN Graphics",
+    "url": "https://www.youtube.com/watch?v=i64SdTw8bNU",
+    "youtubeVideoId": "i64SdTw8bNU",
+    "language": "vi", "applicationId": "illustrator",
+    "topics": ["basics", "vector", "shapes", "pen tool", "cơ bản", "đồ họa vector"],
+    "level": "beginner", "durationMinutes": 62, "publishedAt": "2025-07-26", "versionLabel": "Illustrator 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "illustrator-pen-tool-vi",
+    "title": { "en": "Master the Pen Tool in Illustrator 2025", "vi": "Làm chủ công cụ Pen trong Illustrator 2025" },
+    "creator": "BienVangDesign",
+    "url": "https://www.youtube.com/watch?v=oE7PIJ50fwM",
+    "youtubeVideoId": "oE7PIJ50fwM",
+    "language": "vi", "applicationId": "illustrator",
+    "topics": ["pen tool", "paths", "vector", "công cụ pen", "đường nét"],
+    "level": "beginner", "durationMinutes": 99, "publishedAt": "2025-10-25", "versionLabel": "Illustrator 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "illustrator-basics-vi",
+    "title": { "en": "Illustrator Basics in Ten Minutes", "vi": "Illustrator căn bản trong mười phút" },
+    "creator": "gwyn (Gia Nguyên)",
+    "url": "https://www.youtube.com/watch?v=ccOAR72-dXU",
+    "youtubeVideoId": "ccOAR72-dXU",
+    "language": "vi", "applicationId": "illustrator",
+    "topics": ["basics", "vector", "workspace", "illustration", "cơ bản", "giao diện"],
+    "level": "beginner", "durationMinutes": 11, "publishedAt": "2023-09-30", "versionLabel": "Quy trình Illustrator hiện hành", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "after-effects-2025-course-en",
+    "title": { "en": "After Effects Beginner to Pro: Full 2025 Guide", "vi": "After Effects từ cơ bản đến nâng cao: hướng dẫn 2025" },
+    "creator": "Thomas Woodcock",
+    "url": "https://www.youtube.com/watch?v=FgIovTjK59o",
+    "youtubeVideoId": "FgIovTjK59o",
+    "language": "en", "applicationId": "after-effects",
+    "topics": ["basics", "interface", "keyframes", "animation", "motion graphics", "export"],
+    "level": "beginner", "durationMinutes": 60, "publishedAt": "2025-01-29", "versionLabel": "After Effects 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "after-effects-graph-editor-en",
+    "title": { "en": "Graph Editor for Beginners", "vi": "Trình chỉnh đồ thị cho người mới" },
+    "creator": "MiddyAtif",
+    "url": "https://www.youtube.com/watch?v=FPy3BKdQElE",
+    "youtubeVideoId": "FPy3BKdQElE",
+    "language": "en", "applicationId": "after-effects",
+    "topics": ["graph editor", "easing", "keyframes", "animation", "timing"],
+    "level": "beginner", "durationMinutes": 13, "publishedAt": "2025-06-30", "versionLabel": "After Effects 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "after-effects-text-en",
+    "title": { "en": "Animate Text in After Effects", "vi": "Tạo chuyển động chữ trong After Effects" },
+    "creator": "Bricks",
+    "url": "https://www.youtube.com/watch?v=MpaGgpw9Qys",
+    "youtubeVideoId": "MpaGgpw9Qys",
+    "language": "en", "applicationId": "after-effects",
+    "topics": ["text animation", "motion graphics", "keyframes", "typography"],
+    "level": "beginner", "durationMinutes": 8, "publishedAt": "2025-02-21", "versionLabel": "After Effects 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "after-effects-2026-course-vi",
+    "title": { "en": "After Effects Is Not Difficult (2026)", "vi": "After Effects không khó: khóa học 2026" },
+    "creator": "DN Graphics",
+    "url": "https://www.youtube.com/watch?v=kaUePChHr5M",
+    "youtubeVideoId": "kaUePChHr5M",
+    "language": "vi", "applicationId": "after-effects",
+    "topics": ["basics", "keyframes", "animation", "effects", "cơ bản", "chuyển động"],
+    "level": "beginner", "durationMinutes": 102, "publishedAt": "2026-04-30", "versionLabel": "After Effects 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "after-effects-interface-2026-vi",
+    "title": { "en": "After Effects 2026: Interface and Import", "vi": "Tự học After Effects 2026: giao diện và nhập tư liệu" },
+    "creator": "DN Graphics",
+    "url": "https://www.youtube.com/watch?v=o9Yg4AwqJ1A",
+    "youtubeVideoId": "o9Yg4AwqJ1A",
+    "language": "vi", "applicationId": "after-effects",
+    "topics": ["basics", "workspace", "import", "interface", "giao diện", "nhập tư liệu"],
+    "level": "beginner", "durationMinutes": 6, "publishedAt": "2026-03-12", "versionLabel": "After Effects 2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "after-effects-text-vi",
+    "title": { "en": "Text Animation in After Effects 2025", "vi": "Tạo chuyển động chữ trong After Effects 2025" },
+    "creator": "Tự Học Edit",
+    "url": "https://www.youtube.com/watch?v=GIhFQD2mUOI",
+    "youtubeVideoId": "GIhFQD2mUOI",
+    "language": "vi", "applicationId": "after-effects",
+    "topics": ["text animation", "motion graphics", "keyframes", "chuyển động chữ", "khung hình chính"],
+    "level": "beginner", "durationMinutes": 27, "publishedAt": "2025-05-23", "versionLabel": "After Effects 2025–2026", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "davinci-21-course-en",
+    "title": { "en": "Making Videos in DaVinci Resolve 21", "vi": "Làm video với DaVinci Resolve 21" },
+    "creator": "Casey Faris",
+    "url": "https://www.youtube.com/watch?v=gjxiH2Tm4JE",
+    "youtubeVideoId": "gjxiH2Tm4JE",
+    "language": "en", "applicationId": "davinci-resolve",
+    "topics": ["basics", "editing", "timeline", "audio", "color", "delivery"],
+    "level": "beginner", "durationMinutes": 85, "publishedAt": "2026-05-28", "versionLabel": "DaVinci Resolve 21", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "davinci-color-en",
+    "title": { "en": "Color Grade in DaVinci Resolve for Beginners", "vi": "Chỉnh màu trong DaVinci Resolve cho người mới" },
+    "creator": "Think Media",
+    "url": "https://www.youtube.com/watch?v=jK_nYq4ZpgY",
+    "youtubeVideoId": "jK_nYq4ZpgY",
+    "language": "en", "applicationId": "davinci-resolve",
+    "topics": ["color", "color grading", "exposure", "white balance", "matching"],
+    "level": "beginner", "durationMinutes": 16, "publishedAt": "2025-10-06", "versionLabel": "DaVinci Resolve 20–21", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "davinci-fairlight-en",
+    "title": { "en": "Fairlight Audio Effects in DaVinci Resolve", "vi": "Hiệu ứng âm thanh Fairlight trong DaVinci Resolve" },
+    "creator": "Tedd's Tutorials",
+    "url": "https://www.youtube.com/watch?v=6Sesbc0tTU0",
+    "youtubeVideoId": "6Sesbc0tTU0",
+    "language": "en", "applicationId": "davinci-resolve",
+    "topics": ["audio", "sound editing", "mixing", "fairlight", "noise"],
+    "level": "beginner", "durationMinutes": 5, "publishedAt": "2026-03-26", "versionLabel": "DaVinci Resolve 20–21", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "davinci-21-course-vi",
+    "title": { "en": "DaVinci Resolve 21 for Beginners", "vi": "DaVinci Resolve 21 cho người mới" },
+    "creator": "Justin Vo",
+    "url": "https://www.youtube.com/watch?v=BM8iC2hlC28",
+    "youtubeVideoId": "BM8iC2hlC28",
+    "language": "vi", "applicationId": "davinci-resolve",
+    "topics": ["basics", "editing", "timeline", "delivery", "cơ bản", "dựng phim", "xuất video"],
+    "level": "beginner", "durationMinutes": 46, "publishedAt": "2026-07-04", "versionLabel": "DaVinci Resolve 21", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "davinci-2026-course-vi",
+    "title": { "en": "Complete DaVinci Resolve Course for Beginners 2026", "vi": "Khóa DaVinci Resolve đầy đủ cho người mới 2026" },
+    "creator": "khoa 🌊",
+    "url": "https://www.youtube.com/watch?v=jgDqBe1opL8",
+    "youtubeVideoId": "jgDqBe1opL8",
+    "language": "vi", "applicationId": "davinci-resolve",
+    "topics": ["basics", "editing", "timeline", "audio", "color", "dựng phim", "âm thanh", "màu"],
+    "level": "beginner", "durationMinutes": 19, "publishedAt": "2025-12-26", "versionLabel": "DaVinci Resolve 20–21", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+  {
+    "id": "davinci-color-vi",
+    "title": { "en": "Color Grading with DaVinci Resolve", "vi": "Chỉnh màu bằng DaVinci Resolve" },
+    "creator": "Mean Tính",
+    "url": "https://www.youtube.com/watch?v=PDLRea610Mg",
+    "youtubeVideoId": "PDLRea610Mg",
+    "language": "vi", "applicationId": "davinci-resolve",
+    "topics": ["color", "color grading", "exposure", "white balance", "chỉnh màu", "độ phơi sáng", "cân bằng trắng"],
+    "level": "beginner", "durationMinutes": 14, "publishedAt": "2024-07-19", "versionLabel": "Quy trình Resolve hiện hành", "verifiedAt": "2026-08-02", "sourceType": "video"
+  },
+
+  {
+    "id": "premiere-2026-course-en",
+    "title": { "en": "How to Edit a Video in Adobe Premiere 2026", "vi": "Cách dựng video trong Adobe Premiere 2026" },
+    "creator": "Think Media",
+    "url": "https://www.youtube.com/watch?v=BeH1I5n-798",
+    "youtubeVideoId": "BeH1I5n-798",
+    "language": "en", "applicationId": "premiere-pro",
+    "topics": ["basics", "video editing", "timeline", "trimming", "audio", "delivery", "cơ bản", "dựng video", "dòng thời gian"],
+    "level": "beginner", "durationMinutes": 40, "publishedAt": "2025-03-28", "versionLabel": "Premiere Pro 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "premiere-tools-2026-en",
+    "title": { "en": "Useful Premiere Pro Tools: Editing, Audio and Export", "vi": "Các công cụ Premiere Pro hữu ích: dựng, âm thanh và xuất video" },
+    "creator": "kalikafx",
+    "url": "https://www.youtube.com/watch?v=7mmG1uwMwSA",
+    "youtubeVideoId": "7mmG1uwMwSA",
+    "language": "en", "applicationId": "premiere-pro",
+    "topics": ["workspace", "editing", "audio", "export", "tools", "giao diện", "dựng phim", "âm thanh", "xuất video"],
+    "level": "beginner", "durationMinutes": 26, "publishedAt": "2025-12-04", "versionLabel": "Premiere Pro 2025–2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "premiere-export-2026-en",
+    "title": { "en": "Best Premiere Pro Export Settings for 2026", "vi": "Thiết lập xuất video tốt nhất trong Premiere Pro 2026" },
+    "creator": "John The Video Guy",
+    "url": "https://www.youtube.com/watch?v=HifzbWOKyN4",
+    "youtubeVideoId": "HifzbWOKyN4",
+    "language": "en", "applicationId": "premiere-pro",
+    "topics": ["export", "delivery", "codec", "bitrate", "youtube", "xuất video", "định dạng", "nộp bài"],
+    "level": "beginner", "durationMinutes": 6, "publishedAt": "2025-12-29", "versionLabel": "Premiere Pro 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "premiere-2025-course-vi",
+    "title": { "en": "Learn Premiere Pro 2025 Quickly at Home", "vi": "Học nhanh Premiere Pro 2025 tại nhà" },
+    "creator": "Mean Tính",
+    "url": "https://www.youtube.com/watch?v=6gM9KYAzCF8",
+    "youtubeVideoId": "6gM9KYAzCF8",
+    "language": "vi", "applicationId": "premiere-pro",
+    "topics": ["basics", "editing", "timeline", "trimming", "cơ bản", "dựng phim", "dòng thời gian", "cắt ghép"],
+    "level": "beginner", "durationMinutes": 18, "publishedAt": "2024-01-26", "versionLabel": "Premiere Pro 2025 workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "premiere-editing-course-vi",
+    "title": { "en": "Fast Professional Video Editing Skills for Beginners", "vi": "Kỹ năng dựng video cấp tốc cho người mới" },
+    "creator": "Quạ HD",
+    "url": "https://www.youtube.com/watch?v=CQiUozssQao",
+    "youtubeVideoId": "CQiUozssQao",
+    "language": "vi", "applicationId": "premiere-pro",
+    "topics": ["editing", "cuts", "effects", "audio", "workflow", "dựng video", "cắt ghép", "hiệu ứng", "âm thanh"],
+    "level": "beginner", "durationMinutes": 31, "publishedAt": "2024-10-07", "versionLabel": "Premiere Pro core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "premiere-subject-isolation-vi",
+    "title": { "en": "Automatically Isolate a Person in Premiere Pro 2026", "vi": "Tự động tách người trong Premiere Pro 2026" },
+    "creator": "Tú Thanh Blog",
+    "url": "https://www.youtube.com/watch?v=xhoXkC7DuE4",
+    "youtubeVideoId": "xhoXkC7DuE4",
+    "language": "vi", "applicationId": "premiere-pro",
+    "topics": ["masking", "subject isolation", "effects", "compositing", "tách người", "mặt nạ", "hiệu ứng", "ghép hình"],
+    "level": "intermediate", "durationMinutes": 6, "publishedAt": "2026-01-28", "versionLabel": "Premiere Pro 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+
+  {
+    "id": "procreate-2026-course-en",
+    "title": { "en": "Learn Procreate Fast: A Guide for Beginners in 2026", "vi": "Học nhanh Procreate: hướng dẫn cho người mới 2026" },
+    "creator": "Brooke Glaser",
+    "url": "https://www.youtube.com/watch?v=QwtFYWczrXY",
+    "youtubeVideoId": "QwtFYWczrXY",
+    "language": "en", "applicationId": "procreate",
+    "topics": ["basics", "brushes", "layers", "color", "selection", "export", "cơ bản", "cọ vẽ", "lớp", "màu"],
+    "level": "beginner", "durationMinutes": 25, "publishedAt": "2025-02-12", "versionLabel": "Procreate 2025–2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "procreate-fundamentals-en",
+    "title": { "en": "Procreate Beginners Series: The Fundamentals", "vi": "Procreate cho người mới: kiến thức nền tảng" },
+    "creator": "Procreate",
+    "url": "https://www.youtube.com/watch?v=Vn8bj0YpZg4",
+    "youtubeVideoId": "Vn8bj0YpZg4",
+    "language": "en", "applicationId": "procreate",
+    "topics": ["fundamentals", "canvas", "gestures", "brushes", "layers", "drawing", "nền tảng", "khung vẽ", "cọ vẽ", "lớp"],
+    "level": "beginner", "durationMinutes": 16, "publishedAt": "2022-07-25", "versionLabel": "Procreate core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "procreate-animation-en",
+    "title": { "en": "Procreate Beginners Series: Actions and Animation", "vi": "Procreate cho người mới: thao tác và hoạt hình" },
+    "creator": "Procreate",
+    "url": "https://www.youtube.com/watch?v=Np97KSzgrCs",
+    "youtubeVideoId": "Np97KSzgrCs",
+    "language": "en", "applicationId": "procreate",
+    "topics": ["actions", "animation", "animation assist", "frames", "export", "hoạt hình", "chuyển động", "khung hình", "xuất video"],
+    "level": "beginner", "durationMinutes": 16, "publishedAt": "2022-07-25", "versionLabel": "Procreate core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "procreate-basics-vi",
+    "title": { "en": "Learn Basic Procreate Drawing for Beginners", "vi": "Tự học vẽ Procreate cơ bản cho người mới" },
+    "creator": "Limzim Art",
+    "url": "https://www.youtube.com/watch?v=RcFTcyhpNZM",
+    "youtubeVideoId": "RcFTcyhpNZM",
+    "language": "vi", "applicationId": "procreate",
+    "topics": ["basics", "drawing", "brushes", "layers", "color", "cơ bản", "vẽ", "cọ vẽ", "lớp", "màu"],
+    "level": "beginner", "durationMinutes": 61, "publishedAt": "2025-05-19", "versionLabel": "Procreate 2025–2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "procreate-2025-features-vi",
+    "title": { "en": "How to Use the New Procreate Version 2025", "vi": "Cách sử dụng phiên bản Procreate mới 2025" },
+    "creator": "Trần Chương",
+    "url": "https://www.youtube.com/watch?v=6SKnhIuEXyg",
+    "youtubeVideoId": "6SKnhIuEXyg",
+    "language": "vi", "applicationId": "procreate",
+    "topics": ["new features", "interface", "drawing", "tools", "tính năng mới", "giao diện", "vẽ", "công cụ"],
+    "level": "beginner", "durationMinutes": 17, "publishedAt": "2025-08-15", "versionLabel": "Procreate 2025", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "procreate-illustration-vi",
+    "title": { "en": "Design an Illustration in Procreate for Beginners", "vi": "Thiết kế hình minh họa bằng Procreate cho người mới" },
+    "creator": "Bình Trịnh TattooSupply",
+    "url": "https://www.youtube.com/watch?v=unDeUlaCgJ4",
+    "youtubeVideoId": "unDeUlaCgJ4",
+    "language": "vi", "applicationId": "procreate",
+    "topics": ["illustration", "sketching", "line art", "brushes", "minh họa", "phác thảo", "nét vẽ", "cọ vẽ"],
+    "level": "beginner", "durationMinutes": 14, "publishedAt": "2025-12-15", "versionLabel": "Procreate 2025–2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+
+  {
+    "id": "audacity-2026-course-en",
+    "title": { "en": "Audacity Step-by-Step Tutorial for Beginners 2026", "vi": "Hướng dẫn Audacity từng bước cho người mới 2026" },
+    "creator": "Master Editor",
+    "url": "https://www.youtube.com/watch?v=M_yQaxO_zcQ",
+    "youtubeVideoId": "M_yQaxO_zcQ",
+    "language": "en", "applicationId": "audacity",
+    "topics": ["basics", "recording", "editing", "mixing", "export", "cơ bản", "ghi âm", "chỉnh sửa", "phối âm"],
+    "level": "beginner", "durationMinutes": 16, "publishedAt": "2025-01-06", "versionLabel": "Audacity 3.7.x", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "audacity-audio-cleanup-en",
+    "title": { "en": "Make Your Audio Sound Good in Audacity 2026", "vi": "Làm âm thanh rõ và hay hơn trong Audacity 2026" },
+    "creator": "Master Editor",
+    "url": "https://www.youtube.com/watch?v=CXdiHyMUWYI",
+    "youtubeVideoId": "CXdiHyMUWYI",
+    "language": "en", "applicationId": "audacity",
+    "topics": ["audio cleanup", "voice", "equalization", "compression", "levels", "làm sạch âm thanh", "giọng nói", "cân bằng âm", "nén âm"],
+    "level": "beginner", "durationMinutes": 13, "publishedAt": "2026-01-16", "versionLabel": "Audacity 3.7.x", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "audacity-noise-reduction-en",
+    "title": { "en": "Audacity Noise Reduction: Step-by-Step Guide", "vi": "Khử tạp âm trong Audacity từng bước" },
+    "creator": "Tom Ward • Audio Instructor",
+    "url": "https://www.youtube.com/watch?v=eAo02yhQBgg",
+    "youtubeVideoId": "eAo02yhQBgg",
+    "language": "en", "applicationId": "audacity",
+    "topics": ["noise reduction", "background noise", "audio cleanup", "voice", "khử tạp âm", "tiếng ồn", "làm sạch âm thanh"],
+    "level": "beginner", "durationMinutes": 2, "publishedAt": "2025-10-02", "versionLabel": "Audacity 3.x", "verifiedAt": "2026-08-05", "sourceType": "video"
+  },
+  {
+    "id": "audacity-recording-vi",
+    "title": { "en": "Record and Edit Audio with Audacity", "vi": "Ghi âm và chỉnh âm bằng Audacity" },
+    "creator": "Kỹ Thuật Âm Thanh",
+    "url": "https://www.youtube.com/watch?v=ejF_I-FNJ_8",
+    "youtubeVideoId": "ejF_I-FNJ_8",
+    "language": "vi", "applicationId": "audacity",
+    "topics": ["recording", "editing", "audio", "export", "ghi âm", "chỉnh âm", "cắt ghép", "xuất tệp"],
+    "level": "beginner", "durationMinutes": 18, "publishedAt": "2024-04-08", "versionLabel": "Audacity 3.x core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "audacity-voice-polish-vi",
+    "title": { "en": "Polish a Voice Recording in Three Steps with Audacity", "vi": "Làm giọng thu chuyên nghiệp hơn trong ba bước với Audacity" },
+    "creator": "Yun9Bo",
+    "url": "https://www.youtube.com/watch?v=PRVI0VUvU78",
+    "youtubeVideoId": "PRVI0VUvU78",
+    "language": "vi", "applicationId": "audacity",
+    "topics": ["voice", "audio cleanup", "equalization", "compression", "giọng thu", "làm sạch âm thanh", "cân bằng âm", "nén âm"],
+    "level": "beginner", "durationMinutes": 3, "publishedAt": "2025-04-29", "versionLabel": "Audacity 3.x core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "audacity-noise-reduction-vi",
+    "title": { "en": "Simple Noise Reduction in Audacity", "vi": "Khử tạp âm đơn giản trong Audacity" },
+    "creator": "#podcastViet",
+    "url": "https://www.youtube.com/watch?v=xmi9VLTPNEw",
+    "youtubeVideoId": "xmi9VLTPNEw",
+    "language": "vi", "applicationId": "audacity",
+    "topics": ["noise reduction", "podcast", "voice", "audio cleanup", "khử tạp âm", "giọng nói", "làm sạch âm thanh"],
+    "level": "beginner", "durationMinutes": 4, "publishedAt": "2021-09-21", "versionLabel": "Audacity core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+
+  {
+    "id": "flstudio-2026-course-en",
+    "title": { "en": "FL Studio Complete Beginner Tutorial 2026", "vi": "Khóa FL Studio đầy đủ cho người mới 2026" },
+    "creator": "Memphy",
+    "url": "https://www.youtube.com/watch?v=J_FfaOSWPTY",
+    "youtubeVideoId": "J_FfaOSWPTY",
+    "language": "en", "applicationId": "fl-studio",
+    "topics": ["basics", "beat making", "piano roll", "playlist", "mixer", "export", "cơ bản", "làm beat", "phối khí", "xuất nhạc"],
+    "level": "beginner", "durationMinutes": 43, "publishedAt": "2026-03-15", "versionLabel": "FL Studio 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "flstudio-vocals-2026-en",
+    "title": { "en": "Record Vocals in FL Studio 2026", "vi": "Thu giọng hát trong FL Studio 2026" },
+    "creator": "Key WAV",
+    "url": "https://www.youtube.com/watch?v=oK2zr3kLyF4",
+    "youtubeVideoId": "oK2zr3kLyF4",
+    "language": "en", "applicationId": "fl-studio",
+    "topics": ["vocal recording", "audio recording", "mixer", "microphone", "thu giọng hát", "ghi âm", "bộ trộn", "micro"],
+    "level": "beginner", "durationMinutes": 6, "publishedAt": "2026-02-05", "versionLabel": "FL Studio 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "flstudio-whats-new-2026-en",
+    "title": { "en": "What's New in FL Studio 2026", "vi": "Các tính năng mới trong FL Studio 2026" },
+    "creator": "FL Studio",
+    "url": "https://www.youtube.com/watch?v=IvJ1EAs8Sxw",
+    "youtubeVideoId": "IvJ1EAs8Sxw",
+    "language": "en", "applicationId": "fl-studio",
+    "topics": ["new features", "workflow", "mixer", "plugins", "tính năng mới", "quy trình", "bộ trộn", "trình cắm"],
+    "level": "intermediate", "durationMinutes": 20, "publishedAt": "2026-07-09", "versionLabel": "FL Studio 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "flstudio-vinahouse-2026-vi",
+    "title": { "en": "Make a Vina House Track in FL Studio 2026", "vi": "Làm một bản Vina House bằng FL Studio 2026" },
+    "creator": "Tự Học Làm Nhạc (FL Studio)",
+    "url": "https://www.youtube.com/watch?v=AOj-MWb8xEE",
+    "youtubeVideoId": "AOj-MWb8xEE",
+    "language": "vi", "applicationId": "fl-studio",
+    "topics": ["beat making", "arrangement", "mixing", "music production", "làm beat", "phối khí", "phối âm", "sản xuất âm nhạc"],
+    "level": "beginner", "durationMinutes": 124, "publishedAt": "2026-04-26", "versionLabel": "FL Studio 2026", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "flstudio-trap-beat-vi",
+    "title": { "en": "Make a Trap Hip-Hop Beat in FL Studio", "vi": "Làm beat Trap Hip-Hop trong FL Studio" },
+    "creator": "KICK Academy",
+    "url": "https://www.youtube.com/watch?v=EjXOrmzIp90",
+    "youtubeVideoId": "EjXOrmzIp90",
+    "language": "vi", "applicationId": "fl-studio",
+    "topics": ["beat making", "trap", "hip hop", "arrangement", "mixing", "làm beat", "phối khí", "phối âm"],
+    "level": "beginner", "durationMinutes": 82, "publishedAt": "2025-01-01", "versionLabel": "FL Studio 2025–2026 workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  },
+  {
+    "id": "flstudio-recording-vi",
+    "title": { "en": "Record Vocals in FL Studio in Five Minutes", "vi": "Thu âm trong FL Studio trong năm phút" },
+    "creator": "KICK Academy",
+    "url": "https://www.youtube.com/watch?v=PeQ7Efyf3Sg",
+    "youtubeVideoId": "PeQ7Efyf3Sg",
+    "language": "vi", "applicationId": "fl-studio",
+    "topics": ["vocal recording", "audio recording", "mixer", "microphone", "thu âm", "giọng hát", "bộ trộn", "micro"],
+    "level": "beginner", "durationMinutes": 5, "publishedAt": "2022-08-08", "versionLabel": "FL Studio core workflow", "verifiedAt": "2026-08-03", "sourceType": "video"
+  }
+]
