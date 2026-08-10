@@ -18,7 +18,6 @@ interface ProjectBriefFormProps {
   t: Translation;
   onChange: (value: RoadmapRequest) => void;
   onSubmit: (value: RoadmapRequest) => void;
-  demoMode: boolean;
   isSubmitting: boolean;
 }
 
@@ -27,7 +26,6 @@ export function ProjectBriefForm({
   t,
   onChange,
   onSubmit,
-  demoMode,
   isSubmitting,
 }: ProjectBriefFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -93,15 +91,6 @@ export function ProjectBriefForm({
         <p className="eyebrow">{t.form.eyebrow}</p>
         <h2 id="form-title">{t.form.title}</h2>
         <p>{t.form.intro}</p>
-        {demoMode && (
-          <div className="form-note">
-            <span className="asterisk" aria-hidden="true">✦</span>
-            <div>
-              <strong>{t.form.demoBadge}</strong>
-              <p>{t.form.demoDescription}</p>
-            </div>
-          </div>
-        )}
       </div>
 
       <form className="project-form" onSubmit={submit} noValidate>

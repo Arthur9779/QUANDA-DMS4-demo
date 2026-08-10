@@ -51,8 +51,6 @@ export interface Translation {
     outputType: string;
     targetQuality: string;
     submit: string;
-    demoBadge: string;
-    demoDescription: string;
     availableStudyTime: string;
     privacy: string;
     errorsTitle: string;
@@ -214,9 +212,6 @@ const en: Translation = {
     outputType: "Desired output type",
     targetQuality: "Target quality",
     submit: "Generate my roadmap",
-    demoBadge: "Demo mode",
-    demoDescription:
-      "No API key is configured, so QUANDA will use a dependable sample roadmap.",
     availableStudyTime: "Available study time",
     privacy: "Your brief is used only to create this roadmap.",
     errorsTitle: "Please review these details",
@@ -418,9 +413,6 @@ const vi: Translation = {
     outputType: "Loại sản phẩm mong muốn",
     targetQuality: "Mức chất lượng",
     submit: "Tạo lộ trình cho tôi",
-    demoBadge: "Chế độ demo",
-    demoDescription:
-      "Chưa cấu hình API key, vì vậy QUANDA sẽ dùng lộ trình mẫu đáng tin cậy.",
     availableStudyTime: "Thời gian học hiện có",
     privacy: "Đề bài chỉ được dùng để tạo lộ trình này.",
     errorsTitle: "Vui lòng kiểm tra các thông tin sau",

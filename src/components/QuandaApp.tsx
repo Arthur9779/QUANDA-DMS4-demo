@@ -58,11 +58,7 @@ function emptyForm(locale: Locale): RoadmapRequest {
   };
 }
 
-interface QuandaAppProps {
-  demoMode: boolean;
-}
-
-export function QuandaApp({ demoMode }: QuandaAppProps) {
+export function QuandaApp() {
   const [locale, setLocale] = useState<Locale>("en");
   const [form, setForm] = useState<RoadmapRequest>(() => emptyForm("en"));
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
@@ -378,7 +374,6 @@ export function QuandaApp({ demoMode }: QuandaAppProps) {
         </section>
 
         <ProjectBriefForm
-          demoMode={demoMode}
           isSubmitting={isLoading || !isHydrated}
           onChange={setForm}
           onSubmit={generateRoadmap}
