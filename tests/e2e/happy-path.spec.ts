@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo) => {
   await page.goto("/");
 
+  await expect(
+    page.getByText("No API key is configured, so QUANDA will use a dependable sample roadmap."),
+  ).toHaveCount(0);
+
   await expect(page.locator(".hero")).toHaveCSS(
     "background-image",
     /hero-vector-garden\.svg/,
@@ -33,6 +37,9 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   await expect(page.locator(".tutorial-card").first()).toBeVisible();
 
   await page.getByRole("button", { name: "VI", exact: true }).click();
+  await expect(
+    page.getByText("Chưa cấu hình API key, vì vậy QUANDA sẽ dùng lộ trình mẫu đáng tin cậy."),
+  ).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Lộ trình làm hoạt hình sản phẩm 20 giây" }),
   ).toBeVisible();
