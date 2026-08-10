@@ -92,4 +92,33 @@ describe("application-aware roadmaps", () => {
     expect(roadmap.stages.flatMap((roadmapStage) => roadmapStage.tutorialIds))
       .toEqual([]);
   });
+
+  it("restores an explicit custom application name if the AI omits its internal prefix", () => {
+    const customApplicationId = createCustomApplicationId("Visual Studio Code");
+    const request = {
+      ...illustratorRequest(),
+      projectBrief:
+        "Build and test a small TypeScript web application in Visual Studio Code.",
+      currentExperience: "Beginner with TypeScript and Visual Studio Code",
+      requiredApplications: [customApplicationId],
+      outputType: "other" as const,
+    };
+    const fallback = createSampleRoadmap(request);
+    const malformed = {
+      ...fallback,
+      stages: fallback.stages.map((roadmapStage, index) =>
+        index === 0
+          ? { ...roadmapStage, applicationId: "Visual Studio Code" }
+          : roadmapStage,
+      ),
+    };
+
+    const normalized = normalizeRoadmap(malformed, request);
+    expect(normalized.stages[0].applicationId).toBe(customApplicationId);
+    expect(getApplicationName(normalized.stages[0].applicationId!)).toBe(
+      "Visual Studio Code",
+    );
+    expect(normalized.stages.flatMap((roadmapStage) => roadmapStage.tutorialIds))
+      .toEqual([]);
+  });
 });

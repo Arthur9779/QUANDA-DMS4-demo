@@ -417,6 +417,7 @@ export function QuandaApp({ demoMode }: QuandaAppProps) {
             }}
             onToggleStage={toggleStage}
             roadmap={roadmap}
+            roadmapRequest={form}
             t={t}
             tutorialLanguage={form.tutorialLanguage}
           />

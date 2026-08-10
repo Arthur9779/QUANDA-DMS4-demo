@@ -255,8 +255,11 @@ export function ProjectBriefForm({
           </div>
         </div>
 
-        <fieldset>
+        <fieldset aria-describedby="application-support-copy">
           <legend>{t.form.applications} <small>{t.form.optional}</small></legend>
+          <p className="application-support-copy" id="application-support-copy">
+            {t.form.applicationSupportCopy}
+          </p>
           <label className="check-pill">
             <input
               checked={value.requiredApplications.length === 0 && !otherApplicationActive}

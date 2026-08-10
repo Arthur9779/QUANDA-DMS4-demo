@@ -1,4 +1,9 @@
-import { applications, isSupportedApplicationId } from "@/src/data/applications";
+import {
+  applications,
+  getApplicationName,
+  isCustomApplicationId,
+  isSupportedApplicationId,
+} from "@/src/data/applications";
 import {
   calculateAvailableMinutes,
   getDaysRemaining,
@@ -12,6 +17,23 @@ import {
 import type { RoadmapRequest, RoadmapResponse } from "@/src/types";
 
 const applicationIds = new Set(applications.map((application) => application.id));
+
+function resolveAllowedApplicationId(
+  applicationId: string | null,
+  allowedApplicationIds: Set<string>,
+): string | null {
+  if (!applicationId) return null;
+  if (allowedApplicationIds.has(applicationId)) return applicationId;
+
+  const normalizedName = applicationId.trim().toLocaleLowerCase();
+  return (
+    [...allowedApplicationIds].find(
+      (allowedId) =>
+        isCustomApplicationId(allowedId) &&
+        getApplicationName(allowedId).toLocaleLowerCase() === normalizedName,
+    ) ?? null
+  );
+}
 
 export function normalizeRoadmap(
   roadmap: RoadmapResponse,
@@ -36,10 +58,10 @@ export function normalizeRoadmap(
       ...stage,
       id,
       order: index + 1,
-      applicationId:
-        stage.applicationId && allowedApplicationIds.has(stage.applicationId)
-          ? stage.applicationId
-          : null,
+      applicationId: resolveAllowedApplicationId(
+        stage.applicationId,
+        allowedApplicationIds,
+      ),
       learningMinutes: Math.max(1, Math.round(stage.learningMinutes)),
       productionMinutes: Math.max(1, Math.round(stage.productionMinutes)),
       dependsOnStageIds: [...new Set(validDependencies)],

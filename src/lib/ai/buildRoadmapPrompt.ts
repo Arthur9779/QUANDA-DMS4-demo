@@ -28,7 +28,7 @@ export function buildRoadmapPrompt({
   }));
 
   return `
-Build a deadline-aware creative project roadmap from the normalized input below.
+Build a deadline-aware project roadmap from the normalized input below. The project may use creative software, a coding environment, a game engine, a technical tool, or a custom application/platform.
 
 TARGET_LANGUAGE: ${languageName}
 DAYS_REMAINING: ${daysRemaining}
@@ -84,6 +84,7 @@ Validity rules:
 - Use positive, plausible minute estimates and keep learning separate from production.
 - The stage-time sum must approximately equal totalEstimatedMinutes.
 - When NORMALIZED_INPUT.requiredApplications is non-empty, use only those application IDs or null. Never substitute an unselected application.
+- Treat every custom: application ID as the user's real, explicitly chosen tool. Preserve its ID and displayed name exactly; never replace it with a better-known application.
 - When no application is required, use only IDs from SUPPORTED_APPLICATION_IDS when they are genuinely useful.
 - Explain an application's purpose in the stage goal or why text.
 - Dependencies may refer only to earlier stage IDs.

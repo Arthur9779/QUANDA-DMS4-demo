@@ -43,6 +43,7 @@ export interface Translation {
     daysPerWeek: string;
     tutorialLanguage: string;
     applications: string;
+    applicationSupportCopy: string;
     noApplication: string;
     otherApplication: string;
     otherApplicationLabel: string;
@@ -84,6 +85,11 @@ export interface Translation {
     dependencies: string;
     tutorials: string;
     noTutorial: string;
+    quandaGuide: string;
+    guideSteps: string;
+    guideDoneWhen: string;
+    guideChecks: string;
+    guideNoVideoNeeded: string;
     youtubeVideo: string;
     version: string;
     watchYoutube: string;
@@ -199,6 +205,8 @@ const en: Translation = {
     daysPerWeek: "Study days per week",
     tutorialLanguage: "Preferred tutorial language",
     applications: "Required application(s)",
+    applicationSupportCopy:
+      "Can’t find your tool? Choose ‘Other’ and enter any application, platform, coding environment, or software you need.",
     noApplication: "No required application",
     otherApplication: "Other",
     otherApplicationLabel: "Other application, tool, or platform",
@@ -257,6 +265,12 @@ const en: Translation = {
     dependencies: "Depends on",
     tutorials: "Tutorials",
     noTutorial: "No verified YouTube video matches this stage yet.",
+    quandaGuide: "QUANDA Guide",
+    guideSteps: "Practical steps",
+    guideDoneWhen: "Done when",
+    guideChecks: "Common checks",
+    guideNoVideoNeeded:
+      "This practical stage can be completed with the guide below; no video is required.",
     youtubeVideo: "YouTube video",
     version: "Software version",
     watchYoutube: "Watch on YouTube",
@@ -395,6 +409,8 @@ const vi: Translation = {
     daysPerWeek: "Số ngày học mỗi tuần",
     tutorialLanguage: "Ngôn ngữ video hướng dẫn ưu tiên",
     applications: "Ứng dụng bắt buộc",
+    applicationSupportCopy:
+      "Không thấy công cụ bạn cần? Chọn ‘Khác’ và nhập bất kỳ ứng dụng, nền tảng, môi trường lập trình hoặc phần mềm nào.",
     noApplication: "Không yêu cầu ứng dụng",
     otherApplication: "Khác",
     otherApplicationLabel: "Ứng dụng, công cụ hoặc nền tảng khác",
@@ -453,6 +469,12 @@ const vi: Translation = {
     dependencies: "Phụ thuộc",
     tutorials: "Video hướng dẫn",
     noTutorial: "Chưa có video YouTube đã xác minh phù hợp với giai đoạn này.",
+    quandaGuide: "Hướng dẫn QUANDA",
+    guideSteps: "Các bước thực hiện",
+    guideDoneWhen: "Hoàn thành khi",
+    guideChecks: "Điểm cần kiểm tra",
+    guideNoVideoNeeded:
+      "Giai đoạn thực hành này có thể hoàn thành theo hướng dẫn dưới đây; không bắt buộc có video.",
     youtubeVideo: "Video YouTube",
     version: "Phiên bản phần mềm",
     watchYoutube: "Xem trên YouTube",
