@@ -30,6 +30,7 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
 
   await expect(page.locator("#roadmap-results")).toBeVisible();
   await expect(page.locator(".stage-card")).toHaveCount(8);
+  await expect(page.locator(".tutorial-card").first()).toBeVisible();
 
   await page.getByRole("button", { name: "VI", exact: true }).click();
   await expect(
@@ -54,4 +55,69 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   await expect(page.getByTestId("stage-completion").first()).toBeChecked();
   await expect(page.getByRole("button", { name: "Tạo lại" })).toBeVisible();
   await expect(page.getByTestId("project-calendar")).toBeVisible();
+});
+
+test("preserves a custom coding environment and supplies guides without unrelated videos", async ({
+  page,
+}) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+  page.on("pageerror", (error) => consoleErrors.push(error.message));
+
+  await page.goto("/");
+  await expect(page.getByText(
+    "Can’t find your tool? Choose ‘Other’ and enter any application, platform, coding environment, or software you need.",
+  )).toBeVisible();
+
+  await page.getByLabel("Project brief").fill(
+    "Build a small TypeScript sign-in page with validation, tests, and a verified production build for a class project.",
+  );
+  await page.getByLabel("Current experience").fill(
+    "Complete beginner with TypeScript and Visual Studio Code",
+  );
+  const applicationsFieldset = page.getByRole("group", {
+    name: /Required application\(s\)/,
+  });
+  await applicationsFieldset.getByLabel("Other", { exact: true }).check();
+  await page.getByLabel("Other application, tool, or platform").fill(
+    "Visual Studio Code",
+  );
+  await page.getByLabel("Desired output type").selectOption("other");
+  await page.getByRole("button", { name: "Generate my roadmap" }).click();
+
+  await expect(page.locator("#roadmap-results")).toBeVisible();
+  await expect(page.getByTestId("quanda-guide").first()).toBeVisible();
+  await expect(page.locator('[data-guide-kind="coding"]').first()).toBeVisible();
+  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
+    .toBeVisible();
+  await expect(page.locator(".tutorial-card")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Watch on YouTube" })).toHaveCount(0);
+
+  const proceduralGuide = page.locator('[data-guide-kind="procedural"]').first();
+  await expect(proceduralGuide).toBeVisible();
+  await expect(proceduralGuide.getByTestId("tutorial-status")).toContainText(
+    "no video is required",
+  );
+
+  await page.getByRole("button", { name: "VI", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Hướng dẫn QUANDA" }).first())
+    .toBeVisible();
+  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
+    .toBeVisible();
+  await expect(page.locator(".tutorial-card")).toHaveCount(0);
+
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Hướng dẫn QUANDA" }).first())
+    .toBeVisible();
+  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
+    .toBeVisible();
+
+  const layout = await page.evaluate(() => ({
+    width: window.innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(layout.scrollWidth).toBe(layout.width);
+  expect(consoleErrors).toEqual([]);
 });

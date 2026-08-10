@@ -1,7 +1,7 @@
 export interface ApplicationDefinition {
   id: string;
   name: string;
-  category: "3d" | "graphics" | "video" | "uiux" | "audio" | "drawing";
+  category: "3d" | "graphics" | "video" | "uiux" | "audio" | "drawing" | "custom";
   commonUses: string[];
   commonExportFormats: string[];
 }
@@ -112,8 +112,8 @@ export function getApplicationDefinition(id: string): ApplicationDefinition | nu
   return {
     id,
     name: getApplicationName(id),
-    category: "graphics",
-    commonUses: ["core workflow", "project production"],
+    category: "custom",
+    commonUses: ["custom workflow", "project production"],
     commonExportFormats: [],
   };
 }

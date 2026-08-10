@@ -6,12 +6,15 @@ import type { RoadmapStage } from "@/src/types";
 import type { TutorialRecommendation } from "@/src/lib/tutorialMatcher";
 import { TutorialCard } from "./TutorialCard";
 import { getApplicationName } from "@/src/data/applications";
+import type { QuandaGuide } from "@/src/lib/quandaGuide";
+import { QuandaGuideCard } from "./QuandaGuideCard";
 
 interface RoadmapStageCardProps {
   stage: RoadmapStage;
   isComplete: boolean;
   t: Translation;
   tutorials: TutorialRecommendation[];
+  guide: QuandaGuide | null;
   onToggle: () => void;
 }
 
@@ -20,6 +23,7 @@ export function RoadmapStageCard({
   isComplete,
   t,
   tutorials,
+  guide,
   onToggle,
 }: RoadmapStageCardProps) {
   if (isComplete) {
@@ -119,13 +123,15 @@ export function RoadmapStageCard({
             )}
           </div>
           <div className="tutorial-list">
-            <h4>{t.results.tutorials}</h4>
             {tutorials.length > 0 ? (
-              tutorials.map((tutorial) => (
-                <TutorialCard key={tutorial.id} t={t} tutorial={tutorial} />
-              ))
+              <>
+                <h4>{t.results.tutorials}</h4>
+                {tutorials.map((tutorial) => (
+                  <TutorialCard key={tutorial.id} t={t} tutorial={tutorial} />
+                ))}
+              </>
             ) : (
-              <p className="no-tutorial">{t.results.noTutorial}</p>
+              guide && <QuandaGuideCard guide={guide} stageId={stage.id} t={t} />
             )}
           </div>
         </div>

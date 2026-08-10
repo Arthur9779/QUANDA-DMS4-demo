@@ -2,13 +2,15 @@
 
 import { ArrowLeft, Clock3, RotateCcw, Sprout, Trash2 } from "lucide-react";
 import type { Translation } from "@/src/i18n/translations";
-import type { RoadmapResponse, TutorialLanguage } from "@/src/types";
+import type { RoadmapRequest, RoadmapResponse, TutorialLanguage } from "@/src/types";
 import { FeasibilityCard } from "./FeasibilityCard";
 import { RoadmapStageCard } from "./RoadmapStageCard";
 import { resolveRoadmapTutorialRecommendations } from "@/src/lib/tutorialMatcher";
+import { createQuandaGuide } from "@/src/lib/quandaGuide";
 
 interface RoadmapResultsProps {
   roadmap: RoadmapResponse;
+  roadmapRequest: RoadmapRequest;
   completedStageIds: string[];
   t: Translation;
   tutorialLanguage: TutorialLanguage;
@@ -28,6 +30,7 @@ function formatTotal(minutes: number, t: Translation) {
 
 export function RoadmapResults({
   roadmap,
+  roadmapRequest,
   completedStageIds,
   t,
   tutorialLanguage,
@@ -80,16 +83,28 @@ export function RoadmapResults({
       )}
 
       <div className="timeline" aria-label={t.results.eyebrow}>
-        {roadmap.stages.map((stage) => (
-          <RoadmapStageCard
-            isComplete={completedStageIds.includes(stage.id)}
-            key={stage.id}
-            onToggle={() => onToggleStage(stage.id)}
-            stage={stage}
-            t={t}
-            tutorials={tutorialsByStage[stage.id] ?? []}
-          />
-        ))}
+        {roadmap.stages.map((stage) => {
+          const stageTutorials = tutorialsByStage[stage.id] ?? [];
+          return (
+            <RoadmapStageCard
+              guide={
+                stageTutorials.length === 0
+                  ? createQuandaGuide(
+                      stage,
+                      roadmapRequest,
+                      roadmapRequest.interfaceLanguage,
+                    )
+                  : null
+              }
+              isComplete={completedStageIds.includes(stage.id)}
+              key={stage.id}
+              onToggle={() => onToggleStage(stage.id)}
+              stage={stage}
+              t={t}
+              tutorials={stageTutorials}
+            />
+          );
+        })}
       </div>
 
       <div className="results-grid">
