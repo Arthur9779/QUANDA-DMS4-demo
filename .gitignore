@@ -8,6 +8,9 @@
 /public/app.js
 /public/original.css
 /public/styles.css
+/public/manifest.webmanifest
+/public/sw.js
 /public/assets/
 *.log
+/.codex-*.err
 .env*

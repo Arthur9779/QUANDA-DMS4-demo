@@ -7,7 +7,7 @@ const copy = {
     heroEyebrow: "A practical co-pilot for creative projects", heroLine1: "Make the", heroLine2: "deadline feel", heroAccent: "doable.",
     heroTagline: "From project brief to a practical learning path.",
     heroDescription: "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
-    planProject: "Plan my project", privacy: "No account needed · Your work stays on this device",
+    planProject: "Plan my project", installApp: "Install QUANDA", privacy: "No account needed · Your work stays on this device",
     howEyebrow: "How it works", howTitle: "From a blank page to a clear next step",
     step1Title: "Describe the project", step1Body: "Share the deliverable, what you know, and your deadline.",
     step2Title: "Receive a roadmap", step2Body: "Get a realistic sequence of learning and production tasks.",
@@ -28,7 +28,7 @@ const copy = {
     calendarIntro: "Select a day, add a task, and let the month hold the details. Everything is saved on this device.",
     today: "Today", previousMonth: "Previous month", nextMonth: "Next month", deadlineLegend: "Task deadline", dayPlan: "Day plan", taskLabel: "Task", addCalendar: "Add to calendar",
     emptyTasks: "No tasks yet. Add a small, concrete next step above.", clearDay: "A clear day — add something when you are ready.",
-    complete: "complete", of: "of", taskPlaceholder: "What needs to get done?",
+    complete: "complete", of: "of", taskPlaceholder: "What needs to get done?", deleteTask: "Delete task",
     briefPlaceholder: "For example: I need to create a 20-second product animation for a university assignment. The final output should be a 1080p MP4 with simple sound.",
     experiencePlaceholder: "Photoshop: intermediate; Blender: beginner",
     roadmapEyebrow: "Your production path", roadmapTitle: "Focused production roadmap",
@@ -39,7 +39,10 @@ const copy = {
     stage: "Stage", markComplete: "Mark stage complete", goal: "Goal", why: "Why it matters", application: "Application",
     skill: "Skill to learn", learning: "Learning", production: "Production", productionTasks: "Production tasks", resources: "Tutorials",
     noTutorial: "No verified YouTube video matches this stage yet.", watchYoutube: "Watch on YouTube", youtubeVideo: "YouTube video", softwareVersion: "Software version",
-    tailoredSearch: "Tailored search", searchYoutube: "Find matching tutorials", recommendationFor: "Matched to your profile", skillLevel: "Level",
+    quandaGuide: "QUANDA guide", guideSteps: "Steps to follow", completeWhen: "Complete when", checkBeforeContinue: "Check before continuing",
+    guideOpen: "Open the project, make a safe copy, and confirm the required output in", guidePractice: "Create a small test that applies", guideComplete: "Review the result in the selected application. Finish this stage when every task is checked and the stage goal is met:",
+    guideCheckGoal: "Compare each output with the stage goal before moving on.", guideCheckSource: "Keep the editable source file and save a separate review copy.", guideCheckChange: "Change one action or setting at a time, then check the result.",
+    tailoredSearch: "Tailored search", searchYoutube: "Find matching tutorials", recommendationFor: "Matched to your profile", verifiedTutorial: "Verified tutorial", skillLevel: "Level",
     schedule: "Suggested work blocks", assumptions: "Assumptions", scope: "Scope notes", priority: "High priority",
     editInput: "Edit input", regenerate: "Regenerate", startOver: "Start over",
   },
@@ -48,7 +51,7 @@ const copy = {
     heroEyebrow: "Trợ lý thực tế cho dự án sáng tạo", heroLine1: "Biến deadline", heroLine2: "thành", heroAccent: "điều khả thi.",
     heroTagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
     heroDescription: "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
-    planProject: "Lập kế hoạch dự án", privacy: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
+    planProject: "Lập kế hoạch dự án", installApp: "Cài đặt QUANDA", privacy: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
     howEyebrow: "Cách hoạt động", howTitle: "Từ trang giấy trắng đến bước tiếp theo rõ ràng",
     step1Title: "Mô tả dự án", step1Body: "Chia sẻ sản phẩm cần làm, kỹ năng hiện có và thời hạn.",
     step2Title: "Nhận lộ trình", step2Body: "Nhận chuỗi nhiệm vụ học tập và sản xuất thực tế.",
@@ -69,7 +72,7 @@ const copy = {
     calendarIntro: "Chọn một ngày, thêm công việc và để lịch tháng lưu giữ chi tiết. Mọi thứ được lưu trên thiết bị này.",
     today: "Hôm nay", previousMonth: "Tháng trước", nextMonth: "Tháng sau", deadlineLegend: "Hạn công việc", dayPlan: "Kế hoạch trong ngày", taskLabel: "Công việc", addCalendar: "Thêm vào lịch",
     emptyTasks: "Chưa có công việc. Hãy thêm một bước nhỏ và cụ thể ở trên.", clearDay: "Hôm nay còn trống — thêm việc khi bạn sẵn sàng.",
-    complete: "hoàn thành", of: "trên", taskPlaceholder: "Bạn cần hoàn thành việc gì?",
+    complete: "hoàn thành", of: "trên", taskPlaceholder: "Bạn cần hoàn thành việc gì?", deleteTask: "Xóa công việc",
     briefPlaceholder: "Ví dụ: Tôi cần làm video hoạt hình sản phẩm dài 20 giây cho bài tập đại học. Sản phẩm cuối là MP4 1080p có âm thanh đơn giản.",
     experiencePlaceholder: "Photoshop: trung cấp; Blender: mới bắt đầu",
     roadmapEyebrow: "Lộ trình sản xuất của bạn", roadmapTitle: "Lộ trình sản xuất tập trung",
@@ -80,7 +83,10 @@ const copy = {
     stage: "Giai đoạn", markComplete: "Đánh dấu giai đoạn hoàn thành", goal: "Mục tiêu", why: "Vì sao quan trọng", application: "Ứng dụng",
     skill: "Kỹ năng cần học", learning: "Học", production: "Sản xuất", productionTasks: "Nhiệm vụ sản xuất", resources: "Video hướng dẫn",
     noTutorial: "Chưa có video YouTube đã xác minh phù hợp với giai đoạn này.", watchYoutube: "Xem trên YouTube", youtubeVideo: "Video YouTube", softwareVersion: "Phiên bản phần mềm",
-    tailoredSearch: "Tìm kiếm cá nhân hóa", searchYoutube: "Tìm video phù hợp", recommendationFor: "Phù hợp với hồ sơ của bạn", skillLevel: "Trình độ",
+    quandaGuide: "Hướng dẫn QUANDA", guideSteps: "Các bước thực hiện", completeWhen: "Hoàn thành khi", checkBeforeContinue: "Điểm cần kiểm tra",
+    guideOpen: "Mở dự án, tạo một bản sao an toàn và xác nhận đầu ra cần thiết trong", guidePractice: "Tạo một bài thử nhỏ áp dụng", guideComplete: "Xem lại kết quả trong ứng dụng đã chọn. Hoàn thành giai đoạn khi mọi nhiệm vụ đã được kiểm tra và đạt mục tiêu:",
+    guideCheckGoal: "So sánh từng đầu ra với mục tiêu giai đoạn trước khi chuyển tiếp.", guideCheckSource: "Giữ tệp nguồn có thể chỉnh sửa và lưu một bản riêng để xem lại.", guideCheckChange: "Thay đổi từng thao tác hoặc thiết lập một, rồi kiểm tra kết quả.",
+    tailoredSearch: "Tìm kiếm cá nhân hóa", searchYoutube: "Tìm video phù hợp", recommendationFor: "Phù hợp với hồ sơ của bạn", verifiedTutorial: "Video đã xác minh", skillLevel: "Trình độ",
     schedule: "Buổi làm việc đề xuất", assumptions: "Giả định", scope: "Lưu ý về phạm vi", priority: "Ưu tiên cao",
     editInput: "Sửa thông tin", regenerate: "Tạo lại", startOver: "Bắt đầu lại",
   },
@@ -132,8 +138,42 @@ let visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1, 12);
 let selectedDate = new Date(today);
 let tasks = loadTasks();
 let generatedMilestones = [];
+let completedStages = new Set();
 
 const $ = (selector) => document.querySelector(selector);
+const installButton = $("#install-app");
+let deferredInstallPrompt = null;
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => {
+      // The website remains fully usable when service workers are unavailable.
+    });
+  });
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installButton.hidden = false;
+});
+
+installButton.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  installButton.disabled = true;
+  try {
+    await deferredInstallPrompt.prompt();
+  } finally {
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+    installButton.disabled = false;
+  }
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  installButton.hidden = true;
+});
 const planningForm = $("#planning-form");
 const brief = $("#projectBrief");
 const experience = $("#experience");
@@ -288,6 +328,7 @@ function applyLanguage(language) {
   Array.from($("#tutorialLength").options).forEach((option, index) => { option.textContent = lengthOptions[index]; });
   $("#prev-month").setAttribute("aria-label", copy[language].previousMonth);
   $("#next-month").setAttribute("aria-label", copy[language].nextMonth);
+  $("#load-example").setAttribute("aria-label", copy[language].loadExample);
   renderCalendar();
   renderTaskPanel();
   if (!results.hidden) {
@@ -348,6 +389,7 @@ planningForm.addEventListener("submit", (event) => {
   event.preventDefault();
   updateFormState();
   if (generateButton.disabled) return;
+  completedStages.clear();
   renderRoadmap();
   syncRoadmapMilestones();
   results.hidden = false;
@@ -373,7 +415,9 @@ function metricIcon(type) {
     ? ["M8 2v4", "M16 2v4", "M3 10h18", "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"]
     : type === "timer"
       ? ["M10 2h4", "M12 14l3-3", "M12 6a8 8 0 1 1-8 8 8 8 0 0 1 8-8"]
-      : ["M12 6v6h4", "M12 2a10 10 0 1 1-10 10A10 10 0 0 1 12 2"];
+      : type === "trash"
+        ? ["M3 6h18", "M8 6V4h8v2", "M19 6l-1 14H6L5 6", "M10 11v5", "M14 11v5"]
+        : ["M12 6v6h4", "M12 2a10 10 0 1 1-10 10A10 10 0 0 1 12 2"];
   paths.forEach((data) => { const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.setAttribute("d", data); svg.append(path); });
   return svg;
 }
@@ -387,7 +431,7 @@ function appendFact(list, label, value, iconType) {
   list.append(wrap);
 }
 
-function createTutorialCard(tutorial, application) {
+function createTutorialCard(tutorial, application, matchesProfile = true) {
   const c = copy[currentLanguage];
   const url = `https://www.youtube.com/watch?v=${tutorial.id}`;
   const tutorialCard = make("article", "tutorial-card");
@@ -398,7 +442,7 @@ function createTutorialCard(tutorial, application) {
   thumbnail.setAttribute("aria-label", `${c.watchYoutube}: ${tutorial.title}`);
   thumbnail.style.backgroundImage = `url("https://i.ytimg.com/vi/${tutorial.id}/hqdefault.jpg")`;
   const topLine = make("div", "tutorial-topline");
-  topLine.append(make("span", "source-badge badge-youtube", c.youtubeVideo), make("span", "match-badge", c.recommendationFor));
+  topLine.append(make("span", "source-badge badge-youtube", c.youtubeVideo), make("span", "match-badge", matchesProfile ? c.recommendationFor : c.verifiedTutorial));
   const details = make("dl");
   appendFact(details, c.application, application);
   appendFact(details, c.softwareVersion, tutorial.version);
@@ -437,6 +481,39 @@ function createTutorialSearchCard(application, stage) {
   searchLink.append(document.createTextNode(c.searchYoutube), make("span", "tutorial-link-icon", "↗"));
   card.append(visual, topLine, make("h5", "", `${application} · ${stage.skill}`), make("p", "", c.recommendationFor), details, searchLink);
   return card;
+}
+
+function createQuandaGuide(stage, applications) {
+  const c = copy[currentLanguage];
+  const applicationLabel = applications.join(", ");
+  const guide = make("section", "quanda-guide");
+  const notice = make("div", "quanda-guide-notice");
+  notice.append(make("span", "guide-status-icon", "✓"), make("span", "", c.noTutorial));
+
+  const body = make("div", "quanda-guide-body");
+  const main = make("div", "quanda-guide-main");
+  const title = make("div", "quanda-guide-title");
+  title.append(make("span", "guide-brand-icon", "✦"), make("h5", "", c.quandaGuide));
+  const steps = make("ol", "guide-steps");
+  [
+    `${c.guideOpen} ${applicationLabel}.`,
+    ...stage.tasks,
+    `${c.guidePractice} “${stage.skill}”.`,
+  ].slice(0, 4).forEach((step) => steps.append(make("li", "", step)));
+  main.append(title, make("p", "guide-label", c.guideSteps), steps);
+
+  const aside = make("div", "quanda-guide-aside");
+  const completion = make("section", "guide-card");
+  completion.append(make("h6", "", `✓ ${c.completeWhen}`), make("p", "", `${c.guideComplete} “${stage.goal}”.`));
+  const checkpoints = make("section", "guide-card");
+  checkpoints.append(make("h6", "", c.checkBeforeContinue));
+  const checkList = make("ul");
+  [c.guideCheckGoal, c.guideCheckSource, c.guideCheckChange].forEach((item) => checkList.append(make("li", "", item)));
+  checkpoints.append(checkList);
+  aside.append(completion, checkpoints);
+  body.append(main, aside);
+  guide.append(notice, body);
+  return guide;
 }
 
 function renderRoadmap() {
@@ -494,6 +571,13 @@ function renderRoadmap() {
     const completionInput = make("input");
     completionInput.type = "checkbox";
     completionInput.dataset.testid = "stage-completion";
+    completionInput.checked = completedStages.has(index);
+    completionInput.addEventListener("change", () => {
+      if (completionInput.checked) completedStages.add(index);
+      else completedStages.delete(index);
+      article.classList.toggle("is-complete", completionInput.checked);
+      article.classList.toggle("stage-card-collapsed", completionInput.checked);
+    });
     completionLabel.append(completionInput, make("span", "", "✓"), document.createTextNode(c.markComplete));
     stageHeading.append(stageTitle, completionLabel);
     const goals = make("div", "stage-goal");
@@ -516,14 +600,26 @@ function renderRoadmap() {
     const chosenApplications = selectedApplicationValues();
     const fallbackTopic = $("#outputType").options[$("#outputType").selectedIndex].textContent;
     const tutorialApplications = (chosenApplications.length ? chosenApplications : [fallbackTopic]).slice(0, 3);
-    tutorialApplications.forEach((application) => {
-      const matches = (tutorialCatalog[application]?.[index] || []).filter(tutorialMatchesPreferences);
-      if (matches.length) matches.forEach((tutorial) => tutorialList.append(createTutorialCard(tutorial, application)));
+    const tutorialMatches = tutorialApplications.map((application) => {
+      const verifiedTutorials = tutorialCatalog[application]?.[index] || [];
+      const preferredTutorials = verifiedTutorials.filter(tutorialMatchesPreferences);
+      return {
+        application,
+        hasVerifiedTutorials: verifiedTutorials.length > 0,
+        matchesProfile: preferredTutorials.length > 0,
+        matches: preferredTutorials.length ? preferredTutorials : verifiedTutorials,
+      };
+    });
+    if (!tutorialMatches.some(({ hasVerifiedTutorials }) => hasVerifiedTutorials)) tutorialList.append(createQuandaGuide(stage, tutorialApplications));
+    tutorialMatches.forEach(({ application, matches, matchesProfile }) => {
+      if (matches.length) matches.forEach((tutorial) => tutorialList.append(createTutorialCard(tutorial, application, matchesProfile)));
       else tutorialList.append(createTutorialSearchCard(application, stage));
     });
     lower.append(taskBlock, tutorialList);
     content.append(stageHeading, goals, facts, lower);
     article.append(rail, content);
+    article.classList.toggle("is-complete", completionInput.checked);
+    article.classList.toggle("stage-card-collapsed", completionInput.checked);
     timeline.append(article);
   });
 
@@ -568,6 +664,7 @@ function resetPlanning() {
   results.hidden = true;
   results.replaceChildren();
   generatedMilestones = [];
+  completedStages.clear();
   tasks = tasks.filter((task) => task.source !== "roadmap");
   saveTasks();
   renderCalendar();
@@ -660,7 +757,10 @@ function renderTaskPanel() {
     checkbox.addEventListener("change", () => { task.done = checkbox.checked; saveTasks(); renderCalendar(); renderTaskPanel(); });
     const taskCopy = make("div", "task-copy");
     taskCopy.append(make("strong", "", task.title), make("small", "", `${copy[currentLanguage].deadlineLabel}: ${new Intl.DateTimeFormat(locale(), { day: "numeric", month: "short" }).format(dateFromKey(task.deadline))}`));
-    const remove = make("button", "delete-task", "×"); remove.type = "button"; remove.setAttribute("aria-label", `Delete ${task.title}`);
+    const remove = make("button", "delete-task");
+    remove.type = "button";
+    remove.setAttribute("aria-label", `${c.deleteTask}: ${task.title}`);
+    remove.append(metricIcon("trash"));
     remove.addEventListener("click", () => { tasks = tasks.filter((candidate) => candidate.id !== task.id); saveTasks(); renderCalendar(); renderTaskPanel(); });
     item.append(checkbox, taskCopy, remove); taskListPanel.append(item);
   });
