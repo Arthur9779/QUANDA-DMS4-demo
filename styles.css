@@ -80,6 +80,30 @@ body { overflow-x: clip; }
 
 .skip-link:focus { transform: translateY(0); }
 
+.site-header nav .nav-calendar {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 253, 244, .75);
+  color: var(--ink);
+  font-size: .88rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: border-color .16s, background .16s, transform .16s;
+}
+
+.site-header nav .nav-calendar:hover {
+  border-color: var(--moss);
+  background: var(--green-soft);
+  transform: translateY(-1px);
+}
+
+.site-header nav .nav-calendar:focus-visible { outline: 3px solid #8bb4ff; outline-offset: 3px; }
+
 /* Keep the original hero typography and structure; only spacing and palette change. */
 .hero {
   position: relative;
@@ -228,6 +252,12 @@ body { overflow-x: clip; }
 .tutorial-thumbnail { margin: 0 -18px 16px; }
 .tutorial-play { display: none; }
 .source-badge { font-size: .62rem; }
+.match-badge {
+  color: var(--green);
+  font-size: .61rem;
+  font-weight: 800;
+  text-align: right;
+}
 .tutorial-card h5 { font-size: 1.1rem; font-weight: 600; }
 .tutorial-card > p { font-size: .9rem; font-weight: 400; }
 .tutorial-card dt { font-size: .76rem; font-weight: 400; }
@@ -262,6 +292,31 @@ footer { font-size: 1.29rem; }
   color: #9d342f;
   font-size: .75rem;
 }
+
+.fieldset-help {
+  max-width: 820px;
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.profile-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.remember-profile {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.remember-profile input { width: 18px; height: 18px; accent-color: var(--green); }
+.custom-application-field { margin-top: 18px; }
 
 .calendar-section {
   position: relative;
@@ -553,12 +608,29 @@ footer { font-size: 1.29rem; }
 
 .tutorial-empty { color: var(--muted); line-height: 1.6; }
 
+.tutorial-search-card { background: #edf0df; border-color: #aeba83; }
+
+.tutorial-search-visual {
+  min-height: 132px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  margin: 0 -18px 16px;
+  background: linear-gradient(135deg, #dce8cf, #eef1df);
+  color: var(--kombu);
+}
+
+.tutorial-search-visual span { font-family: Georgia, serif; font-size: 3.2rem; line-height: .8; }
+.tutorial-search-visual strong { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+
 @media (max-width: 1050px) {
   .hero { background-position: 64% center; }
   .calendar-app { grid-template-columns: 1fr; }
   .task-panel { display: grid; grid-template-columns: .75fr 1fr; gap: 24px; }
   .task-form { margin-top: 0; padding: 0; border-bottom: 0; }
   .task-list-panel { grid-column: 1 / -1; }
+  .profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 680px) {
@@ -567,6 +639,7 @@ footer { font-size: 1.29rem; }
   .form-section { width: auto; margin-left: 0; margin-right: 0; }
   .site-header nav { gap: 8px; }
   .site-header nav > a { display: none; }
+  .site-header nav .nav-calendar { display: inline-flex; min-height: 46px; padding-inline: 13px; }
   .site-header .button-secondary { width: 46px; min-width: 46px; padding: 0; }
   .site-header .button-secondary span { display: none; }
   .site-header .button-secondary svg { display: block; }
@@ -581,6 +654,9 @@ footer { font-size: 1.29rem; }
   .steps li p { font-size: 1.1rem; }
   .form-intro > p:not(.eyebrow) { font-size: 1.15rem; }
   .project-form { padding: 24px 17px; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .fieldset-help { font-size: .98rem; }
+  .remember-profile { font-size: .93rem; }
   .project-form .label-row label,
   .project-form .field > label,
   .project-form fieldset legend { font-size: 1.05rem; }
