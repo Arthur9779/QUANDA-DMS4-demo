@@ -21,6 +21,8 @@
     "eval:ontology": "tsx scripts/evaluate-ontology.ts",
     "eval:retrieval": "tsx scripts/evaluate-ontology-retrieval.ts",
     "eval:creative-dna": "tsx scripts/evaluate-creative-dna.ts",
+    "eval:tutorials": "tsx scripts/evaluate-tutorial-matching.ts",
+    "tutorial:match": "tsx scripts/match-tutorials.ts",
     "creative-dna": "tsx scripts/analyze-creative-dna.ts",
     "creative-dna:live": "tsx scripts/analyze-creative-dna.ts --live",
     "ontology:build": "tsx scripts/build-ontology.ts && pnpm ontology:search-documents:build",

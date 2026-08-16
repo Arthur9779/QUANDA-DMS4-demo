@@ -8,7 +8,10 @@ This document defines the shared contracts that the ontology compiler, Creative 
 | --- | --- | --- |
 | Creative DNA | `creativeDnaVersion` | `1` |
 | Ontology node and relationship | `ontologySchemaVersion` | `1` |
+| Skill gap | `skillGapVersion` | `1` |
+| Tutorial need | `tutorialNeedVersion` | `1` |
 | Tutorial metadata | `tutorialMetadataVersion` | `1` |
+| Tutorial classifier | `classifierVersion` | `1` |
 | Tutorial matching score | `tutorialMatchScoreVersion` | `1` |
 | Evaluation benchmark | `benchmarkVersion` | `1` |
 
@@ -64,7 +67,7 @@ The v1 score contract reserves normalized signals for required skill, applicatio
 
 Aesthetic similarity is a secondary bonus. It must never outweigh technical relevance. Broken links and direct topic conflicts may be configured as hard rejections.
 
-The score schema is a contract only. PR 5 will choose weights, calibrate thresholds, and implement ranking.
+PR 5 implements and versions the deterministic score in `src/tutorial-matching/ranking.ts`; see `docs/tutorial-matching.md` for the actual weights and penalties.
 
 ## Over-teaching
 
@@ -82,4 +85,4 @@ Human-labelled fixtures provide the initial signal. Later PRs may add duration, 
 
 ## Deferred work
 
-PRs 2–6 will add semantic retrieval, Creative DNA inference, review UI, live tutorial classification/ranking, and roadmap integration. No current Gemini prompt, tutorial recommendation, form, or roadmap behavior is changed by the ontology compiler.
+PR 6 will feed the confirmed learning plan into a project-oriented roadmap, separate learning from production time, and support later progress-aware replanning.
