@@ -6,12 +6,13 @@ The v1 benchmark provides deterministic fixtures for measuring tutorial accuracy
 
 `briefs.v1.json` contains 25 cases: 18 English and 7 Vietnamese cases. It covers 3D, animation, graphic design, branding, motion graphics, illustration, UI/UX, creative coding, audio, music, photography, filmmaking, interactive installation, traditional-media emulation, and cross-application workflows.
 
-Expected concepts use semantic labels until PR 1 supplies canonical ontology IDs. `acceptableAnyOf` supports genuinely ambiguous interpretations, and `preserveAsUnknown` identifies terms that should not be force-mapped.
+Expected concepts continue to use reviewable semantic labels. PR 1 can now map exact labels to canonical ontology IDs and report ambiguous or absent terms without guessing. `acceptableAnyOf` supports genuinely ambiguous interpretations, and `preserveAsUnknown` identifies terms that should not be force-mapped.
 
 ## Run
 
 ```bash
 pnpm eval
+pnpm eval:ontology
 ```
 
 Optional paths may be supplied:
@@ -20,7 +21,7 @@ Optional paths may be supplied:
 pnpm eval -- evals/briefs.v1.json evals/fixtures/naive-software-first.json
 ```
 
-The runner validates both files, requires one prediction for every benchmark case, computes metrics from the labelled predictions, and prints a summary. It never calls Gemini or an external tutorial provider.
+The main runner validates both files, requires one prediction for every benchmark case, computes metrics from the labelled predictions, and prints a summary. `eval:ontology` separately reports exact, ambiguous, and unknown mappings against the compiled ontology. Neither command calls Gemini or an external tutorial provider.
 
 ## Metrics
 

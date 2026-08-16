@@ -1,0 +1,5 @@
+# QUANDA malformed fixture
+Version: 1.0
+Purpose: Structural error coverage.
+
+- orphan concept
