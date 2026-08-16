@@ -42,6 +42,11 @@ Open `http://localhost:3000`.
 | `GEMINI_API_KEY` | No | Server-only Google AI Studio API key. With no key, QUANDA uses demo mode. |
 | `GEMINI_BASE_URL` | No | Gemini API endpoint. Defaults to Google's `v1beta` endpoint. |
 | `GEMINI_MODEL` | No | Model name. Defaults to `gemini-3.1-flash-lite`. |
+| `GEMINI_FILE_SEARCH_STORE` | For semantic retrieval | Indexed Gemini File Search store resource name. |
+| `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` | For semantic retrieval | Source hash of the ontology indexed in that store. |
+| `GEMINI_FILE_SEARCH_EMBEDDING_MODEL` | No | Store embedding model. Defaults to `models/gemini-embedding-2`. |
+| `GEMINI_RETRIEVAL_MODEL` | No | Model used for retrieval interactions; falls back to `GEMINI_MODEL`. |
+| `GEMINI_RETRIEVAL_TIMEOUT_MS` | No | Semantic retrieval timeout between 250 and 15,000 ms. |
 | `NEXT_PUBLIC_APP_URL` | No | Public app origin for local documentation and deployment configuration. |
 
 Never prefix the Gemini key with `NEXT_PUBLIC_` and never place it in client-side code. `.env.local` is ignored by Git.
@@ -109,16 +114,21 @@ Run the deterministic baseline without Gemini or YouTube access:
 
 ```bash
 pnpm eval
+pnpm eval:ontology
+pnpm eval:retrieval
 ```
+
+The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md).
 
 ## 11. Vercel deployment
 
 1. Push this repository to GitHub.
 2. Import the repository into Vercel and keep the detected Next.js framework preset.
 3. Add `GEMINI_API_KEY` as a server environment variable.
-4. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite` and `NEXT_PUBLIC_APP_URL` with the public origin.
-5. Deploy and test the public URL in English and Vietnamese.
-6. Temporarily test without the API key, or with the upstream service unavailable, to confirm demo and fallback behaviour.
+4. Run `pnpm ontology:index` locally with the same API key, then add the printed `GEMINI_FILE_SEARCH_STORE` and `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` values to Vercel. Skip this step to use deterministic local ontology retrieval.
+5. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
+6. Deploy and test the public URL in English and Vietnamese.
+7. Temporarily test without the API key, with a stale index hash, or with the upstream service unavailable, to confirm demo and retrieval fallback behaviour.
 
 The server endpoint uses bounded request sizes, a short in-memory rate limit, and request timeouts; it does not start background jobs.
 
