@@ -1,0 +1,661 @@
+{
+  "benchmarkVersion": 1,
+  "name": "QUANDA creative-project briefs v1",
+  "cases": [
+    {
+      "id": "blender-toon-beginner",
+      "locale": "en",
+      "disciplines": ["3D", "animation"],
+      "input": {
+        "projectBrief": "The assignment requires Blender. Create a ten-second stylized product animation with toon shading and a simple camera move.",
+        "currentExperience": "Complete Blender beginner.",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "Blender" }, { "label": "toon shading" }, { "label": "camera animation" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "stylized lighting" }, { "label": "rendering" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "character rigging" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender"],
+        "acceptableTutorialTopics": ["Blender navigation prerequisite", "toon shading", "camera animation"],
+        "irrelevantTutorialTopics": ["character rigging", "complete five-hour Blender course"],
+        "acceptablePrerequisiteConcepts": ["short Blender navigation"],
+        "irrelevantPrerequisiteConcepts": ["advanced geometry nodes"],
+        "notes": "A short navigation prerequisite is acceptable because the user is a complete beginner."
+      }
+    },
+    {
+      "id": "blender-toon-intermediate",
+      "locale": "en",
+      "disciplines": ["3D", "animation"],
+      "input": {
+        "projectBrief": "Create a stylized Blender product animation with toon shading and controlled rim lighting.",
+        "currentExperience": "Intermediate in Blender; comfortable with navigation, modelling, materials, and keyframes.",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "toon shading" }, { "label": "stylized lighting" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "camera animation" }, { "label": "rendering" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "Blender navigation" }, { "label": "basic modelling" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender"],
+        "acceptableTutorialTopics": ["toon shading", "stylized lighting"],
+        "irrelevantTutorialTopics": ["Blender navigation", "complete beginner course", "basic modelling"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["navigation", "basic modelling"]
+      }
+    },
+    {
+      "id": "blender-required-watercolor-preference",
+      "locale": "en",
+      "disciplines": ["3D", "animation", "visual style"],
+      "input": {
+        "projectBrief": "The assignment must be completed in Blender. I would prefer a watercolor-inspired look for a looping animated landscape.",
+        "currentExperience": "Beginner Blender user who understands navigation and simple materials.",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "tutorialLanguage": "either",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "Blender" }, { "label": "looping animation" }],
+        "preferredConcepts": [{ "label": "watercolor-inspired" }],
+        "acceptableInferredConcepts": [{ "label": "non-photorealistic rendering" }, { "label": "paper texture" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "photorealistic rendering" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender"],
+        "acceptableTutorialTopics": ["watercolor shader", "NPR materials", "looping animation"],
+        "irrelevantTutorialTopics": ["photorealistic product rendering"],
+        "acceptablePrerequisiteConcepts": ["basic material nodes"],
+        "irrelevantPrerequisiteConcepts": ["Blender installation"]
+      }
+    },
+    {
+      "id": "retro-cheap-3d-look",
+      "locale": "en",
+      "disciplines": ["3D", "games", "visual style"],
+      "input": {
+        "projectBrief": "In Blender, I want to make a tiny environment with that cheap old 3D game look, crunchy textures, and a fixed camera.",
+        "currentExperience": "Comfortable with basic Blender modelling.",
+        "requiredApplications": ["blender"],
+        "outputType": "3d",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "environment modelling" }, { "label": "low-resolution textures" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "fixed camera" }],
+        "acceptableAnyOf": [{
+          "description": "Multiple labels reasonably describe the requested old-game aesthetic.",
+          "concepts": [{ "label": "low-poly" }, { "label": "PS1-style" }, { "label": "retro 3D" }, { "label": "lo-fi 3D" }],
+          "minimumMatches": 1
+        }],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "high-poly sculpting" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender"],
+        "acceptableTutorialTopics": ["low-poly environment", "pixelated textures", "PS1-style rendering"],
+        "irrelevantTutorialTopics": ["photorealistic sculpting"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["character rigging"]
+      }
+    },
+    {
+      "id": "illustrator-logo-system",
+      "locale": "en",
+      "disciplines": ["graphic design", "branding"],
+      "input": {
+        "projectBrief": "Design a responsive logo system in Adobe Illustrator with a wordmark, icon, monochrome version, and clear-space rules.",
+        "currentExperience": "Intermediate Photoshop user and Illustrator beginner.",
+        "requiredApplications": ["illustrator"],
+        "outputType": "graphic",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "logo design" }, { "label": "vector construction" }, { "label": "responsive logo system" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "clear space" }, { "label": "monochrome testing" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "photo retouching" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["illustrator"],
+        "acceptableTutorialTopics": ["logo construction", "pen tool", "shape builder"],
+        "irrelevantTutorialTopics": ["complete Photoshop course"],
+        "acceptablePrerequisiteConcepts": ["Illustrator interface basics"],
+        "irrelevantPrerequisiteConcepts": ["digital painting"]
+      }
+    },
+    {
+      "id": "bauhaus-audio-reactive-poster",
+      "locale": "en",
+      "disciplines": ["graphic design", "creative coding", "audio"],
+      "input": {
+        "projectBrief": "Create a Bauhaus-inspired generative poster where circles and rectangles react to live music in p5.js.",
+        "currentExperience": "Photoshop intermediate, no creative coding experience.",
+        "requiredApplications": ["p5.js"],
+        "outputType": "interactive visual",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "creative coding" }, { "label": "audio reactivity" }],
+        "preferredConcepts": [{ "label": "Bauhaus" }],
+        "acceptableInferredConcepts": [{ "label": "geometric composition" }, { "label": "Web Audio API" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "3D character rigging" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["p5.js"],
+        "acceptableTutorialTopics": ["p5.js sound input", "FFT", "generative composition"],
+        "irrelevantTutorialTopics": ["complete JavaScript web app course"],
+        "acceptablePrerequisiteConcepts": ["JavaScript variables and functions"],
+        "irrelevantPrerequisiteConcepts": ["React state management"]
+      }
+    },
+    {
+      "id": "after-effects-kinetic-type",
+      "locale": "en",
+      "disciplines": ["motion graphics", "typography"],
+      "input": {
+        "projectBrief": "Make a fifteen-second kinetic typography sequence in After Effects synchronized to a spoken quote.",
+        "currentExperience": "After Effects beginner; comfortable with Photoshop layers.",
+        "requiredApplications": ["after-effects"],
+        "outputType": "video",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "kinetic typography" }, { "label": "audio synchronization" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "text animators" }, { "label": "easing" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "3D character animation" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["after-effects"],
+        "acceptableTutorialTopics": ["text animators", "audio markers", "kinetic typography"],
+        "irrelevantTutorialTopics": ["complete visual effects course"],
+        "acceptablePrerequisiteConcepts": ["timeline basics"],
+        "irrelevantPrerequisiteConcepts": ["advanced expressions"]
+      }
+    },
+    {
+      "id": "procreate-ink-illustration",
+      "locale": "en",
+      "disciplines": ["illustration", "traditional-media emulation"],
+      "input": {
+        "projectBrief": "Illustrate a botanical label in Procreate using expressive ink lines and a limited two-colour palette.",
+        "currentExperience": "Strong traditional drawing skills, new to Procreate.",
+        "requiredApplications": ["procreate"],
+        "outputType": "illustration",
+        "tutorialLanguage": "either",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "digital inking" }, { "label": "limited palette" }],
+        "preferredConcepts": [{ "label": "expressive linework" }],
+        "acceptableInferredConcepts": [{ "label": "brush stabilization" }, { "label": "layer masks" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "oil painting" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["procreate"],
+        "acceptableTutorialTopics": ["inking brushes", "line stabilization", "limited palette"],
+        "irrelevantTutorialTopics": ["beginner drawing anatomy"],
+        "acceptablePrerequisiteConcepts": ["Procreate gesture basics"],
+        "irrelevantPrerequisiteConcepts": ["foundational drawing course"]
+      }
+    },
+    {
+      "id": "figma-mobile-checkout",
+      "locale": "en",
+      "disciplines": ["UI/UX", "prototyping"],
+      "input": {
+        "projectBrief": "Create and test a mobile checkout prototype in Figma with form validation, error states, and a confirmation screen.",
+        "currentExperience": "Intermediate Figma visual designer, little usability-testing experience.",
+        "requiredApplications": ["figma"],
+        "outputType": "uiux",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "interactive prototyping" }, { "label": "form validation states" }, { "label": "usability testing" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "component variants" }, { "label": "task-based testing" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "logo design" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["figma"],
+        "acceptableTutorialTopics": ["Figma variables", "interactive components", "usability test"],
+        "irrelevantTutorialTopics": ["Figma beginner interface tour"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["basic frame creation"]
+      }
+    },
+    {
+      "id": "p5-particle-audio",
+      "locale": "en",
+      "disciplines": ["creative coding", "audio"],
+      "input": {
+        "projectBrief": "Build a p5.js particle system whose speed and colour respond to microphone volume, then record a thirty-second performance.",
+        "currentExperience": "Basic JavaScript; no p5.js or audio-analysis experience.",
+        "requiredApplications": ["p5.js"],
+        "outputType": "creative coding",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "particle system" }, { "label": "microphone amplitude" }, { "label": "mapping values" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "p5.sound" }, { "label": "screen recording" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "React" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["p5.js"],
+        "acceptableTutorialTopics": ["p5.js particles", "audio amplitude", "map function"],
+        "irrelevantTutorialTopics": ["complete front-end development course"],
+        "acceptablePrerequisiteConcepts": ["JavaScript classes"],
+        "irrelevantPrerequisiteConcepts": ["HTML forms"]
+      }
+    },
+    {
+      "id": "audacity-podcast-cleanup",
+      "locale": "en",
+      "disciplines": ["audio", "podcasting"],
+      "input": {
+        "projectBrief": "Clean a five-minute interview in Audacity: reduce steady room noise, even out dialogue levels, and export a clear MP3.",
+        "currentExperience": "Comfortable recording audio but new to cleanup and mastering.",
+        "requiredApplications": ["audacity"],
+        "outputType": "audio",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "noise reduction" }, { "label": "dialogue leveling" }, { "label": "MP3 export" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "compression" }, { "label": "loudness normalization" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "music composition" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["audacity"],
+        "acceptableTutorialTopics": ["noise reduction", "compression", "loudness normalization"],
+        "irrelevantTutorialTopics": ["Audacity multitrack music production"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["recording hardware setup"]
+      }
+    },
+    {
+      "id": "fl-studio-lofi-mix",
+      "locale": "en",
+      "disciplines": ["music", "audio production"],
+      "input": {
+        "projectBrief": "Produce a ninety-second lo-fi beat in FL Studio with sampled drums, a simple chord loop, and a balanced final mix.",
+        "currentExperience": "Can write melodies but has never mixed a track.",
+        "requiredApplications": ["fl-studio"],
+        "outputType": "audio",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "beat making" }, { "label": "sampling" }, { "label": "basic mixing" }],
+        "preferredConcepts": [{ "label": "lo-fi" }],
+        "acceptableInferredConcepts": [{ "label": "sidechain compression" }, { "label": "headroom" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "advanced orchestration" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["fl-studio"],
+        "acceptableTutorialTopics": ["drum sampling", "mixing fundamentals", "lo-fi texture"],
+        "irrelevantTutorialTopics": ["complete music theory course"],
+        "acceptablePrerequisiteConcepts": ["channel rack basics"],
+        "irrelevantPrerequisiteConcepts": ["advanced synthesis"]
+      }
+    },
+    {
+      "id": "photoshop-portrait-retouch",
+      "locale": "en",
+      "disciplines": ["photography", "photo editing"],
+      "input": {
+        "projectBrief": "Retouch a studio portrait in Photoshop while keeping natural skin texture, correcting flyaway hairs, and matching a warm reference grade.",
+        "currentExperience": "Intermediate Photoshop user.",
+        "requiredApplications": ["photoshop"],
+        "outputType": "photo",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "non-destructive retouching" }, { "label": "skin texture preservation" }, { "label": "colour matching" }],
+        "preferredConcepts": [{ "label": "warm grade" }],
+        "acceptableInferredConcepts": [{ "label": "frequency separation" }, { "label": "healing tools" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "digital painting" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["photoshop"],
+        "acceptableTutorialTopics": ["natural skin retouching", "flyaway hair cleanup", "colour match"],
+        "irrelevantTutorialTopics": ["Photoshop complete beginner course"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["layer basics"]
+      }
+    },
+    {
+      "id": "davinci-short-documentary",
+      "locale": "en",
+      "disciplines": ["filmmaking", "video editing"],
+      "input": {
+        "projectBrief": "Edit a three-minute documentary in DaVinci Resolve with clear interview audio, B-roll pacing, basic colour correction, captions, and H.264 delivery.",
+        "currentExperience": "Has edited one short video and knows timeline basics.",
+        "requiredApplications": ["davinci-resolve"],
+        "outputType": "video",
+        "tutorialLanguage": "en",
+        "softwareVersions": ["DaVinci Resolve 21"]
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "interview editing" }, { "label": "dialogue cleanup" }, { "label": "colour correction" }, { "label": "captions" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "J-cuts and L-cuts" }, { "label": "H.264 delivery" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "Fairlight audio effects for colour correction" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["davinci-resolve"],
+        "acceptableTutorialTopics": ["documentary pacing", "dialogue cleanup", "primary colour correction", "captions"],
+        "irrelevantTutorialTopics": ["complete beginner course", "unrelated Fairlight effects"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["timeline navigation"]
+      }
+    },
+    {
+      "id": "touchdesigner-arduino-installation",
+      "locale": "en",
+      "disciplines": ["interactive installation", "creative coding", "physical computing"],
+      "input": {
+        "projectBrief": "Build an interactive projection in TouchDesigner where an Arduino distance sensor changes the scale and colour of abstract visuals.",
+        "currentExperience": "Basic Arduino wiring; complete TouchDesigner beginner.",
+        "requiredApplications": ["touchdesigner", "arduino"],
+        "outputType": "interactive installation",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "serial communication" }, { "label": "sensor mapping" }, { "label": "real-time visuals" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "projection setup" }, { "label": "value smoothing" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "game character animation" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["touchdesigner", "arduino"],
+        "acceptableTutorialTopics": ["Arduino serial to TouchDesigner", "sensor normalization", "TOP networks"],
+        "irrelevantTutorialTopics": ["complete Arduino robotics course"],
+        "acceptablePrerequisiteConcepts": ["TouchDesigner interface basics"],
+        "irrelevantPrerequisiteConcepts": ["advanced GLSL"]
+      }
+    },
+    {
+      "id": "blender-davinci-product-workflow",
+      "locale": "en",
+      "disciplines": ["3D", "animation", "video editing"],
+      "input": {
+        "projectBrief": "Model and animate a cosmetic bottle in Blender, render an image sequence, then edit sound and export the final commercial in DaVinci Resolve.",
+        "currentExperience": "Blender modelling intermediate; new to animation and DaVinci Resolve.",
+        "requiredApplications": ["blender", "davinci-resolve"],
+        "outputType": "video",
+        "tutorialLanguage": "either",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "product animation" }, { "label": "image-sequence rendering" }, { "label": "sound editing" }, { "label": "video delivery" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "studio lighting" }, { "label": "frame-rate consistency" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "character rigging" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender", "davinci-resolve"],
+        "acceptableTutorialTopics": ["product camera animation", "PNG sequence render", "DaVinci sound edit", "H.264 export"],
+        "irrelevantTutorialTopics": ["complete Blender modelling course"],
+        "acceptablePrerequisiteConcepts": ["DaVinci interface basics"],
+        "irrelevantPrerequisiteConcepts": ["Blender navigation"]
+      }
+    },
+    {
+      "id": "canva-procreate-campaign",
+      "locale": "en",
+      "disciplines": ["mixed media", "graphic design", "illustration"],
+      "input": {
+        "projectBrief": "Draw three handmade food illustrations in Procreate and assemble them into a consistent social campaign in Canva with reusable layouts.",
+        "currentExperience": "Procreate intermediate; Canva beginner.",
+        "requiredApplications": ["procreate", "canva"],
+        "outputType": "graphic",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "digital illustration" }, { "label": "transparent export" }, { "label": "reusable social templates" }],
+        "preferredConcepts": [{ "label": "handmade look" }],
+        "acceptableInferredConcepts": [{ "label": "brand consistency" }, { "label": "layout hierarchy" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "3D modelling" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["procreate", "canva"],
+        "acceptableTutorialTopics": ["Procreate transparent PNG", "Canva brand templates"],
+        "irrelevantTutorialTopics": ["Canva complete marketing course"],
+        "acceptablePrerequisiteConcepts": ["Canva layout basics"],
+        "irrelevantPrerequisiteConcepts": ["drawing fundamentals"]
+      }
+    },
+    {
+      "id": "neo-y2k-eco-rave",
+      "locale": "en",
+      "disciplines": ["motion graphics", "visual style"],
+      "input": {
+        "projectBrief": "Create a short After Effects ident with a neo-y2k eco-rave look, translucent organic forms, chrome type, and fast rhythmic cuts.",
+        "currentExperience": "Intermediate motion designer.",
+        "requiredApplications": ["after-effects"],
+        "outputType": "video",
+        "tutorialLanguage": "en",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "motion graphics" }, { "label": "rhythmic editing" }],
+        "preferredConcepts": [{ "label": "neo-y2k eco-rave" }],
+        "acceptableInferredConcepts": [{ "label": "chrome typography" }, { "label": "translucent organic forms" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "force-fit to cyberpunk" }],
+        "preserveAsUnknown": ["neo-y2k eco-rave"],
+        "expectedApplicationIds": ["after-effects"],
+        "acceptableTutorialTopics": ["chrome type", "organic shape animation", "beat synchronization"],
+        "irrelevantTutorialTopics": ["generic cyberpunk city tutorial"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["After Effects beginner course"]
+      }
+    },
+    {
+      "id": "vi-blender-toon-character",
+      "locale": "vi",
+      "disciplines": ["3D", "animation"],
+      "input": {
+        "projectBrief": "Bài tập bắt buộc dùng Blender để tạo nhân vật đơn giản có phong cách hoạt hình, tô bóng toon và một chuyển động quay đầu ngắn.",
+        "currentExperience": "Mới dùng Blender nhưng đã biết di chuyển trong viewport.",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "Blender" }, { "label": "toon shading" }, { "label": "head-turn animation" }],
+        "preferredConcepts": [{ "label": "cartoon style" }],
+        "acceptableInferredConcepts": [{ "label": "simple rig" }, { "label": "stylized lighting" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "Blender installation" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender"],
+        "acceptableTutorialTopics": ["toon shader", "simple character rig", "head turn"],
+        "irrelevantTutorialTopics": ["khóa Blender đầy đủ cho người mới"],
+        "acceptablePrerequisiteConcepts": ["rig cơ bản"],
+        "irrelevantPrerequisiteConcepts": ["điều hướng viewport"]
+      }
+    },
+    {
+      "id": "vi-illustrator-cultural-poster",
+      "locale": "vi",
+      "disciplines": ["graphic design", "poster"],
+      "input": {
+        "projectBrief": "Thiết kế poster lễ hội văn hóa bằng Illustrator, bắt buộc có hệ chữ rõ, họa tiết vector và ba kích thước xuất khác nhau.",
+        "currentExperience": "Biết Photoshop, mới học Illustrator.",
+        "requiredApplications": ["illustrator"],
+        "outputType": "graphic",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "typographic hierarchy" }, { "label": "vector pattern" }, { "label": "multi-size export" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "grid layout" }, { "label": "print-safe colour" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "photo manipulation" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["illustrator"],
+        "acceptableTutorialTopics": ["hệ thống lưới", "họa tiết vector", "xuất nhiều kích thước"],
+        "irrelevantTutorialTopics": ["khóa Photoshop cơ bản"],
+        "acceptablePrerequisiteConcepts": ["công cụ vector cơ bản"],
+        "irrelevantPrerequisiteConcepts": ["vẽ chân dung"]
+      }
+    },
+    {
+      "id": "vi-after-effects-logo-motion",
+      "locale": "vi",
+      "disciplines": ["motion graphics", "branding"],
+      "input": {
+        "projectBrief": "Tạo logo motion dài 6 giây trong After Effects, chuyển động gọn, có easing và xuất nền trong suốt để ghép vào video.",
+        "currentExperience": "Đã biết keyframe và timeline cơ bản.",
+        "requiredApplications": ["after-effects"],
+        "outputType": "video",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "logo animation" }, { "label": "easing" }, { "label": "alpha-channel export" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "graph editor" }, { "label": "motion blur" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "3D character rigging" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["after-effects"],
+        "acceptableTutorialTopics": ["logo motion", "graph editor", "xuất alpha"],
+        "irrelevantTutorialTopics": ["khóa After Effects toàn diện"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["timeline cơ bản"]
+      }
+    },
+    {
+      "id": "vi-p5-audio-visualizer",
+      "locale": "vi",
+      "disciplines": ["creative coding", "audio"],
+      "input": {
+        "projectBrief": "Dùng p5.js để làm visualizer phản ứng với âm lượng và tần số của một bài nhạc, sau đó quay màn hình thành video 30 giây.",
+        "currentExperience": "Biết JavaScript cơ bản nhưng chưa dùng p5.js.",
+        "requiredApplications": ["p5.js"],
+        "outputType": "creative coding",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "audio visualization" }, { "label": "FFT" }, { "label": "amplitude mapping" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "p5.sound" }, { "label": "screen recording" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "React application" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["p5.js"],
+        "acceptableTutorialTopics": ["p5.sound", "FFT", "ánh xạ biên độ"],
+        "irrelevantTutorialTopics": ["khóa lập trình web đầy đủ"],
+        "acceptablePrerequisiteConcepts": ["hàm JavaScript"],
+        "irrelevantPrerequisiteConcepts": ["React hooks"]
+      }
+    },
+    {
+      "id": "vi-audacity-voiceover",
+      "locale": "vi",
+      "disciplines": ["audio", "voice-over"],
+      "input": {
+        "projectBrief": "Làm sạch bản thu thuyết minh bằng Audacity: giảm tiếng quạt, cắt hơi thở quá lớn, cân âm lượng và xuất WAV.",
+        "currentExperience": "Mới dùng Audacity nhưng biết cách thu âm.",
+        "requiredApplications": ["audacity"],
+        "outputType": "audio",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "noise reduction" }, { "label": "breath editing" }, { "label": "loudness normalization" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "compression" }, { "label": "WAV export" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "music production" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["audacity"],
+        "acceptableTutorialTopics": ["giảm nhiễu", "chỉnh giọng đọc", "chuẩn hóa âm lượng"],
+        "irrelevantTutorialTopics": ["phối nhạc nhiều track"],
+        "acceptablePrerequisiteConcepts": ["giao diện Audacity ngắn"],
+        "irrelevantPrerequisiteConcepts": ["thiết lập micro"]
+      }
+    },
+    {
+      "id": "vi-blender-davinci-short-film",
+      "locale": "vi",
+      "disciplines": ["3D", "animation", "video editing"],
+      "input": {
+        "projectBrief": "Dựng cảnh 3D và chuyển động camera trong Blender, xuất chuỗi PNG rồi ghép âm thanh, chỉnh màu và xuất MP4 trong DaVinci Resolve.",
+        "currentExperience": "Blender trung cấp, chưa dùng DaVinci Resolve.",
+        "requiredApplications": ["blender", "davinci-resolve"],
+        "outputType": "video",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "camera animation" }, { "label": "PNG sequence" }, { "label": "sound editing" }, { "label": "colour correction" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "frame-rate matching" }, { "label": "H.264 export" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "Fairlight tutorial for colour stage" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["blender", "davinci-resolve"],
+        "acceptableTutorialTopics": ["camera Blender", "xuất chuỗi PNG", "âm thanh DaVinci", "chỉnh màu"],
+        "irrelevantTutorialTopics": ["khóa Blender nhập môn đầy đủ"],
+        "acceptablePrerequisiteConcepts": ["giao diện DaVinci cơ bản"],
+        "irrelevantPrerequisiteConcepts": ["điều hướng Blender"]
+      }
+    },
+    {
+      "id": "vi-figma-bilingual-prototype",
+      "locale": "vi",
+      "disciplines": ["UI/UX", "prototyping", "bilingual design"],
+      "input": {
+        "projectBrief": "Thiết kế prototype ứng dụng đặt lịch bằng Figma với nội dung tiếng Việt và tiếng Anh, Auto Layout, component và luồng đặt lịch có kiểm thử.",
+        "currentExperience": "Đã biết thiết kế màn hình Figma nhưng chưa làm prototype phức tạp.",
+        "requiredApplications": ["figma"],
+        "outputType": "uiux",
+        "tutorialLanguage": "vi",
+        "softwareVersions": []
+      },
+      "expected": {
+        "requiredConcepts": [{ "label": "bilingual interface" }, { "label": "Auto Layout" }, { "label": "components" }, { "label": "prototype testing" }],
+        "preferredConcepts": [],
+        "acceptableInferredConcepts": [{ "label": "localization expansion" }, { "label": "component variants" }],
+        "acceptableAnyOf": [],
+        "forbiddenOrIrrelevantConcepts": [{ "label": "logo animation" }],
+        "preserveAsUnknown": [],
+        "expectedApplicationIds": ["figma"],
+        "acceptableTutorialTopics": ["Auto Layout", "component variants", "prototype interactions", "thiết kế song ngữ"],
+        "irrelevantTutorialTopics": ["khóa Figma cho người mới hoàn toàn"],
+        "acceptablePrerequisiteConcepts": [],
+        "irrelevantPrerequisiteConcepts": ["tạo frame cơ bản"]
+      }
+    }
+  ]
+}

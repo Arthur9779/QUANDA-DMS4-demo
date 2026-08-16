@@ -1,0 +1,233 @@
+{
+  "predictionFixtureVersion": 1,
+  "name": "Naive software-first baseline",
+  "benchmarkVersion": 1,
+  "predictions": [
+    {
+      "caseId": "blender-toon-beginner",
+      "tutorials": [{
+        "id": "naive-blender-course-1", "title": "Complete Blender Beginner Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["Blender"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "blender-toon-intermediate",
+      "tutorials": [{
+        "id": "naive-blender-course-2", "title": "Complete Blender Beginner Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "blender-required-watercolor-preference",
+      "tutorials": [{
+        "id": "naive-blender-course-3", "title": "Blender Fundamentals from Zero", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["Blender"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "retro-cheap-3d-look",
+      "tutorials": [{
+        "id": "naive-blender-course-4", "title": "Blender Complete Modelling Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "indexed", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["environment modelling"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "illustrator-logo-system",
+      "tutorials": [{
+        "id": "baseline-logo-focused", "title": "Build a Responsive Logo System in Illustrator", "rank": 1,
+        "applicationId": "illustrator", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "acceptable", "verificationStatus": "verified", "tutorialType": "focused",
+        "coveredRequiredConcepts": ["logo design", "vector construction"], "overTeaching": false, "skillSpecific": true
+      }]
+    },
+    {
+      "caseId": "bauhaus-audio-reactive-poster",
+      "tutorials": [{
+        "id": "naive-javascript-course", "title": "Complete JavaScript Course for Beginners", "rank": 1,
+        "applicationId": "p5.js", "language": "en", "versionCompatible": null, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "indexed", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["creative coding"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "after-effects-kinetic-type",
+      "tutorials": [{
+        "id": "baseline-kinetic-type", "title": "Kinetic Typography with Text Animators", "rank": 1,
+        "applicationId": "after-effects", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "acceptable", "verificationStatus": "verified", "tutorialType": "focused",
+        "coveredRequiredConcepts": ["kinetic typography", "audio synchronization"], "overTeaching": false, "skillSpecific": true
+      }]
+    },
+    {
+      "caseId": "procreate-ink-illustration",
+      "tutorials": [{
+        "id": "naive-procreate-course", "title": "Complete Procreate Beginner Course", "rank": 1,
+        "applicationId": "procreate", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "figma-mobile-checkout",
+      "tutorials": [{
+        "id": "naive-figma-course", "title": "Figma for Absolute Beginners", "rank": 1,
+        "applicationId": "figma", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "p5-particle-audio",
+      "tutorials": [{
+        "id": "naive-p5-course", "title": "p5.js Full Beginner Course", "rank": 1,
+        "applicationId": "p5.js", "language": "en", "versionCompatible": null, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "unverified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "audacity-podcast-cleanup",
+      "tutorials": [{
+        "id": "baseline-audacity-noise", "title": "Audacity Noise Reduction and Dialogue Leveling", "rank": 1,
+        "applicationId": "audacity", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "acceptable", "verificationStatus": "verified", "tutorialType": "focused",
+        "coveredRequiredConcepts": ["noise reduction", "dialogue leveling"], "overTeaching": false, "skillSpecific": true
+      }]
+    },
+    {
+      "caseId": "fl-studio-lofi-mix",
+      "tutorials": [{
+        "id": "naive-fl-course", "title": "FL Studio Complete Beginner Course", "rank": 1,
+        "applicationId": "fl-studio", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "indexed", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["beat making"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "photoshop-portrait-retouch",
+      "tutorials": [{
+        "id": "baseline-natural-retouch", "title": "Natural Skin Retouching without Losing Texture", "rank": 1,
+        "applicationId": "photoshop", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "acceptable", "verificationStatus": "verified", "tutorialType": "focused",
+        "coveredRequiredConcepts": ["non-destructive retouching", "skin texture preservation"], "overTeaching": false, "skillSpecific": true
+      }]
+    },
+    {
+      "caseId": "davinci-short-documentary",
+      "tutorials": [{
+        "id": "naive-davinci-course", "title": "DaVinci Resolve Complete Beginner Course", "rank": 1,
+        "applicationId": "davinci-resolve", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["interview editing"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "touchdesigner-arduino-installation",
+      "tutorials": [{
+        "id": "naive-touchdesigner-course", "title": "TouchDesigner Complete Beginner Course", "rank": 1,
+        "applicationId": "touchdesigner", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "unverified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["real-time visuals"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "blender-davinci-product-workflow",
+      "tutorials": [{
+        "id": "naive-blender-course-5", "title": "Complete Blender Beginner Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["product animation"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "canva-procreate-campaign",
+      "tutorials": [{
+        "id": "naive-canva-course", "title": "Complete Canva Marketing Course", "rank": 1,
+        "applicationId": "canva", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "unverified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["reusable social templates"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "neo-y2k-eco-rave",
+      "unknownConcepts": ["neo-y2k eco-rave"],
+      "tutorials": [{
+        "id": "naive-cyberpunk", "title": "Create a Cyberpunk City in After Effects", "rank": 1,
+        "applicationId": "after-effects", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "unverified", "tutorialType": "project_based",
+        "coveredRequiredConcepts": ["motion graphics"], "overTeaching": false, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-blender-toon-character",
+      "tutorials": [{
+        "id": "naive-blender-en-vi-case", "title": "Complete Blender Beginner Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["Blender"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-illustrator-cultural-poster",
+      "tutorials": [{
+        "id": "naive-illustrator-en", "title": "Adobe Illustrator Full Course", "rank": 1,
+        "applicationId": "illustrator", "language": "en", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "indexed", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-after-effects-logo-motion",
+      "tutorials": [{
+        "id": "naive-ae-en", "title": "After Effects Complete Course", "rank": 1,
+        "applicationId": "after-effects", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-p5-audio-visualizer",
+      "tutorials": [{
+        "id": "naive-js-en", "title": "JavaScript from Zero to Expert", "rank": 1,
+        "applicationId": "p5.js", "language": "en", "versionCompatible": null, "prerequisiteFit": true,
+        "relevance": "irrelevant", "verificationStatus": "unverified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-audacity-voiceover",
+      "tutorials": [{
+        "id": "baseline-audacity-vi", "title": "Giảm nhiễu và cân âm lượng giọng đọc trong Audacity", "rank": 1,
+        "applicationId": "audacity", "language": "vi", "versionCompatible": true, "prerequisiteFit": true,
+        "relevance": "acceptable", "verificationStatus": "verified", "tutorialType": "focused",
+        "coveredRequiredConcepts": ["noise reduction", "loudness normalization"], "overTeaching": false, "skillSpecific": true
+      }]
+    },
+    {
+      "caseId": "vi-blender-davinci-short-film",
+      "tutorials": [{
+        "id": "naive-blender-en-mixed", "title": "Complete Blender Beginner Course", "rank": 1,
+        "applicationId": "blender", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": ["camera animation"], "overTeaching": true, "skillSpecific": false
+      }]
+    },
+    {
+      "caseId": "vi-figma-bilingual-prototype",
+      "tutorials": [{
+        "id": "naive-figma-en-vi-case", "title": "Figma Complete Beginner Course", "rank": 1,
+        "applicationId": "figma", "language": "en", "versionCompatible": true, "prerequisiteFit": false,
+        "relevance": "irrelevant", "verificationStatus": "verified", "tutorialType": "broad_course",
+        "coveredRequiredConcepts": [], "overTeaching": true, "skillSpecific": false
+      }]
+    }
+  ]
+}

@@ -101,6 +101,16 @@ pnpm run test:all
 
 `npm run build` executes the same production build script and is the Vercel compatibility check.
 
+## Knowledge contracts and evaluation
+
+Versioned Creative DNA, ontology, tutorial metadata, and tutorial-score contracts are documented in [`docs/knowledge-contracts.md`](docs/knowledge-contracts.md). The offline benchmark and metric definitions are documented in [`evals/README.md`](evals/README.md).
+
+Run the deterministic baseline without Gemini or YouTube access:
+
+```bash
+pnpm eval
+```
+
 ## 11. Vercel deployment
 
 1. Push this repository to GitHub.
