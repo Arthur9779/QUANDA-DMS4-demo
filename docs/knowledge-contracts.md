@@ -39,11 +39,11 @@ Unknown concepts are valid creative information. A phrase such as `neo-y2k eco-r
 
 ## Ontology
 
-Ontology nodes have stable IDs, labels, normalized labels, families, categories, aliases, descriptions, and forward-compatible metadata. PR 1 will define deterministic ID generation while compiling the full knowledge source.
+Ontology nodes have stable IDs, labels, normalized labels, families, categories, aliases, descriptions, and forward-compatible metadata. The PR 1 compiler generates deterministic canonical IDs and a validated runtime artifact from `knowledge/quanda.skills`; see `docs/ontology.md`.
 
 Relationships are typed. `sourceId` and `targetId` preserve direction for relationships such as `requires`, `prerequisite_of`, and `implemented_with`. Symmetric meanings such as `similar_to` still use an explicit direction in storage; a compiler or retrieval layer may materialize the reverse edge when needed.
 
-PR 0 intentionally does not parse or populate the full ontology.
+The raw source remains canonical. Runtime consumers use the compiled artifact and never reparse the `.skills` file on each request.
 
 ## Tutorial metadata
 
@@ -82,4 +82,4 @@ Human-labelled fixtures provide the initial signal. Later PRs may add duration, 
 
 ## Deferred work
 
-PRs 1–6 will add ontology compilation, semantic retrieval, Creative DNA inference, review UI, live tutorial classification/ranking, and roadmap integration. No current Gemini prompt, tutorial recommendation, form, or roadmap behavior is changed by these contracts.
+PRs 2–6 will add semantic retrieval, Creative DNA inference, review UI, live tutorial classification/ranking, and roadmap integration. No current Gemini prompt, tutorial recommendation, form, or roadmap behavior is changed by the ontology compiler.
