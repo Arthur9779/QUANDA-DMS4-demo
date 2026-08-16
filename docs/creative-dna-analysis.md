@@ -67,4 +67,4 @@ pnpm creative-dna:live -- "Create a TouchDesigner installation" --app=TouchDesig
 
 ## Deferred
 
-PR 4 will add the Creative DNA review/editing UI. Image-reference analysis, tutorial ranking, and roadmap integration remain deferred to later PRs.
+The Creative DNA review/editing UI is documented in [`creative-dna-review.md`](creative-dna-review.md). Image-reference analysis, tutorial ranking, and Creative-DNA-aware roadmap integration remain deferred to later PRs.

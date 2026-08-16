@@ -67,6 +67,76 @@ export interface Translation {
     outputOptions: LabelOption[];
     qualityOptions: LabelOption[];
   };
+  review: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    intentLabel: string;
+    intentHint: string;
+    requirements: string;
+    groups: Record<
+      | "creativeDirection"
+      | "medium"
+      | "visualQualities"
+      | "techniques"
+      | "subject"
+      | "motionInteraction"
+      | "toolsSoftware"
+      | "codingTechnology"
+      | "output"
+      | "moreDetails",
+      string
+    >;
+    required: string;
+    preference: string;
+    suggested: string;
+    addedByYou: string;
+    notSure: string;
+    addConcept: string;
+    removeConcept: string;
+    editRequirement: string;
+    requirementWarning: string;
+    searchTitle: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+    searchHint: string;
+    searching: string;
+    noResults: string;
+    closeSearch: string;
+    addResult: string;
+    cantFind: string;
+    customLabel: string;
+    customPlaceholder: string;
+    addOwn: string;
+    ownWording: string;
+    ownWordingHelp: string;
+    removed: string;
+    removedHint: string;
+    restore: string;
+    showMore: string;
+    showLess: string;
+    editDetails: string;
+    analyzeAgain: string;
+    staleTitle: string;
+    staleMessage: string;
+    fallbackTitle: string;
+    fallbackMessage: string;
+    confirm: string;
+    confirmHint: string;
+    loadingTitle: string;
+    loadingStatuses: string[];
+    errorTitle: string;
+    errorMessage: string;
+    retry: string;
+    debugDetails: string;
+    constraintLabels: {
+      deliverable: string;
+      deadline: string;
+      targetQuality: string;
+      hoursPerDay: string;
+      daysPerWeek: string;
+    };
+  };
   results: {
     eyebrow: string;
     demo: string;
@@ -176,8 +246,8 @@ const en: Translation = {
         description: "Share the deliverable, what you know, and your deadline.",
       },
       {
-        title: "Receive a roadmap",
-        description: "Get a realistic sequence of learning and production tasks.",
+        title: "Check the direction",
+        description: "Correct QUANDA's interpretation before it shapes your path.",
       },
       {
         title: "Learn, make, finish",
@@ -211,9 +281,9 @@ const en: Translation = {
     otherApplicationPlaceholder: "For example: Cinema 4D, Canva, Unity, or CapCut",
     outputType: "Desired output type",
     targetQuality: "Target quality",
-    submit: "Generate my roadmap",
+    submit: "Understand my project",
     availableStudyTime: "Available study time",
-    privacy: "Your brief is used only to create this roadmap.",
+    privacy: "Your brief is used only to understand and plan this project.",
     errorsTitle: "Please review these details",
     errors: {
       projectBrief: "Project brief must be between 30 and 2,000 characters.",
@@ -243,6 +313,86 @@ const en: Translation = {
       { value: "portfolio", label: "Portfolio-ready" },
       { value: "unsure", label: "Not sure" },
     ],
+  },
+  review: {
+    eyebrow: "Check the direction",
+    title: "QUANDA understood your project",
+    intro:
+      "Check the direction below before I build your learning path. Remove anything that feels wrong or add something I missed.",
+    intentLabel: "Project intent",
+    intentHint: "You can refine this summary, or leave it as it is.",
+    requirements: "Project requirements",
+    groups: {
+      creativeDirection: "Creative direction",
+      medium: "Medium",
+      visualQualities: "Visual qualities",
+      techniques: "Techniques",
+      subject: "Subject",
+      motionInteraction: "Motion / interaction",
+      toolsSoftware: "Tools & software",
+      codingTechnology: "Coding / technology",
+      output: "Output",
+      moreDetails: "More details",
+    },
+    required: "Required by brief",
+    preference: "Preference",
+    suggested: "Suggested",
+    addedByYou: "Added by you",
+    notSure: "Not sure?",
+    addConcept: "Add concept",
+    removeConcept: "Remove {label}",
+    editRequirement: "Edit requirement: {label}",
+    requirementWarning:
+      "This was detected as a required project constraint. Remove it only if the requirement is incorrect.",
+    searchTitle: "Add to your Creative DNA",
+    searchLabel: "Search concepts",
+    searchPlaceholder: "Try Y2K, fisheye, toon shading…",
+    searchHint: "Search uses QUANDA's knowledge base, not another AI request.",
+    searching: "Searching…",
+    noResults: "No matching concepts yet. Refine the search or keep your own wording.",
+    closeSearch: "Close concept search",
+    addResult: "Add {label}",
+    cantFind: "Can't find it? Add your own description",
+    customLabel: "Your wording",
+    customPlaceholder: "For example: neo-y2k eco rave",
+    addOwn: "Keep my wording",
+    ownWording: "Your wording",
+    ownWordingHelp:
+      "QUANDA will keep your wording even if it is not yet in the knowledge base.",
+    removed: "Removed suggestions",
+    removedHint: "These stay recorded and will not be silently re-added.",
+    restore: "Restore {label}",
+    showMore: "Show {count} more",
+    showLess: "Show less",
+    editDetails: "Edit project details",
+    analyzeAgain: "Analyze again",
+    staleTitle: "Your project details changed",
+    staleMessage:
+      "Analyze again to refresh QUANDA's interpretation before continuing.",
+    fallbackTitle: "A careful starting point",
+    fallbackMessage:
+      "QUANDA couldn't fully analyze the project online, so this review uses the project details it could identify. You can still correct it.",
+    confirm: "Looks right — continue",
+    confirmHint: "Your corrections will be saved on this device.",
+    loadingTitle: "Understanding your project",
+    loadingStatuses: [
+      "Reading your project details",
+      "Identifying creative direction",
+      "Mapping relevant concepts",
+      "Checking project requirements",
+    ],
+    errorTitle: "QUANDA couldn't analyze the project",
+    errorMessage:
+      "Try again, or edit the project details. Your draft is still saved on this device.",
+    retry: "Try analysis again",
+    debugDetails: "Developer details",
+    constraintLabels: {
+      deliverable: "Output",
+      deadline: "Deadline",
+      targetQuality: "Target quality",
+      hoursPerDay: "hours/day",
+      daysPerWeek: "days/week",
+    },
   },
   results: {
     eyebrow: "Your production path",
@@ -377,8 +527,8 @@ const vi: Translation = {
         description: "Chia sẻ sản phẩm cần làm, kỹ năng hiện có và thời hạn.",
       },
       {
-        title: "Nhận lộ trình",
-        description: "Nhận chuỗi nhiệm vụ học tập và sản xuất thực tế.",
+        title: "Kiểm tra định hướng",
+        description: "Chỉnh cách QUANDA hiểu dự án trước khi tạo lộ trình.",
       },
       {
         title: "Học, làm, hoàn thành",
@@ -412,9 +562,9 @@ const vi: Translation = {
     otherApplicationPlaceholder: "Ví dụ: Cinema 4D, Canva, Unity hoặc CapCut",
     outputType: "Loại sản phẩm mong muốn",
     targetQuality: "Mức chất lượng",
-    submit: "Tạo lộ trình cho tôi",
+    submit: "Phân tích dự án của tôi",
     availableStudyTime: "Thời gian học hiện có",
-    privacy: "Đề bài chỉ được dùng để tạo lộ trình này.",
+    privacy: "Đề bài chỉ được dùng để hiểu và lập kế hoạch cho dự án này.",
     errorsTitle: "Vui lòng kiểm tra các thông tin sau",
     errors: {
       projectBrief: "Đề bài phải dài từ 30 đến 2.000 ký tự.",
@@ -444,6 +594,86 @@ const vi: Translation = {
       { value: "portfolio", label: "Sẵn sàng cho hồ sơ năng lực" },
       { value: "unsure", label: "Chưa chắc" },
     ],
+  },
+  review: {
+    eyebrow: "Kiểm tra định hướng",
+    title: "QUANDA đã hiểu dự án của bạn",
+    intro:
+      "Hãy kiểm tra định hướng bên dưới trước khi QUANDA tạo lộ trình học. Xóa điều chưa đúng hoặc thêm điều còn thiếu.",
+    intentLabel: "Ý định dự án",
+    intentHint: "Bạn có thể chỉnh bản tóm tắt này hoặc giữ nguyên.",
+    requirements: "Yêu cầu dự án",
+    groups: {
+      creativeDirection: "Định hướng sáng tạo",
+      medium: "Phương tiện",
+      visualQualities: "Đặc điểm hình ảnh",
+      techniques: "Kỹ thuật",
+      subject: "Chủ thể",
+      motionInteraction: "Chuyển động / tương tác",
+      toolsSoftware: "Công cụ & phần mềm",
+      codingTechnology: "Lập trình / công nghệ",
+      output: "Đầu ra",
+      moreDetails: "Chi tiết khác",
+    },
+    required: "Bắt buộc theo đề bài",
+    preference: "Mong muốn",
+    suggested: "QUANDA đề xuất",
+    addedByYou: "Bạn đã thêm",
+    notSure: "Chưa chắc?",
+    addConcept: "Thêm khái niệm",
+    removeConcept: "Xóa {label}",
+    editRequirement: "Sửa yêu cầu: {label}",
+    requirementWarning:
+      "Điều này được xác định là yêu cầu bắt buộc của dự án. Chỉ xóa nếu yêu cầu đó không chính xác.",
+    searchTitle: "Thêm vào DNA sáng tạo",
+    searchLabel: "Tìm khái niệm",
+    searchPlaceholder: "Thử Y2K, fisheye, toon shading…",
+    searchHint: "Tìm kiếm dùng kho kiến thức của QUANDA, không gửi thêm yêu cầu AI.",
+    searching: "Đang tìm…",
+    noResults: "Chưa có kết quả phù hợp. Hãy đổi từ khóa hoặc giữ cách diễn đạt của bạn.",
+    closeSearch: "Đóng tìm kiếm khái niệm",
+    addResult: "Thêm {label}",
+    cantFind: "Không tìm thấy? Thêm mô tả của bạn",
+    customLabel: "Cách diễn đạt của bạn",
+    customPlaceholder: "Ví dụ: neo-y2k eco rave",
+    addOwn: "Giữ cách diễn đạt này",
+    ownWording: "Cách diễn đạt của bạn",
+    ownWordingHelp:
+      "QUANDA sẽ giữ nguyên cách bạn diễn đạt dù khái niệm chưa có trong kho kiến thức.",
+    removed: "Đề xuất đã xóa",
+    removedHint: "Những mục này vẫn được ghi nhận và sẽ không tự xuất hiện lại.",
+    restore: "Khôi phục {label}",
+    showMore: "Hiện thêm {count} mục",
+    showLess: "Thu gọn",
+    editDetails: "Sửa thông tin dự án",
+    analyzeAgain: "Phân tích lại",
+    staleTitle: "Thông tin dự án đã thay đổi",
+    staleMessage:
+      "Hãy phân tích lại để cập nhật cách QUANDA hiểu dự án trước khi tiếp tục.",
+    fallbackTitle: "Điểm bắt đầu thận trọng",
+    fallbackMessage:
+      "QUANDA chưa thể phân tích đầy đủ trực tuyến, nên phần này dùng những chi tiết hệ thống đã xác định được. Bạn vẫn có thể chỉnh sửa.",
+    confirm: "Đúng hướng — tiếp tục",
+    confirmHint: "Các chỉnh sửa sẽ được lưu trên thiết bị này.",
+    loadingTitle: "Đang hiểu dự án của bạn",
+    loadingStatuses: [
+      "Đang đọc thông tin dự án",
+      "Đang xác định định hướng sáng tạo",
+      "Đang liên kết các khái niệm phù hợp",
+      "Đang kiểm tra yêu cầu dự án",
+    ],
+    errorTitle: "QUANDA chưa thể phân tích dự án",
+    errorMessage:
+      "Hãy thử lại hoặc sửa thông tin dự án. Bản nháp vẫn được lưu trên thiết bị này.",
+    retry: "Thử phân tích lại",
+    debugDetails: "Chi tiết dành cho lập trình viên",
+    constraintLabels: {
+      deliverable: "Đầu ra",
+      deadline: "Hạn chót",
+      targetQuality: "Mức chất lượng",
+      hoursPerDay: "giờ/ngày",
+      daysPerWeek: "ngày/tuần",
+    },
   },
   results: {
     eyebrow: "Lộ trình sản xuất của bạn",

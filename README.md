@@ -121,7 +121,7 @@ pnpm eval:retrieval
 pnpm eval:creative-dna
 ```
 
-The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed Creative DNA classification and its server boundary are documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md).
+The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed classification is documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md), and the editable review/persistence flow in [`docs/creative-dna-review.md`](docs/creative-dna-review.md).
 
 ## 11. Vercel deployment
 

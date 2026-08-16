@@ -3,11 +3,13 @@ import {
   readCalendarTasks,
   readCompletion,
   readCreativeDnaAnalysis,
+  readCreativeDnaReview,
   readDraft,
   readLanguage,
   readRoadmap,
   STORAGE_KEYS,
   writeCreativeDnaAnalysis,
+  writeCreativeDnaReview,
 } from "@/src/lib/storage";
 
 class MemoryStorage implements Storage {
@@ -123,5 +125,51 @@ describe("local storage recovery", () => {
     };
     writeCreativeDnaAnalysis(storage, analysis);
     expect(readCreativeDnaAnalysis(storage)).toEqual(analysis);
+
+    const review = {
+      reviewVersion: 1 as const,
+      inputFingerprint: "12ab34cd",
+      confirmed: true,
+      analysis: {
+        ...analysis,
+        creativeDna: {
+          ...analysis.creativeDna,
+          concepts: [
+            {
+              ontologyId: "creative-direction.aesthetic.y2k",
+              label: "Y2K",
+              source: "user_added" as const,
+              status: "user_confirmed" as const,
+            },
+            {
+              ontologyId: "creative-direction.aesthetic.cyberpunk",
+              label: "Cyberpunk",
+              source: "ai_inferred" as const,
+              status: "user_rejected" as const,
+            },
+          ],
+          unknownConcepts: [
+            {
+              raw: "neo-y2k eco rave",
+              nearestOntologyIds: [],
+              source: "user_added" as const,
+              status: "user_confirmed" as const,
+            },
+          ],
+        },
+      },
+    };
+    writeCreativeDnaReview(storage, review);
+    expect(readCreativeDnaReview(storage)).toEqual(review);
+    expect(readCreativeDnaAnalysis(storage)).toEqual(review.analysis);
+  });
+
+  it("fails safely for an incompatible review version", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      STORAGE_KEYS.creativeDnaAnalysis,
+      JSON.stringify({ reviewVersion: 99, inputFingerprint: "12ab34cd" }),
+    );
+    expect(readCreativeDnaReview(storage)).toBeNull();
   });
 });

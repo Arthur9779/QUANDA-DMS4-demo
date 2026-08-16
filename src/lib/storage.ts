@@ -2,6 +2,12 @@ import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { isCalendarTask } from "@/src/lib/calendar";
 import { ProjectAnalysisResponseSchema } from "@/src/project-analysis/contracts";
+import {
+  CREATIVE_DNA_REVIEW_VERSION,
+  CreativeDnaReviewRecordSchema,
+  type CreativeDnaReviewRecord,
+} from "@/src/creative-dna-review/contracts";
+import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
 import type {
   CalendarTask,
   Locale,
@@ -77,10 +83,11 @@ export function writeRoadmap(
 export function readCreativeDnaAnalysis(
   storage: Storage,
 ): ProjectAnalysisResponse | null {
-  const parsed = ProjectAnalysisResponseSchema.safeParse(
-    safeParse(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis)),
-  );
-  return parsed.success ? parsed.data : null;
+  const value = safeParse(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis));
+  const review = CreativeDnaReviewRecordSchema.safeParse(value);
+  if (review.success) return review.data.analysis;
+  const analysis = ProjectAnalysisResponseSchema.safeParse(value);
+  return analysis.success ? analysis.data : null;
 }
 
 export function writeCreativeDnaAnalysis(
@@ -94,6 +101,48 @@ export function writeCreativeDnaAnalysis(
     );
   } catch {
     // Creative DNA remains usable in memory when storage is unavailable.
+  }
+}
+
+export function readCreativeDnaReview(
+  storage: Storage,
+  currentInput?: RoadmapRequest,
+): CreativeDnaReviewRecord | null {
+  const value = safeParse(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis));
+  const review = CreativeDnaReviewRecordSchema.safeParse(value);
+  if (review.success) return review.data;
+
+  const legacyAnalysis = ProjectAnalysisResponseSchema.safeParse(value);
+  if (!legacyAnalysis.success || !currentInput) return null;
+  return {
+    reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
+    inputFingerprint: createProjectInputFingerprint(currentInput),
+    analysis: legacyAnalysis.data,
+    confirmed: false,
+  };
+}
+
+export function writeCreativeDnaReview(
+  storage: Storage,
+  review: CreativeDnaReviewRecord,
+): void {
+  const parsed = CreativeDnaReviewRecordSchema.safeParse(review);
+  if (!parsed.success) return;
+  try {
+    storage.setItem(
+      STORAGE_KEYS.creativeDnaAnalysis,
+      JSON.stringify(parsed.data),
+    );
+  } catch {
+    // Review edits remain usable in memory when storage is unavailable.
+  }
+}
+
+export function clearCreativeDnaReview(storage: Storage): void {
+  try {
+    storage.removeItem(STORAGE_KEYS.creativeDnaAnalysis);
+  } catch {
+    // In-memory review reset still succeeds.
   }
 }
 

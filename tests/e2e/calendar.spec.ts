@@ -19,7 +19,9 @@ test("keeps manual tasks and synchronises roadmap milestones", async ({ page }) 
   await expect(manualTask).toBeVisible();
 
   await page.getByRole("button", { name: "Load example" }).click();
-  await page.getByRole("button", { name: "Generate my roadmap" }).click();
+  await page.getByRole("button", { name: "Understand my project" }).click();
+  await expect(page.getByRole("heading", { name: "QUANDA understood your project" })).toBeVisible();
+  await page.getByRole("button", { name: "Looks right — continue" }).click();
   await expect(page.locator("#roadmap-results")).toBeVisible();
 
   const roadmapTask = await page.evaluate(() => {

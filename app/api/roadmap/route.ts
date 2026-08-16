@@ -17,7 +17,7 @@ import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import type { RoadmapRequest, RoadmapResponse } from "@/src/types";
 
 const MAX_BODY_BYTES = 30_000;
-const RATE_LIMIT = 8;
+const RATE_LIMIT = process.env.NODE_ENV === "production" ? 8 : 100;
 const RATE_WINDOW_MS = 60_000;
 const requestBuckets = new Map<
   string,

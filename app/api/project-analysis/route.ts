@@ -3,7 +3,7 @@ import { analyzeProject } from "@/src/project-analysis";
 import { ProjectAnalysisRequestSchema } from "@/src/project-analysis/contracts";
 
 const MAX_BODY_BYTES = 30_000;
-const RATE_LIMIT = 8;
+const RATE_LIMIT = process.env.NODE_ENV === "production" ? 8 : 100;
 const RATE_WINDOW_MS = 60_000;
 const requestBuckets = new Map<
   string,
