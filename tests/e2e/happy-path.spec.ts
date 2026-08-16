@@ -30,7 +30,9 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
     await loadExample.click();
   }
 
-  await page.getByRole("button", { name: "Generate my roadmap" }).click();
+  await page.getByRole("button", { name: "Understand my project" }).click();
+  await expect(page.getByRole("heading", { name: "QUANDA understood your project" })).toBeVisible();
+  await page.getByRole("button", { name: "Looks right — continue" }).click();
 
   await expect(page.locator("#roadmap-results")).toBeVisible();
   await expect(page.locator(".stage-card")).toHaveCount(8);
@@ -92,7 +94,9 @@ test("preserves a custom coding environment and supplies guides without unrelate
     "Visual Studio Code",
   );
   await page.getByLabel("Desired output type").selectOption("other");
-  await page.getByRole("button", { name: "Generate my roadmap" }).click();
+  await page.getByRole("button", { name: "Understand my project" }).click();
+  await expect(page.getByRole("heading", { name: "QUANDA understood your project" })).toBeVisible();
+  await page.getByRole("button", { name: "Looks right — continue" }).click();
 
   await expect(page.locator("#roadmap-results")).toBeVisible();
   await expect(page.getByTestId("quanda-guide").first()).toBeVisible();

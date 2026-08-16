@@ -13,18 +13,23 @@ import type {
 import { ProjectBriefForm } from "./ProjectBriefForm";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
+import { CreativeDnaReview } from "./CreativeDnaReview";
+import { LoadingAnalysis } from "./LoadingAnalysis";
 import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import { LoadingRoadmap } from "./LoadingRoadmap";
 import {
   clearProjectStorage,
+  clearCreativeDnaReview,
   readCalendarTasks,
   readCompletion,
   readDraft,
+  readCreativeDnaReview,
   readLanguage,
   readRoadmap,
   writeCompletion,
   writeCalendarTasks,
   writeDraft,
+  writeCreativeDnaReview,
   writeLanguage,
   writeRoadmap,
 } from "@/src/lib/storage";
@@ -35,6 +40,22 @@ import {
   syncRoadmapCalendarTasks,
 } from "@/src/lib/calendar";
 import { toLocalDateKey } from "@/src/lib/date";
+import {
+  CREATIVE_DNA_REVIEW_VERSION,
+  createProjectInputFingerprint,
+  addOntologyConcept,
+  addUnknownConcept,
+  confirmCreativeDna,
+  mergeReviewOverrides,
+  rejectConcept,
+  rejectConstraint,
+  rejectUnknownConcept,
+  restoreConcept,
+  updateProjectIntent,
+  type CreativeDnaReviewRecord,
+  type OntologySearchResult,
+} from "@/src/creative-dna-review";
+import { ProjectAnalysisResponseSchema } from "@/src/project-analysis/contracts";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -62,13 +83,20 @@ export function QuandaApp() {
   const [locale, setLocale] = useState<Locale>("en");
   const [form, setForm] = useState<RoadmapRequest>(() => emptyForm("en"));
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
+  const [creativeDnaReview, setCreativeDnaReview] =
+    useState<CreativeDnaReviewRecord | null>(null);
   const [completion, setCompletion] = useState<Record<string, string[]>>({});
   const [calendarTasks, setCalendarTasks] = useState<CalendarTask[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const t = getTranslation(locale);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
+  const creativeDnaIsStale = creativeDnaReview
+    ? creativeDnaReview.inputFingerprint !== createProjectInputFingerprint(form)
+    : false;
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -82,10 +110,15 @@ export function QuandaApp() {
       const restoredForm = savedDraft
         ? { ...savedDraft, interfaceLanguage: restoredLocale }
         : emptyForm(restoredLocale);
+      const savedCreativeDnaReview = readCreativeDnaReview(
+        window.localStorage,
+        restoredForm,
+      );
 
       setLocale(restoredLocale);
       setForm(restoredForm);
       setRoadmap(savedRoadmap);
+      setCreativeDnaReview(savedCreativeDnaReview);
       setCompletion(savedCompletion);
       setCalendarTasks(
         savedRoadmap
@@ -122,6 +155,12 @@ export function QuandaApp() {
       writeRoadmap(window.localStorage, roadmap);
     }
   }, [isHydrated, roadmap]);
+
+  useEffect(() => {
+    if (isHydrated && creativeDnaReview) {
+      writeCreativeDnaReview(window.localStorage, creativeDnaReview);
+    }
+  }, [creativeDnaReview, isHydrated]);
 
   useEffect(() => {
     if (isHydrated) {
@@ -175,9 +214,116 @@ export function QuandaApp() {
     };
     setForm(nextForm);
     setRoadmap(null);
+    setCreativeDnaReview(null);
+    clearCreativeDnaReview(window.localStorage);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     setError(null);
+    setAnalysisError(null);
     requestAnimationFrame(scrollToForm);
+  };
+
+  const analyzeProject = async (request: RoadmapRequest) => {
+    setForm(request);
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    setError(null);
+    setRoadmap(null);
+    setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+    trackEvent("creative_dna_analysis_started", {
+      language: request.interfaceLanguage,
+      outputType: request.outputType,
+    });
+    requestAnimationFrame(() => {
+      document.querySelector("#analysis-loading")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30_000);
+    try {
+      const response = await fetch("/api/project-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`analysis_${response.status}`);
+      const parsed = ProjectAnalysisResponseSchema.safeParse(await response.json());
+      if (!parsed.success) throw new Error("analysis_invalid");
+
+      const creativeDna = mergeReviewOverrides(
+        creativeDnaReview?.analysis.creativeDna ?? null,
+        parsed.data.creativeDna,
+      );
+      const review: CreativeDnaReviewRecord = {
+        reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
+        inputFingerprint: createProjectInputFingerprint(request),
+        analysis: { ...parsed.data, creativeDna },
+        confirmed: false,
+      };
+      setCreativeDnaReview(review);
+      trackEvent("creative_dna_review_viewed", { source: parsed.data.source });
+      trackEvent(
+        parsed.data.source === "fallback"
+          ? "creative_dna_analysis_fallback"
+          : "creative_dna_analysis_succeeded",
+        {
+          source: parsed.data.source,
+          conceptCount: creativeDna.concepts.length,
+          unknownCount: creativeDna.unknownConcepts.length,
+        },
+      );
+      window.setTimeout(() => {
+        document.querySelector("#creative-dna-review")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 50);
+    } catch {
+      setAnalysisError(getTranslation(request.interfaceLanguage).review.errorMessage);
+    } finally {
+      window.clearTimeout(timeout);
+      setIsAnalyzing(false);
+    }
+  };
+
+  const updateCreativeDna = (
+    operation: (
+      creativeDna: CreativeDnaReviewRecord["analysis"]["creativeDna"],
+    ) => CreativeDnaReviewRecord["analysis"]["creativeDna"],
+  ) => {
+    setCreativeDnaReview((current) =>
+      current
+        ? {
+            ...current,
+            analysis: {
+              ...current.analysis,
+              creativeDna: operation(current.analysis.creativeDna),
+            },
+            confirmed: false,
+          }
+        : current,
+    );
+  };
+
+  const confirmCreativeDnaReview = () => {
+    if (!creativeDnaReview) return;
+    const confirmedReview: CreativeDnaReviewRecord = {
+      ...creativeDnaReview,
+      analysis: {
+        ...creativeDnaReview.analysis,
+        creativeDna: confirmCreativeDna(creativeDnaReview.analysis.creativeDna),
+      },
+      confirmed: true,
+    };
+    setCreativeDnaReview(confirmedReview);
+    writeCreativeDnaReview(window.localStorage, confirmedReview);
+    trackEvent("creative_dna_confirmed", {
+      conceptCount: confirmedReview.analysis.creativeDna.concepts.length,
+    });
+    void generateRoadmap(form);
   };
 
   const generateRoadmap = async (request: RoadmapRequest) => {
@@ -374,14 +520,34 @@ export function QuandaApp() {
         </section>
 
         <ProjectBriefForm
-          isSubmitting={isLoading || !isHydrated}
+          isSubmitting={isLoading || isAnalyzing || !isHydrated}
           onChange={setForm}
-          onSubmit={generateRoadmap}
+          onSubmit={(request) => void analyzeProject(request)}
           t={t}
           value={form}
         />
 
         <div aria-live="polite">
+          {isAnalyzing && <LoadingAnalysis t={t} />}
+          {analysisError && (
+            <div className="api-error analysis-error" role="alert">
+              <strong>{t.review.errorTitle}</strong>
+              <p>{analysisError}</p>
+              <div className="analysis-error-actions">
+                <button
+                  className="button button-primary"
+                  disabled={isAnalyzing}
+                  onClick={() => void analyzeProject(form)}
+                  type="button"
+                >
+                  {t.review.retry}
+                </button>
+                <button className="button button-text" onClick={scrollToForm} type="button">
+                  {t.review.editDetails}
+                </button>
+              </div>
+            </div>
+          )}
           {isLoading && <LoadingRoadmap t={t} />}
           {error && (
             <div className="api-error" role="alert">
@@ -391,22 +557,86 @@ export function QuandaApp() {
           )}
         </div>
 
+        {creativeDnaReview && !isAnalyzing && (
+          <CreativeDnaReview
+            creativeDna={creativeDnaReview.analysis.creativeDna}
+            isBusy={isLoading || isAnalyzing}
+            isFallback={creativeDnaReview.analysis.source === "fallback"}
+            isStale={creativeDnaIsStale}
+            onAddOntology={(node: OntologySearchResult) => {
+              updateCreativeDna((creativeDna) => addOntologyConcept(creativeDna, node));
+              trackEvent("creative_dna_concept_added", {
+                family: node.family,
+                category: node.category,
+              });
+            }}
+            onAddUnknown={(wording) => {
+              updateCreativeDna((creativeDna) => addUnknownConcept(creativeDna, wording));
+              trackEvent("creative_dna_unknown_added");
+            }}
+            onConfirm={confirmCreativeDnaReview}
+            onEditDetails={scrollToForm}
+            onIntentChange={(intent) =>
+              updateCreativeDna((creativeDna) => updateProjectIntent(creativeDna, intent))
+            }
+            onReanalyze={() => {
+              trackEvent("creative_dna_reanalysis_requested");
+              void analyzeProject(form);
+            }}
+            onRejectConcept={(identity, deliberate) => {
+              updateCreativeDna((creativeDna) =>
+                rejectConcept(creativeDna, identity, {
+                  allowExplicitRequirement: deliberate,
+                }),
+              );
+              trackEvent("creative_dna_concept_removed", {
+                explicitOverride: Boolean(deliberate),
+              });
+            }}
+            onRejectConstraint={(identity, deliberate) =>
+              updateCreativeDna((creativeDna) =>
+                rejectConstraint(creativeDna, identity, {
+                  allowExplicitRequirement: deliberate,
+                }),
+              )
+            }
+            onRejectUnknown={(identity) => {
+              updateCreativeDna((creativeDna) =>
+                rejectUnknownConcept(creativeDna, identity),
+              );
+              trackEvent("creative_dna_concept_removed", {
+                explicitOverride: false,
+              });
+            }}
+            onRestore={(identity) =>
+              updateCreativeDna((creativeDna) => restoreConcept(creativeDna, identity))
+            }
+            t={t}
+          />
+        )}
+
         {roadmap && (
           <RoadmapResults
             completedStageIds={completedStageIds}
             onEdit={scrollToForm}
             onRegenerate={() => {
               trackEvent("roadmap_regenerated");
-              void generateRoadmap(form);
+              if (creativeDnaReview?.confirmed && !creativeDnaIsStale) {
+                void generateRoadmap(form);
+              } else {
+                void analyzeProject(form);
+              }
             }}
             onStartOver={() => {
               if (!window.confirm(t.results.startOverConfirm)) return;
               clearProjectStorage(window.localStorage);
               setForm(emptyForm(locale));
               setRoadmap(null);
+              setCreativeDnaReview(null);
               setCompletion({});
               setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
               setError(null);
+              setAnalysisError(null);
               writeLanguage(window.localStorage, locale);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
