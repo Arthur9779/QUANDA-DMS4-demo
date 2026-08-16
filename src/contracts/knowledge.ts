@@ -224,6 +224,7 @@ export const TutorialMatchCandidateSignalsSchema = z.object({
 
 export type ConceptSource = z.infer<typeof ConceptSourceSchema>;
 export type ConceptStatus = z.infer<typeof ConceptStatusSchema>;
+export type ConceptEvidence = z.infer<typeof ConceptEvidenceSchema>;
 export type CreativeDNAConcept = z.infer<typeof CreativeDNAConceptSchema>;
 export type UnknownConcept = z.infer<typeof UnknownConceptSchema>;
 export type ProjectConstraint = z.infer<typeof ProjectConstraintSchema>;

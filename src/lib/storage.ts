@@ -1,12 +1,14 @@
 import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { isCalendarTask } from "@/src/lib/calendar";
+import { ProjectAnalysisResponseSchema } from "@/src/project-analysis/contracts";
 import type {
   CalendarTask,
   Locale,
   RoadmapRequest,
   RoadmapResponse,
 } from "@/src/types";
+import type { ProjectAnalysisResponse } from "@/src/project-analysis/contracts";
 
 export const STORAGE_KEYS = {
   language: "quanda:v1:language",
@@ -14,6 +16,7 @@ export const STORAGE_KEYS = {
   roadmap: "quanda:v1:last-roadmap",
   completion: "quanda:v1:completion",
   calendar: "quanda:v1:calendar-tasks",
+  creativeDnaAnalysis: "quanda:v1:creative-dna-analysis",
 } as const;
 
 function safeParse(value: string | null): unknown {
@@ -71,6 +74,29 @@ export function writeRoadmap(
   }
 }
 
+export function readCreativeDnaAnalysis(
+  storage: Storage,
+): ProjectAnalysisResponse | null {
+  const parsed = ProjectAnalysisResponseSchema.safeParse(
+    safeParse(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis)),
+  );
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeCreativeDnaAnalysis(
+  storage: Storage,
+  analysis: ProjectAnalysisResponse,
+): void {
+  try {
+    storage.setItem(
+      STORAGE_KEYS.creativeDnaAnalysis,
+      JSON.stringify(analysis),
+    );
+  } catch {
+    // Creative DNA remains usable in memory when storage is unavailable.
+  }
+}
+
 export function readCompletion(
   storage: Storage,
 ): Record<string, string[]> {
@@ -121,6 +147,7 @@ export function clearProjectStorage(storage: Storage): void {
     storage.removeItem(STORAGE_KEYS.draft);
     storage.removeItem(STORAGE_KEYS.roadmap);
     storage.removeItem(STORAGE_KEYS.completion);
+    storage.removeItem(STORAGE_KEYS.creativeDnaAnalysis);
   } catch {
     // The in-memory reset still succeeds.
   }

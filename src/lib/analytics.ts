@@ -1,4 +1,7 @@
 export type AnalyticsEvent =
+  | "creative_dna_analysis_started"
+  | "creative_dna_analysis_succeeded"
+  | "creative_dna_analysis_fallback"
   | "roadmap_generate_started"
   | "roadmap_generate_succeeded"
   | "roadmap_generate_fallback"

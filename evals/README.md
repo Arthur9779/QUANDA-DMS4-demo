@@ -14,6 +14,7 @@ Expected concepts continue to use reviewable semantic labels. PR 1 can now map e
 pnpm eval
 pnpm eval:ontology
 pnpm eval:retrieval
+pnpm eval:creative-dna
 ```
 
 Optional paths may be supplied:
@@ -22,7 +23,7 @@ Optional paths may be supplied:
 pnpm eval -- evals/briefs.v1.json evals/fixtures/naive-software-first.json
 ```
 
-The main runner validates both files, requires one prediction for every benchmark case, computes metrics from the labelled predictions, and prints a summary. `eval:ontology` separately reports exact, ambiguous, and unknown mappings against the compiled ontology. `eval:retrieval` runs the deterministic hybrid-retrieval fallback across the same bilingual cases and reports candidate recall, irrelevant candidates, diversity, and fallback usage. None of these commands calls Gemini or an external tutorial provider.
+The main runner validates both files, requires one prediction for every benchmark case, computes metrics from the labelled predictions, and prints a summary. `eval:ontology` separately reports exact, ambiguous, and unknown mappings against the compiled ontology. `eval:retrieval` runs the deterministic hybrid-retrieval fallback across the same bilingual cases and reports candidate recall, irrelevant candidates, diversity, and fallback usage. `eval:creative-dna` measures provenance, mapped concept recall, inference precision, unknown preservation, irrelevant concepts, and retrieval-versus-classification misses. None of these commands calls Gemini or an external tutorial provider.
 
 ## Metrics
 
