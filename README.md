@@ -42,6 +42,8 @@ Open `http://localhost:3000`.
 | `GEMINI_API_KEY` | No | Server-only Google AI Studio API key. With no key, QUANDA uses demo mode. |
 | `GEMINI_BASE_URL` | No | Gemini API endpoint. Defaults to Google's `v1beta` endpoint. |
 | `GEMINI_MODEL` | No | Model name. Defaults to `gemini-3.1-flash-lite`. |
+| `GEMINI_CLASSIFICATION_MODEL` | No | Model used for Creative DNA classification; falls back to `GEMINI_MODEL`. |
+| `GEMINI_CLASSIFICATION_TIMEOUT_MS` | No | Creative DNA classification timeout, clamped to 500–25,000 ms. |
 | `GEMINI_FILE_SEARCH_STORE` | For semantic retrieval | Indexed Gemini File Search store resource name. |
 | `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` | For semantic retrieval | Source hash of the ontology indexed in that store. |
 | `GEMINI_FILE_SEARCH_EMBEDDING_MODEL` | No | Store embedding model. Defaults to `models/gemini-embedding-2`. |
@@ -116,9 +118,10 @@ Run the deterministic baseline without Gemini or YouTube access:
 pnpm eval
 pnpm eval:ontology
 pnpm eval:retrieval
+pnpm eval:creative-dna
 ```
 
-The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md).
+The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed Creative DNA classification and its server boundary are documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md).
 
 ## 11. Vercel deployment
 
