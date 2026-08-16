@@ -19,8 +19,10 @@ The document title and `Key: value` preamble metadata are also retained by the c
 ```bash
 edit knowledge/quanda.skills
 pnpm ontology:build
+pnpm ontology:index
 pnpm test
 pnpm eval:ontology
+pnpm eval:retrieval
 pnpm build
 ```
 
@@ -44,8 +46,8 @@ Different labels that produce the same ASCII slug all receive deterministic cont
 
 The generated artifact includes compact collision diagnostics because they are useful for curation. It omits a generated timestamp so identical source produces byte-identical output.
 
-## Runtime and future work
+## Runtime and retrieval
 
 `src/ontology/runtime.ts` validates the generated artifact once and exposes ID, family, category, exact-label, alias, token, and prefix lookups. Nothing imports it from the current client experience, so the ontology is not added to the initial browser bundle and existing roadmap/tutorial behavior is unchanged.
 
-PR 2 will add semantic retrieval, PR 3 will classify Creative DNA against canonical IDs, and PR 5 will use those IDs for tutorial classification and matching. Embeddings, Gemini retrieval, Creative DNA UI, tutorial discovery/ranking, and roadmap prompt changes are intentionally outside this PR.
+PR 2 adds a server-side hybrid retrieval layer, deterministic search documents, and an optional Gemini File Search index. See [`ontology-retrieval.md`](ontology-retrieval.md) for setup, freshness, fallback, diagnostics, and evaluation details. PR 3 will classify Creative DNA against canonical IDs, and PR 5 will use those IDs for tutorial classification and matching. Creative DNA UI, tutorial discovery/ranking, and roadmap prompt changes remain intentionally outside this PR.
