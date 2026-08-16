@@ -8,6 +8,10 @@ import {
   type CreativeDnaReviewRecord,
 } from "@/src/creative-dna-review/contracts";
 import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
+import {
+  LearningPlanSchema,
+  type LearningPlan,
+} from "@/src/tutorial-matching/contracts";
 import type {
   CalendarTask,
   Locale,
@@ -23,6 +27,7 @@ export const STORAGE_KEYS = {
   completion: "quanda:v1:completion",
   calendar: "quanda:v1:calendar-tasks",
   creativeDnaAnalysis: "quanda:v1:creative-dna-analysis",
+  learningPlan: "quanda:v1:learning-plan",
 } as const;
 
 function safeParse(value: string | null): unknown {
@@ -146,6 +151,31 @@ export function clearCreativeDnaReview(storage: Storage): void {
   }
 }
 
+export function readLearningPlan(storage: Storage): LearningPlan | null {
+  const parsed = LearningPlanSchema.safeParse(
+    safeParse(storage.getItem(STORAGE_KEYS.learningPlan)),
+  );
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeLearningPlan(storage: Storage, plan: LearningPlan): void {
+  const parsed = LearningPlanSchema.safeParse(plan);
+  if (!parsed.success) return;
+  try {
+    storage.setItem(STORAGE_KEYS.learningPlan, JSON.stringify(parsed.data));
+  } catch {
+    // Tutorial decisions remain available in memory.
+  }
+}
+
+export function clearLearningPlan(storage: Storage): void {
+  try {
+    storage.removeItem(STORAGE_KEYS.learningPlan);
+  } catch {
+    // In-memory reset still succeeds.
+  }
+}
+
 export function readCompletion(
   storage: Storage,
 ): Record<string, string[]> {
@@ -197,6 +227,7 @@ export function clearProjectStorage(storage: Storage): void {
     storage.removeItem(STORAGE_KEYS.roadmap);
     storage.removeItem(STORAGE_KEYS.completion);
     storage.removeItem(STORAGE_KEYS.creativeDnaAnalysis);
+    storage.removeItem(STORAGE_KEYS.learningPlan);
   } catch {
     // The in-memory reset still succeeds.
   }

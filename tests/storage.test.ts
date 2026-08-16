@@ -6,10 +6,12 @@ import {
   readCreativeDnaReview,
   readDraft,
   readLanguage,
+  readLearningPlan,
   readRoadmap,
   STORAGE_KEYS,
   writeCreativeDnaAnalysis,
   writeCreativeDnaReview,
+  writeLearningPlan,
 } from "@/src/lib/storage";
 
 class MemoryStorage implements Storage {
@@ -171,5 +173,23 @@ describe("local storage recovery", () => {
       JSON.stringify({ reviewVersion: 99, inputFingerprint: "12ab34cd" }),
     );
     expect(readCreativeDnaReview(storage)).toBeNull();
+  });
+
+  it("round-trips skill overrides and tutorial decisions", () => {
+    const storage = new MemoryStorage();
+    const plan = {
+      learningPlanVersion: 1 as const,
+      tutorialRankingVersion: 1 as const,
+      inputFingerprint: "12ab34cd",
+      skillGaps: [],
+      tutorialNeeds: [],
+      tutorialMatches: [],
+      source: "catalogue" as const,
+      createdAt: "2026-08-16T00:00:00.000Z",
+    };
+    writeLearningPlan(storage, plan);
+    expect(readLearningPlan(storage)).toEqual(plan);
+    storage.setItem(STORAGE_KEYS.learningPlan, JSON.stringify({ ...plan, learningPlanVersion: 9 }));
+    expect(readLearningPlan(storage)).toBeNull();
   });
 });

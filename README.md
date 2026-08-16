@@ -49,6 +49,7 @@ Open `http://localhost:3000`.
 | `GEMINI_FILE_SEARCH_EMBEDDING_MODEL` | No | Store embedding model. Defaults to `models/gemini-embedding-2`. |
 | `GEMINI_RETRIEVAL_MODEL` | No | Model used for retrieval interactions; falls back to `GEMINI_MODEL`. |
 | `GEMINI_RETRIEVAL_TIMEOUT_MS` | No | Semantic retrieval timeout between 250 and 15,000 ms. |
+| `YOUTUBE_API_KEY` | No | Server-only YouTube Data API key for optional live video discovery. Curated and indexed matching works without it. |
 | `NEXT_PUBLIC_APP_URL` | No | Public app origin for local documentation and deployment configuration. |
 
 Never prefix the Gemini key with `NEXT_PUBLIC_` and never place it in client-side code. `.env.local` is ignored by Git.
@@ -119,15 +120,17 @@ pnpm eval
 pnpm eval:ontology
 pnpm eval:retrieval
 pnpm eval:creative-dna
+pnpm eval:tutorials
+pnpm tutorial:match --case blender-beginner-toon
 ```
 
-The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed classification is documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md), and the editable review/persistence flow in [`docs/creative-dna-review.md`](docs/creative-dna-review.md).
+The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed classification is documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md), the editable review/persistence flow in [`docs/creative-dna-review.md`](docs/creative-dna-review.md), and contextual skill-gap/tutorial matching in [`docs/tutorial-matching.md`](docs/tutorial-matching.md).
 
 ## 11. Vercel deployment
 
 1. Push this repository to GitHub.
 2. Import the repository into Vercel and keep the detected Next.js framework preset.
-3. Add `GEMINI_API_KEY` as a server environment variable.
+3. Add `GEMINI_API_KEY` as a server environment variable. Optionally add `YOUTUBE_API_KEY` for live YouTube discovery; the verified local catalogue remains the first source tier.
 4. Run `pnpm ontology:index` locally with the same API key, then add the printed `GEMINI_FILE_SEARCH_STORE` and `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` values to Vercel. Skip this step to use deterministic local ontology retrieval.
 5. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
 6. Deploy and test the public URL in English and Vietnamese.

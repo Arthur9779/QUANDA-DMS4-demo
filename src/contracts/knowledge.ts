@@ -3,7 +3,10 @@ import { z } from "zod";
 export const KNOWLEDGE_CONTRACT_VERSIONS = {
   creativeDna: 1,
   ontology: 1,
+  skillGap: 1,
+  tutorialNeed: 1,
   tutorialMetadata: 1,
+  tutorialClassifier: 1,
   tutorialMatchScore: 1,
 } as const;
 
@@ -173,6 +176,48 @@ export const TutorialMetadataSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
+export const SkillGapSchema = z.object({
+  skillGapVersion: z.literal(KNOWLEDGE_CONTRACT_VERSIONS.skillGap),
+  id: StableIdSchema,
+  skillId: StableIdSchema,
+  label: SemanticLabelSchema,
+  relatedTechniqueIds: z.array(StableIdSchema).max(40).default([]),
+  softwareIds: z.array(z.string().trim().min(1).max(160)).max(20).default([]),
+  status: z.enum(["known", "partial", "needs_learning", "not_required"]),
+  reason: z.string().trim().min(1).max(600),
+  prerequisiteSkillIds: z.array(StableIdSchema).max(20).default([]),
+  priority: z.enum(["required", "useful", "optional"]),
+  estimatedLearningMinutes: z.number().int().positive().max(10_000).optional(),
+  confidence: ConfidenceSchema.optional(),
+});
+
+export const TutorialNeedSchema = z.object({
+  tutorialNeedVersion: z.literal(KNOWLEDGE_CONTRACT_VERSIONS.tutorialNeed),
+  id: StableIdSchema,
+  label: SemanticLabelSchema,
+  skillIds: z.array(StableIdSchema).min(1).max(40),
+  techniqueIds: z.array(StableIdSchema).max(40).default([]),
+  softwareIds: z.array(z.string().trim().min(1).max(160)).max(20).default([]),
+  prerequisiteIds: z.array(StableIdSchema).max(40).default([]),
+  aestheticIds: z.array(StableIdSchema).max(40).default([]),
+  outputIds: z.array(StableIdSchema).max(40).default([]),
+  productionStageIds: z.array(StableIdSchema).max(40).default([]),
+  userLevel: z.enum(["beginner", "intermediate", "advanced", "mixed"]).optional(),
+  preferredLanguage: z.enum(["en", "vi", "either"]),
+  preferredDurationMinutes: z.number().int().positive().max(600).optional(),
+  searchQueries: z.array(z.string().trim().min(3).max(180)).min(1).max(4),
+  priority: z.enum(["required", "useful", "optional"]),
+  status: z.enum(["active", "known", "not_required"]).default("active"),
+});
+
+export const TutorialDNASchema = TutorialMetadataSchema.extend({
+  classifierVersion: z.literal(
+    KNOWLEDGE_CONTRACT_VERSIONS.tutorialClassifier,
+  ),
+  metadataHash: z.string().regex(/^[a-f0-9]{8}$/),
+  learningObjectives: z.array(SemanticLabelSchema).max(20).default([]),
+});
+
 export const TUTORIAL_SOURCE_PRIORITY = [
   "verified_quanda_catalog",
   "indexed_classified",
@@ -232,6 +277,9 @@ export type CreativeDNA = z.infer<typeof CreativeDNASchema>;
 export type OntologyNode = z.infer<typeof OntologyNodeSchema>;
 export type OntologyRelationship = z.infer<typeof OntologyRelationshipSchema>;
 export type TutorialMetadata = z.infer<typeof TutorialMetadataSchema>;
+export type SkillGap = z.infer<typeof SkillGapSchema>;
+export type TutorialNeed = z.infer<typeof TutorialNeedSchema>;
+export type TutorialDNA = z.infer<typeof TutorialDNASchema>;
 export type TutorialMatchScoreConfig = z.infer<
   typeof TutorialMatchScoreConfigSchema
 >;

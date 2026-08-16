@@ -15,21 +15,26 @@ import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
 import { CreativeDnaReview } from "./CreativeDnaReview";
 import { LoadingAnalysis } from "./LoadingAnalysis";
+import { LoadingLearningPath } from "./LoadingLearningPath";
+import { LearningPathReview } from "./LearningPathReview";
 import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import { LoadingRoadmap } from "./LoadingRoadmap";
 import {
   clearProjectStorage,
   clearCreativeDnaReview,
+  clearLearningPlan,
   readCalendarTasks,
   readCompletion,
   readDraft,
   readCreativeDnaReview,
+  readLearningPlan,
   readLanguage,
   readRoadmap,
   writeCompletion,
   writeCalendarTasks,
   writeDraft,
   writeCreativeDnaReview,
+  writeLearningPlan,
   writeLanguage,
   writeRoadmap,
 } from "@/src/lib/storage";
@@ -56,6 +61,13 @@ import {
   type OntologySearchResult,
 } from "@/src/creative-dna-review";
 import { ProjectAnalysisResponseSchema } from "@/src/project-analysis/contracts";
+import {
+  LearningPlanSchema,
+  markSkillGap,
+  mergeLearningDecisions,
+  replaceTutorial,
+  type LearningPlan,
+} from "@/src/tutorial-matching";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -85,17 +97,23 @@ export function QuandaApp() {
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
   const [creativeDnaReview, setCreativeDnaReview] =
     useState<CreativeDnaReviewRecord | null>(null);
+  const [learningPlan, setLearningPlan] = useState<LearningPlan | null>(null);
   const [completion, setCompletion] = useState<Record<string, string[]>>({});
   const [calendarTasks, setCalendarTasks] = useState<CalendarTask[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isMatchingTutorials, setIsMatchingTutorials] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [matchingError, setMatchingError] = useState<string | null>(null);
   const t = getTranslation(locale);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
   const creativeDnaIsStale = creativeDnaReview
     ? creativeDnaReview.inputFingerprint !== createProjectInputFingerprint(form)
+    : false;
+  const learningPlanIsStale = learningPlan
+    ? learningPlan.inputFingerprint !== createProjectInputFingerprint(form)
     : false;
 
   useEffect(() => {
@@ -114,11 +132,19 @@ export function QuandaApp() {
         window.localStorage,
         restoredForm,
       );
+      const savedLearningPlan = readLearningPlan(window.localStorage);
 
       setLocale(restoredLocale);
       setForm(restoredForm);
       setRoadmap(savedRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
+      setLearningPlan(
+        savedLearningPlan &&
+          savedLearningPlan.inputFingerprint ===
+            createProjectInputFingerprint(restoredForm)
+          ? savedLearningPlan
+          : null,
+      );
       setCompletion(savedCompletion);
       setCalendarTasks(
         savedRoadmap
@@ -161,6 +187,12 @@ export function QuandaApp() {
       writeCreativeDnaReview(window.localStorage, creativeDnaReview);
     }
   }, [creativeDnaReview, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated && learningPlan) {
+      writeLearningPlan(window.localStorage, learningPlan);
+    }
+  }, [isHydrated, learningPlan]);
 
   useEffect(() => {
     if (isHydrated) {
@@ -216,9 +248,12 @@ export function QuandaApp() {
     setRoadmap(null);
     setCreativeDnaReview(null);
     clearCreativeDnaReview(window.localStorage);
+    setLearningPlan(null);
+    clearLearningPlan(window.localStorage);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     setError(null);
     setAnalysisError(null);
+    setMatchingError(null);
     requestAnimationFrame(scrollToForm);
   };
 
@@ -294,6 +329,8 @@ export function QuandaApp() {
       creativeDna: CreativeDnaReviewRecord["analysis"]["creativeDna"],
     ) => CreativeDnaReviewRecord["analysis"]["creativeDna"],
   ) => {
+    setLearningPlan(null);
+    clearLearningPlan(window.localStorage);
     setCreativeDnaReview((current) =>
       current
         ? {
@@ -306,6 +343,53 @@ export function QuandaApp() {
           }
         : current,
     );
+  };
+
+  const matchTutorials = async (review: CreativeDnaReviewRecord) => {
+    setIsMatchingTutorials(true);
+    setMatchingError(null);
+    setRoadmap(null);
+    trackEvent("tutorial_matching_started", {
+      language: form.tutorialLanguage,
+    });
+    requestAnimationFrame(() => {
+      document.querySelector("#learning-path-loading")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30_000);
+    try {
+      const response = await fetch("/api/tutorial-matching", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: form, review }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`tutorial_matching_${response.status}`);
+      const parsed = LearningPlanSchema.safeParse(await response.json());
+      if (!parsed.success) throw new Error("tutorial_matching_invalid");
+      const next = mergeLearningDecisions(learningPlan, parsed.data);
+      setLearningPlan(next);
+      trackEvent("tutorial_matching_succeeded", {
+        gapCount: next.skillGaps.length,
+        matchedCount: next.tutorialMatches.filter(
+          (match) => Boolean(match.selectedTutorialId),
+        ).length,
+      });
+      window.setTimeout(() => {
+        document.querySelector("#learning-path-review")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 50);
+    } catch {
+      setMatchingError(t.learning.errorMessage);
+    } finally {
+      window.clearTimeout(timeout);
+      setIsMatchingTutorials(false);
+    }
   };
 
   const confirmCreativeDnaReview = () => {
@@ -323,7 +407,7 @@ export function QuandaApp() {
     trackEvent("creative_dna_confirmed", {
       conceptCount: confirmedReview.analysis.creativeDna.concepts.length,
     });
-    void generateRoadmap(form);
+    void matchTutorials(confirmedReview);
   };
 
   const generateRoadmap = async (request: RoadmapRequest) => {
@@ -520,7 +604,7 @@ export function QuandaApp() {
         </section>
 
         <ProjectBriefForm
-          isSubmitting={isLoading || isAnalyzing || !isHydrated}
+          isSubmitting={isLoading || isAnalyzing || isMatchingTutorials || !isHydrated}
           onChange={setForm}
           onSubmit={(request) => void analyzeProject(request)}
           t={t}
@@ -529,6 +613,7 @@ export function QuandaApp() {
 
         <div aria-live="polite">
           {isAnalyzing && <LoadingAnalysis t={t} />}
+          {isMatchingTutorials && <LoadingLearningPath t={t} />}
           {analysisError && (
             <div className="api-error analysis-error" role="alert">
               <strong>{t.review.errorTitle}</strong>
@@ -548,6 +633,22 @@ export function QuandaApp() {
               </div>
             </div>
           )}
+          {matchingError && (
+            <div className="api-error analysis-error" role="alert">
+              <strong>{t.learning.errorTitle}</strong>
+              <p>{matchingError}</p>
+              <button
+                className="button button-primary"
+                disabled={isMatchingTutorials || !creativeDnaReview?.confirmed}
+                onClick={() =>
+                  creativeDnaReview && void matchTutorials(creativeDnaReview)
+                }
+                type="button"
+              >
+                {t.learning.retry}
+              </button>
+            </div>
+          )}
           {isLoading && <LoadingRoadmap t={t} />}
           {error && (
             <div className="api-error" role="alert">
@@ -557,10 +658,10 @@ export function QuandaApp() {
           )}
         </div>
 
-        {creativeDnaReview && !isAnalyzing && (
+        {creativeDnaReview && !isAnalyzing && !isMatchingTutorials && (
           <CreativeDnaReview
             creativeDna={creativeDnaReview.analysis.creativeDna}
-            isBusy={isLoading || isAnalyzing}
+            isBusy={isLoading || isAnalyzing || isMatchingTutorials}
             isFallback={creativeDnaReview.analysis.source === "fallback"}
             isStale={creativeDnaIsStale}
             onAddOntology={(node: OntologySearchResult) => {
@@ -615,14 +716,45 @@ export function QuandaApp() {
           />
         )}
 
+        {learningPlan &&
+          creativeDnaReview?.confirmed &&
+          !learningPlanIsStale &&
+          !isMatchingTutorials && (
+            <LearningPathReview
+              isBusy={isLoading}
+              onContinue={() => void generateRoadmap(form)}
+              onReplace={(needId, feedback) => {
+                setLearningPlan((current) =>
+                  current ? replaceTutorial(current, needId, feedback) : current,
+                );
+                trackEvent("tutorial_replaced", { feedback: feedback ?? "none" });
+              }}
+              onSkillStatus={(skillId, status) => {
+                setLearningPlan((current) =>
+                  current ? markSkillGap(current, skillId, status) : current,
+                );
+                trackEvent("skill_gap_updated", { status });
+              }}
+              plan={learningPlan}
+              t={t}
+            />
+          )}
+
         {roadmap && (
           <RoadmapResults
             completedStageIds={completedStageIds}
             onEdit={scrollToForm}
             onRegenerate={() => {
               trackEvent("roadmap_regenerated");
-              if (creativeDnaReview?.confirmed && !creativeDnaIsStale) {
+              if (
+                creativeDnaReview?.confirmed &&
+                learningPlan &&
+                !creativeDnaIsStale &&
+                !learningPlanIsStale
+              ) {
                 void generateRoadmap(form);
+              } else if (creativeDnaReview?.confirmed && !creativeDnaIsStale) {
+                void matchTutorials(creativeDnaReview);
               } else {
                 void analyzeProject(form);
               }
@@ -633,10 +765,12 @@ export function QuandaApp() {
               setForm(emptyForm(locale));
               setRoadmap(null);
               setCreativeDnaReview(null);
+              setLearningPlan(null);
               setCompletion({});
               setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
               setError(null);
               setAnalysisError(null);
+              setMatchingError(null);
               writeLanguage(window.localStorage, locale);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}

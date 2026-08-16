@@ -137,6 +137,38 @@ export interface Translation {
       daysPerWeek: string;
     };
   };
+  learning: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    alreadyKnow: string;
+    needForProject: string;
+    knownEmpty: string;
+    estimate: string;
+    skillReason: string;
+    prerequisiteReason: string;
+    required: string;
+    useful: string;
+    optional: string;
+    whyTutorial: string;
+    whyTutorialCopy: string;
+    useThis: string;
+    replace: string;
+    alreadyKnowThis: string;
+    needHelp: string;
+    notRelevant: string;
+    tooAdvanced: string;
+    tooLong: string;
+    noTutorial: string;
+    noTutorialHelp: string;
+    continue: string;
+    saved: string;
+    loadingTitle: string;
+    loadingStatuses: string[];
+    errorTitle: string;
+    errorMessage: string;
+    retry: string;
+  };
   results: {
     eyebrow: string;
     demo: string;
@@ -393,6 +425,44 @@ const en: Translation = {
       hoursPerDay: "hours/day",
       daysPerWeek: "days/week",
     },
+  },
+  learning: {
+    eyebrow: "Your minimum learning path",
+    title: "Learn only what this project needs",
+    intro:
+      "QUANDA compared the confirmed direction with your experience, then kept the smallest useful skill chain.",
+    alreadyKnow: "You already know",
+    needForProject: "Skills to learn for this project",
+    knownEmpty: "No project-relevant skills were marked as known yet.",
+    estimate: "Estimated learning time",
+    skillReason: "Required by the confirmed project direction.",
+    prerequisiteReason: "A minimum prerequisite for a required project skill.",
+    required: "Required",
+    useful: "Useful",
+    optional: "Optional",
+    whyTutorial: "Why this tutorial?",
+    whyTutorialCopy: "It is the strongest focused match for this skill, software, level, and available time.",
+    useThis: "Use this",
+    replace: "Replace",
+    alreadyKnowThis: "I already know this",
+    needHelp: "Need help",
+    notRelevant: "Not relevant",
+    tooAdvanced: "Too advanced",
+    tooLong: "Too long",
+    noTutorial: "No suitable verified tutorial found",
+    noTutorialHelp: "QUANDA will keep the skill in your plan without inventing a link.",
+    continue: "Continue to my roadmap",
+    saved: "Your choices are saved on this device.",
+    loadingTitle: "Building your focused learning path",
+    loadingStatuses: [
+      "Identifying what you need to learn",
+      "Checking minimum prerequisites",
+      "Finding focused tutorials",
+      "Removing broad and repeated resources",
+    ],
+    errorTitle: "QUANDA couldn't match tutorials",
+    errorMessage: "Try again. Your confirmed Creative DNA is still saved.",
+    retry: "Try matching again",
   },
   results: {
     eyebrow: "Your production path",
@@ -674,6 +744,44 @@ const vi: Translation = {
       hoursPerDay: "giờ/ngày",
       daysPerWeek: "ngày/tuần",
     },
+  },
+  learning: {
+    eyebrow: "Lộ trình học tối thiểu",
+    title: "Chỉ học những gì dự án này cần",
+    intro:
+      "QUANDA đã đối chiếu định hướng được xác nhận với kinh nghiệm của bạn và giữ lại chuỗi kỹ năng ngắn nhất có ích.",
+    alreadyKnow: "Bạn đã biết",
+    needForProject: "Kỹ năng cần học cho dự án này",
+    knownEmpty: "Chưa có kỹ năng liên quan đến dự án được đánh dấu là đã biết.",
+    estimate: "Thời gian học ước tính",
+    skillReason: "Kỹ năng này cần thiết cho định hướng dự án đã xác nhận.",
+    prerequisiteReason: "Kiến thức nền tối thiểu cho một kỹ năng bắt buộc của dự án.",
+    required: "Bắt buộc",
+    useful: "Hữu ích",
+    optional: "Không bắt buộc",
+    whyTutorial: "Vì sao chọn video này?",
+    whyTutorialCopy: "Đây là lựa chọn tập trung phù hợp nhất với kỹ năng, phần mềm, trình độ và quỹ thời gian của bạn.",
+    useThis: "Dùng video này",
+    replace: "Đổi video",
+    alreadyKnowThis: "Tôi đã biết kỹ năng này",
+    needHelp: "Tôi cần hỗ trợ",
+    notRelevant: "Không liên quan",
+    tooAdvanced: "Quá nâng cao",
+    tooLong: "Quá dài",
+    noTutorial: "Chưa tìm thấy video đã xác minh phù hợp",
+    noTutorialHelp: "QUANDA sẽ giữ kỹ năng trong kế hoạch mà không bịa đường dẫn.",
+    continue: "Tiếp tục đến lộ trình",
+    saved: "Lựa chọn của bạn được lưu trên thiết bị này.",
+    loadingTitle: "Đang tạo lộ trình học tập trung",
+    loadingStatuses: [
+      "Đang xác định kỹ năng cần học",
+      "Đang kiểm tra kiến thức nền tối thiểu",
+      "Đang tìm video tập trung",
+      "Đang loại nguồn quá rộng và trùng lặp",
+    ],
+    errorTitle: "QUANDA chưa thể ghép video hướng dẫn",
+    errorMessage: "Hãy thử lại. DNA sáng tạo đã xác nhận vẫn được lưu.",
+    retry: "Thử ghép lại",
   },
   results: {
     eyebrow: "Lộ trình sản xuất của bạn",

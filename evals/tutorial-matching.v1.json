@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "blender-beginner-toon",
+      "project": {
+        "interfaceLanguage": "en",
+        "projectBrief": "I am new to Blender and need to make a toon-shaded product animation with a simple camera move.",
+        "deadline": "2026-09-30",
+        "currentExperience": "Blender: complete beginner",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "en",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["toon shading", "product animation", "camera animation"],
+      "expectedSkillIds": [
+        "learning-classification.prerequisite-software-knowledge.viewport-navigation",
+        "learning-classification.prerequisite-software-knowledge.materials",
+        "tutorial-content-classification.tutorial-technique.toon-shading",
+        "motion-and-animation.camera-animation.spline-camera"
+      ],
+      "knownSkillIds": [],
+      "forbiddenSkillIds": []
+    },
+    {
+      "id": "blender-intermediate-toon",
+      "project": {
+        "interfaceLanguage": "en",
+        "projectBrief": "I need to make a toon-shaded Blender product animation with a simple camera move.",
+        "deadline": "2026-09-30",
+        "currentExperience": "I know Blender modelling, navigation and materials at an intermediate level.",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "en",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["toon shading", "product animation", "camera animation"],
+      "expectedSkillIds": [
+        "tutorial-content-classification.tutorial-technique.toon-shading",
+        "motion-and-animation.camera-animation.spline-camera"
+      ],
+      "knownSkillIds": [
+        "learning-classification.prerequisite-software-knowledge.viewport-navigation",
+        "learning-classification.prerequisite-software-knowledge.materials"
+      ],
+      "forbiddenSkillIds": []
+    },
+    {
+      "id": "geometry-nodes-vegetation",
+      "project": {
+        "interfaceLanguage": "en",
+        "projectBrief": "I need procedural vegetation scattering and density masks for a solarpunk Blender environment.",
+        "deadline": "2026-09-30",
+        "currentExperience": "I know Blender modelling but have never used Geometry Nodes.",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "en",
+        "requiredApplications": ["blender"],
+        "outputType": "3d",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["geometry nodes", "vegetation scatter", "point distribution"],
+      "expectedSkillIds": [
+        "motion-and-animation.procedural-motion.geometry-nodes",
+        "3d-production.geometry-nodes-technique.vegetation-scatter",
+        "3d-production.geometry-nodes-technique.point-distribution"
+      ],
+      "knownSkillIds": [
+        "learning-classification.prerequisite-software-knowledge.viewport-navigation"
+      ],
+      "forbiddenSkillIds": []
+    },
+    {
+      "id": "bauhaus-audio-reactive-poster",
+      "project": {
+        "interfaceLanguage": "en",
+        "projectBrief": "I want a Bauhaus poster where geometric shapes react to music using p5.js creative coding.",
+        "deadline": "2026-09-30",
+        "currentExperience": "I know Illustrator but have never coded.",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "en",
+        "requiredApplications": ["custom:p5.js"],
+        "outputType": "other",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["Bauhaus", "p5.js", "FFT", "audio reactive"],
+      "expectedSkillIds": [
+        "learning-classification.prerequisite-technique-knowledge.javascript-syntax",
+        "learning-classification.prerequisite-coding-knowledge.canvas",
+        "audio-and-music.audio-reactive-technique.fft",
+        "web-and-creative-coding.animation-library.p5-js-frame-loop"
+      ],
+      "knownSkillIds": [],
+      "forbiddenSkillIds": []
+    },
+    {
+      "id": "touchdesigner-hand-tracking",
+      "project": {
+        "interfaceLanguage": "en",
+        "projectBrief": "I need hand tracking in TouchDesigner to grow projected flowers by mapping movement to parameters.",
+        "deadline": "2026-09-30",
+        "currentExperience": "I know TouchDesigner basics but not hand tracking.",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "en",
+        "requiredApplications": ["custom:TouchDesigner"],
+        "outputType": "other",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["hand tracking", "input mapping", "instancing", "growth"],
+      "expectedSkillIds": [
+        "experience-installation-physical-interaction.computer-vision.hand-tracking",
+        "programming-concepts.interaction-programming-concept.input-mapping",
+        "3d-production.geometry-nodes-technique.instancing"
+      ],
+      "knownSkillIds": [],
+      "forbiddenSkillIds": []
+    },
+    {
+      "id": "vietnamese-y2k-blender",
+      "project": {
+        "interfaceLanguage": "vi",
+        "projectBrief": "Tôi cần làm animation sản phẩm phong cách Y2K với vật liệu chrome và camera fisheye trong Blender.",
+        "deadline": "2026-09-30",
+        "currentExperience": "Tôi đã biết cơ bản Blender và modelling.",
+        "hoursPerDay": 2,
+        "daysPerWeek": 5,
+        "tutorialLanguage": "vi",
+        "requiredApplications": ["blender"],
+        "outputType": "video",
+        "targetQuality": "portfolio"
+      },
+      "creativeLabels": ["Y2K", "chrome", "fisheye", "product animation"],
+      "expectedSkillIds": [
+        "3d-production.material-technique.metallic-pbr",
+        "photography-and-cinematography.lens-type.fisheye",
+        "motion-and-animation.camera-animation.spline-camera"
+      ],
+      "knownSkillIds": [
+        "learning-classification.prerequisite-software-knowledge.viewport-navigation"
+      ],
+      "forbiddenSkillIds": []
+    }
+  ]
+}

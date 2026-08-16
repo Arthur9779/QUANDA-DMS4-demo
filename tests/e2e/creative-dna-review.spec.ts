@@ -44,6 +44,8 @@ test("reviews, corrects, adds, confirms, and restores Creative DNA", async ({
   await expect(review.getByText("neo-y2k eco rave", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Looks right — continue" }).click();
+  await expect(page.locator("#learning-path-review")).toBeVisible();
+  await page.getByRole("button", { name: "Continue to my roadmap" }).click();
   await expect(page.locator("#roadmap-results")).toBeVisible();
   await expect
     .poll(() =>
@@ -93,6 +95,8 @@ test("supports the full review flow in Vietnamese without overflow", async ({
   ).toBeVisible();
   await expect(page.getByText("Bắt buộc theo đề bài", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: "Đúng hướng — tiếp tục" }).click();
+  await expect(page.locator("#learning-path-review")).toBeVisible();
+  await page.getByRole("button", { name: "Tiếp tục đến lộ trình" }).click();
   await expect(page.locator("#roadmap-results")).toBeVisible();
 
   const layout = await page.evaluate(() => ({
