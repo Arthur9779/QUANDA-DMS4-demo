@@ -222,6 +222,20 @@ export function QuandaApp() {
           completion[nextRoadmap.id] ?? [],
         ),
       );
+    } else if (roadmap?.source === "fallback") {
+      // Fallback roadmaps are generated once per confirmed review. Keep their
+      // project-specific content intact while updating the visible title when
+      // the user switches language.
+      const isProductAnimationExample = /20[- ]second product animation|hoạt hình sản phẩm.*20 giây/i.test(form.projectBrief);
+      setRoadmap({
+        ...roadmap,
+        language: nextLocale,
+        title: isProductAnimationExample
+          ? nextLocale === "vi"
+            ? "Lộ trình làm hoạt hình sản phẩm 20 giây"
+            : "20-second product animation roadmap"
+          : roadmap.title,
+      });
     }
   };
 
@@ -411,6 +425,14 @@ export function QuandaApp() {
   };
 
   const generateRoadmap = async (request: RoadmapRequest) => {
+    if (!creativeDnaReview?.confirmed) {
+      void analyzeProject(request);
+      return;
+    }
+    if (!learningPlan || learningPlan.inputFingerprint !== createProjectInputFingerprint(request)) {
+      void matchTutorials(creativeDnaReview);
+      return;
+    }
     setForm(request);
     setIsLoading(true);
     setError(null);
@@ -435,7 +457,11 @@ export function QuandaApp() {
       const apiResponse = await fetch("/api/roadmap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          project: request,
+          review: creativeDnaReview,
+          learningPlan,
+        }),
         signal: controller.signal,
       });
       if (apiResponse.status === 429) {
@@ -778,7 +804,7 @@ export function QuandaApp() {
             roadmap={roadmap}
             roadmapRequest={form}
             t={t}
-            tutorialLanguage={form.tutorialLanguage}
+            learningPlan={learningPlan}
           />
         )}
 

@@ -38,6 +38,7 @@ function resolveAllowedApplicationId(
 export function normalizeRoadmap(
   roadmap: RoadmapResponse,
   request: RoadmapRequest,
+  options: { allowedTutorialIds?: ReadonlySet<string> } = {},
 ): RoadmapResponse {
   const requestedApplicationIds = new Set(
     request.requiredApplications.filter(isSupportedApplicationId),
@@ -65,16 +66,22 @@ export function normalizeRoadmap(
       learningMinutes: Math.max(1, Math.round(stage.learningMinutes)),
       productionMinutes: Math.max(1, Math.round(stage.productionMinutes)),
       dependsOnStageIds: [...new Set(validDependencies)],
-      tutorialIds: validateTutorialIds(stage.tutorialIds).slice(0, 3),
+      tutorialIds: options.allowedTutorialIds
+        ? stage.tutorialIds.filter((id) => options.allowedTutorialIds!.has(id)).slice(0, 3)
+        : validateTutorialIds(stage.tutorialIds).slice(0, 3),
+      productionTasks: stage.productionTasks?.length ? stage.productionTasks : stage.tasks,
+      learningTasks: stage.learningTasks ?? [],
+      definitionOfDone: stage.definitionOfDone?.length
+        ? stage.definitionOfDone
+        : [stage.goal],
     };
 
-    return {
-      ...normalizedStage,
-      tutorialIds: fillTutorialIds(
-        normalizedStage,
-        request.tutorialLanguage,
-      ),
-    };
+    return options.allowedTutorialIds
+      ? normalizedStage
+      : {
+          ...normalizedStage,
+          tutorialIds: fillTutorialIds(normalizedStage, request.tutorialLanguage),
+        };
   });
 
   const totalEstimatedMinutes = stages.reduce(
