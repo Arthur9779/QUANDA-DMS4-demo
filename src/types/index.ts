@@ -32,23 +32,6 @@ export type OutputType =
   | "photo"
   | "other";
 
-export interface RouteEvidence {
-  primaryApplicationId: string;
-  primaryReasonCode: string;
-  primarySkillLevel: "beginner" | "intermediate" | "advanced" | "not-stated";
-  selectedTechnique: string;
-  routes: Array<{ applicationId: string; status: "selected" | "rejected"; reasonCode: string }>;
-  skippedLearning: string[];
-  estimatedLearningAvoidedMinutes: number | null;
-  basis: {
-    outputType: string;
-    requiredApplicationIds: string[];
-    knownApplications: Array<{ applicationId: string; level: "beginner" | "intermediate" | "advanced" | "not-stated" }>;
-    daysRemaining: number;
-    availableMinutes: number;
-  };
-}
-
 export interface RoadmapRequest {
   interfaceLanguage: Locale;
   projectBrief: string;
@@ -107,7 +90,6 @@ export interface RoadmapResponse {
   assumptions: string[];
   warnings: string[];
   stages: RoadmapStage[];
-  routeEvidence?: RouteEvidence;
   schedule: RoadmapScheduleItem[];
   source?: "ai" | "demo" | "fallback";
   notice?: string;

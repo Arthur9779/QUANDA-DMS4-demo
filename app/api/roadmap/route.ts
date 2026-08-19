@@ -13,7 +13,6 @@ import { normalizeRoadmap } from "@/src/lib/normalizeRoadmap";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import { createIntegratedFallback, createRoadmapInput, RoadmapGenerationRequestSchema, validateRoadmapForInput } from "@/src/roadmap";
-import { attachRouteEvidence } from "@/src/roadmap";
 import type { RoadmapResponse } from "@/src/types";
 
 // The confirmed learning plan includes ranked tutorial metadata; keep a bounded
@@ -248,9 +247,9 @@ export async function POST(request: NextRequest) {
       const roadmap = fallbackRoadmap(roadmapInput, "fallback");
       return response(roadmap, 200, roadmap.source, "input_constraint_validation");
     }
-    const roadmap = attachRouteEvidence(normalizeRoadmap(parsedRoadmap.data, roadmapInput.projectInput, {
+    const roadmap = normalizeRoadmap(parsedRoadmap.data, roadmapInput.projectInput, {
       allowedTutorialIds: new Set(roadmapInput.selectedTutorials.map((item) => item.tutorial.id)),
-    }), roadmapInput);
+    });
     return response(roadmap, 200, roadmap.source);
   } catch (error) {
     logAiFailure("generation request", error);
