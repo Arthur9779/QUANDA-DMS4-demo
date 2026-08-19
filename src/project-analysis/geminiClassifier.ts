@@ -203,6 +203,22 @@ function responseText(data: GoogleAiResponse): string {
   );
 }
 
+function parseStructuredOutput(text: string): unknown {
+  const trimmed = text.trim();
+  const unfenced = trimmed
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  try {
+    return JSON.parse(unfenced);
+  } catch {
+    const start = unfenced.indexOf("{");
+    const end = unfenced.lastIndexOf("}");
+    if (start < 0 || end <= start) throw new Error("No JSON object found");
+    return JSON.parse(unfenced.slice(start, end + 1));
+  }
+}
+
 export class GeminiCreativeDnaClassifier implements CreativeDnaClassifier {
   private readonly fetchImpl: typeof fetch;
   private readonly timeoutMs: number;
@@ -281,7 +297,7 @@ export class GeminiCreativeDnaClassifier implements CreativeDnaClassifier {
       );
     }
     try {
-      return CreativeDnaModelOutputSchema.parse(JSON.parse(text));
+      return CreativeDnaModelOutputSchema.parse(parseStructuredOutput(text));
     } catch {
       throw new CreativeDnaClassifierError(
         "INVALID_RESPONSE",

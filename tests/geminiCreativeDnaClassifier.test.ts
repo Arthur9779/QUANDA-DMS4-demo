@@ -81,6 +81,29 @@ describe("Gemini Creative DNA classifier", () => {
     });
   });
 
+  it("accepts a JSON response wrapped in a markdown fence", async () => {
+    const classifier = new GeminiCreativeDnaClassifier({
+      apiKey: "test-key",
+      fetchImpl: vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    { text: "```json\\n" + JSON.stringify(validOutput) + "\\n```" },
+                  ],
+                },
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      ),
+    });
+    await expect(classifier.classify("prompt")).resolves.toEqual(validOutput);
+  });
+
   it("requires a server-side API key", () => {
     expect(
       () => new GeminiCreativeDnaClassifier({ apiKey: "" }),
