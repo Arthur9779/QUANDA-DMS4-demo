@@ -244,7 +244,6 @@ export class GeminiCreativeDnaClassifier implements CreativeDnaClassifier {
               temperature: 0.15,
               maxOutputTokens: 6_000,
               responseMimeType: "application/json",
-              responseSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
             },
           }),
           signal: requestSignal,

@@ -45,9 +45,7 @@ describe("Gemini Creative DNA classifier", () => {
       temperature: 0.15,
       responseMimeType: "application/json",
     });
-    expect(body.generationConfig.responseSchema.required).toContain(
-      "concepts",
-    );
+    expect(body.generationConfig).not.toHaveProperty("responseSchema");
     expect(String(options.body)).not.toContain("quanda.skills");
   });
 
