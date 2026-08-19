@@ -3035,3 +3035,68 @@ footer {
   .learning-need-number { height: 34px; justify-content: flex-start; padding-left: 18px; }
   .skill-state-controls button, .tutorial-match-actions button, .tutorial-match-actions a { justify-content: center; width: 100%; }
 }
+
+.route-proof-card {
+  border: 1px solid var(--line);
+  background: var(--blue-soft);
+  border-radius: 28px;
+  margin: 0 0 50px;
+  padding: 28px;
+}
+.route-proof-heading h3 {
+  font-family: var(--font-newsreader), Georgia, serif;
+  letter-spacing: -.03em;
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 650;
+}
+.route-proof-heading > p:last-child {
+  max-width: 760px;
+  color: var(--muted);
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+.route-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+.route-decision {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 20px;
+  padding: 20px;
+}
+.route-decision-selected { background: var(--green-soft); border-color: #91a56f; }
+.route-decision-removed { background: var(--amber-soft); border-color: #d9b770; }
+.route-decision-label {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin: 0 0 9px;
+  font-size: .68rem;
+  font-weight: 900;
+}
+.route-decision h4 { margin: 0; font-size: 1.2rem; line-height: 1.35; }
+.route-decision > p:not(.route-decision-label):not(.route-time-avoided) {
+  color: var(--muted);
+  margin: 12px 0 0;
+  line-height: 1.55;
+}
+.route-options { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.route-option { border-top: 1px solid var(--line); padding-top: 10px; }
+.route-option:first-child { border-top: 0; padding-top: 0; }
+.route-option strong { display: flex; align-items: center; gap: 5px; }
+.route-option span { color: var(--muted); display: block; margin-top: 3px; font-size: .72rem; font-weight: 850; }
+.route-option p { color: var(--muted); margin: 5px 0 0; font-size: .88rem; line-height: 1.5; }
+.route-option-selected strong { color: var(--green); }
+.route-decision > ul:not(.route-options) { margin: 0; padding-left: 20px; }
+.route-decision > ul:not(.route-options) li { color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.route-time-avoided { color: var(--muted); display: flex; align-items: flex-start; gap: 6px; margin: 14px 0 0; line-height: 1.5; }
+@media (max-width: 800px) {
+  .route-proof-grid { grid-template-columns: 1fr; }
+}

@@ -8,6 +8,7 @@ import {
 import type { RoadmapResponse, RoadmapStage } from "@/src/types";
 import type { RoadmapGenerationInput } from "./contracts";
 import { ROADMAP_GENERATOR_VERSION } from "./contracts";
+import { attachRouteEvidence } from "./routeEvidence";
 
 function copy(input: RoadmapGenerationInput, en: string, vi: string) {
   return input.projectInput.interfaceLanguage === "vi" ? vi : en;
@@ -220,7 +221,7 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
   const availableMinutes = calculateAvailableMinutes(project.deadline, project.hoursPerDay, project.daysPerWeek);
   const feasibility = getFeasibilityStatus(totalEstimatedMinutes, availableMinutes);
   const excess = Math.max(0, totalEstimatedMinutes - availableMinutes);
-  return {
+  return attachRouteEvidence({
     id: `roadmap-${input.inputFingerprint}`,
     language: locale,
     title: isProductAnimationExample
@@ -252,7 +253,7 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     notice: copy(input, "QUANDA created this project-aware plan from your confirmed direction, skill gaps, and selected tutorials.", "QUANDA đã tạo kế hoạch theo dự án từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã chọn."),
     roadmapGeneratorVersion: ROADMAP_GENERATOR_VERSION,
     inputFingerprint: input.inputFingerprint,
-  };
+  }, input);
 }
 
 export function validateRoadmapForInput(roadmap: RoadmapResponse, input: RoadmapGenerationInput): string[] {
