@@ -10,6 +10,7 @@
 /public/styles.css
 /public/manifest.webmanifest
 /public/sw.js
+/public/planning-logic.mjs
 /public/assets/
 *.log
 /.codex-*.err

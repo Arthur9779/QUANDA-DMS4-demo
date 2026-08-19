@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://quanda-dms4-demo-jet.vercel.app"),
   title: "QUANDA — From brief to learning path",
-  description: "Turn a creative project brief into a practical learning and production plan.",
+  description: "QUANDA solves the creative production pipeline with concrete tools, efficient routes, and traceable recommendations.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/assets/quanda-icon-192.png", sizes: "192x192", type: "image/png" }],
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "QUANDA — From brief to learning path",
-    description: "Turn a creative project brief into a practical learning and production plan.",
+    description: "QUANDA solves the creative production pipeline with concrete tools, efficient routes, and traceable recommendations.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "QUANDA — From brief to a learning path" }],
   },
   twitter: {

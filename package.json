@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node scripts/sync-static.mjs && vinext dev",
     "build": "node scripts/sync-static.mjs && vinext build",
-    "start": "vinext start"
+    "start": "vinext start",
+    "test": "node --test tests/planning-logic.test.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

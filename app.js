@@ -1,3 +1,5 @@
+import { buildRouteEvidence, buildStageDecisions } from "./planning-logic.mjs";
+
 const TASK_STORAGE_KEY = "quanda-calendar-tasks-v2";
 const PROFILE_STORAGE_KEY = "quanda-learning-profile-v1";
 
@@ -5,12 +7,12 @@ const copy = {
   en: {
     skip: "Skip to content", navHow: "How it works", navCalendar: "Calendar", loadExample: "Load example",
     heroEyebrow: "A practical co-pilot for creative projects", heroLine1: "Make the", heroLine2: "deadline feel", heroAccent: "doable.",
-    heroTagline: "From project brief to a practical learning path.",
+    heroTagline: "From project brief to an efficient production route.",
     heroDescription: "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
     planProject: "Plan my project", installApp: "Install QUANDA", privacy: "No account needed · Your work stays on this device",
     howEyebrow: "How it works", howTitle: "From a blank page to a clear next step",
     step1Title: "Describe the project", step1Body: "Share the deliverable, what you know, and your deadline.",
-    step2Title: "Receive a roadmap", step2Body: "Get a realistic sequence of learning and production tasks.",
+    step2Title: "See the efficient route", step2Body: "Compare concrete tools, skipped learning, and the reason behind each step.",
     step3Title: "Learn, make, finish", step3Body: "Follow curated tutorials and check off concrete outputs.",
     formEyebrow: "Tell us what you are making", formTitle: "Shape your project plan",
     formIntro: "A little context helps QUANDA build a sequence that fits your skills, tools, and actual week.",
@@ -23,7 +25,7 @@ const copy = {
     daysPerWeek: "Study days per week", tutorialLanguage: "Preferred tutorial language", outputType: "Desired output type",
     optional: "Optional", applications: "Required application(s)", noApplication: "No required application",
     quality: "Target quality", qualityBasic: "Basic submission", qualityPortfolio: "Portfolio-ready", qualityUnsure: "Not sure",
-    generate: "Generate my roadmap", formPrivacy: "Your brief is used only to create this roadmap.",
+    generate: "Generate my production plan", formPrivacy: "Your brief is used only to create this production plan.",
     calendarEyebrow: "Your project garden", calendarTitle: "Keep every deadline in view.",
     calendarIntro: "Select a day, add a task, and let the month hold the details. Everything is saved on this device.",
     today: "Today", previousMonth: "Previous month", nextMonth: "Next month", deadlineLegend: "Task deadline", dayPlan: "Day plan", taskLabel: "Task", addCalendar: "Add to calendar",
@@ -31,8 +33,10 @@ const copy = {
     complete: "complete", of: "of", taskPlaceholder: "What needs to get done?", deleteTask: "Delete task",
     briefPlaceholder: "For example: I need to create a 20-second product animation for a university assignment. The final output should be a 1080p MP4 with simple sound.",
     experiencePlaceholder: "Photoshop: intermediate; Blender: beginner",
-    roadmapEyebrow: "Your production path", roadmapTitle: "Focused production roadmap",
-    roadmapSummary: "A structured sequence that protects the deadline while keeping learning and production work separate.",
+    roadmapEyebrow: "Your production path", roadmapTitle: "Focused production pipeline",
+    roadmapSummary: "A concrete sequence of production steps, selected tools, and evidence for why this route is efficient.",
+    routeProofEyebrow: "Route evidence", routeProofTitle: "Why this is the shortest viable route", routeProofSummary: "QUANDA compared practical tool routes against your output, experience, deadline, and available time.",
+    selectedRoute: "Selected route", routesConsidered: "Routes considered", rejectedRoute: "Not selected", selectedBecause: "Why this route was selected", skippedLearning: "What QUANDA removed", timeAvoided: "Estimated learning avoided", decisionBasis: "Decision evidence", techniqueApplication: "Actionable mapping", noTimeEstimate: "No time estimate shown because no relevant prior tool experience was provided.",
     totalTime: "Total estimated time", feasibility: "Achievable with focus",
     feasibilityBody: "Protect the high-priority stages and review progress before the final export.",
     deadlineTime: "Time to deadline", availableTime: "Available study time", days: "days", hours: "hours",
@@ -49,12 +53,12 @@ const copy = {
   vi: {
     skip: "Bỏ qua đến nội dung", navHow: "Cách hoạt động", navCalendar: "Lịch", loadExample: "Tải ví dụ",
     heroEyebrow: "Trợ lý thực tế cho dự án sáng tạo", heroLine1: "Biến deadline", heroLine2: "thành", heroAccent: "điều khả thi.",
-    heroTagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
+    heroTagline: "Từ đề bài dự án đến tuyến sản xuất hiệu quả.",
     heroDescription: "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
     planProject: "Lập kế hoạch dự án", installApp: "Cài đặt QUANDA", privacy: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
     howEyebrow: "Cách hoạt động", howTitle: "Từ trang giấy trắng đến bước tiếp theo rõ ràng",
     step1Title: "Mô tả dự án", step1Body: "Chia sẻ sản phẩm cần làm, kỹ năng hiện có và thời hạn.",
-    step2Title: "Nhận lộ trình", step2Body: "Nhận chuỗi nhiệm vụ học tập và sản xuất thực tế.",
+    step2Title: "Thấy tuyến hiệu quả", step2Body: "So sánh công cụ cụ thể, phần học được loại bỏ và lý do cho từng bước.",
     step3Title: "Học, làm, hoàn thành", step3Body: "Theo video hướng dẫn đã tuyển chọn và đánh dấu từng đầu ra cụ thể.",
     formEyebrow: "Hãy cho biết bạn đang làm gì", formTitle: "Định hình kế hoạch dự án",
     formIntro: "Một ít bối cảnh giúp QUANDA tạo trình tự phù hợp với kỹ năng, công cụ và quỹ thời gian thực tế của bạn.",
@@ -67,7 +71,7 @@ const copy = {
     daysPerWeek: "Số ngày học mỗi tuần", tutorialLanguage: "Ngôn ngữ video hướng dẫn ưu tiên", outputType: "Loại sản phẩm mong muốn",
     optional: "Không bắt buộc", applications: "Ứng dụng bắt buộc", noApplication: "Không yêu cầu ứng dụng",
     quality: "Mức chất lượng", qualityBasic: "Bài nộp cơ bản", qualityPortfolio: "Sẵn sàng cho hồ sơ năng lực", qualityUnsure: "Chưa chắc",
-    generate: "Tạo lộ trình cho tôi", formPrivacy: "Đề bài chỉ được dùng để tạo lộ trình này.",
+    generate: "Tạo kế hoạch sản xuất", formPrivacy: "Đề bài chỉ được dùng để tạo kế hoạch sản xuất này.",
     calendarEyebrow: "Khu vườn dự án", calendarTitle: "Nhìn rõ mọi hạn chót.",
     calendarIntro: "Chọn một ngày, thêm công việc và để lịch tháng lưu giữ chi tiết. Mọi thứ được lưu trên thiết bị này.",
     today: "Hôm nay", previousMonth: "Tháng trước", nextMonth: "Tháng sau", deadlineLegend: "Hạn công việc", dayPlan: "Kế hoạch trong ngày", taskLabel: "Công việc", addCalendar: "Thêm vào lịch",
@@ -75,8 +79,10 @@ const copy = {
     complete: "hoàn thành", of: "trên", taskPlaceholder: "Bạn cần hoàn thành việc gì?", deleteTask: "Xóa công việc",
     briefPlaceholder: "Ví dụ: Tôi cần làm video hoạt hình sản phẩm dài 20 giây cho bài tập đại học. Sản phẩm cuối là MP4 1080p có âm thanh đơn giản.",
     experiencePlaceholder: "Photoshop: trung cấp; Blender: mới bắt đầu",
-    roadmapEyebrow: "Lộ trình sản xuất của bạn", roadmapTitle: "Lộ trình sản xuất tập trung",
-    roadmapSummary: "Một trình tự rõ ràng giúp bảo vệ hạn chót và tách riêng thời gian học với thời gian sản xuất.",
+    roadmapEyebrow: "Quy trình sản xuất của bạn", roadmapTitle: "Quy trình sản xuất tập trung",
+    roadmapSummary: "Một chuỗi bước sản xuất cụ thể, công cụ được chọn rõ ràng và bằng chứng cho thấy vì sao lộ trình này hiệu quả.",
+    routeProofEyebrow: "Bằng chứng chọn lộ trình", routeProofTitle: "Vì sao đây là lộ trình khả thi ngắn nhất", routeProofSummary: "QUANDA so sánh các tuyến công cụ thực tế dựa trên sản phẩm, kinh nghiệm, hạn chót và thời gian bạn có.",
+    selectedRoute: "Lộ trình được chọn", routesConsidered: "Các lộ trình đã cân nhắc", rejectedRoute: "Không chọn", selectedBecause: "Vì sao chọn lộ trình này", skippedLearning: "QUANDA đã loại bỏ", timeAvoided: "Thời gian học ước tính tránh được", decisionBasis: "Cơ sở quyết định", techniqueApplication: "Mapping có thể thực hiện", noTimeEstimate: "Không hiển thị ước tính thời gian vì chưa có kinh nghiệm công cụ liên quan được cung cấp.",
     totalTime: "Tổng thời gian ước tính", feasibility: "Khá sát",
     feasibilityBody: "Ưu tiên các giai đoạn quan trọng và kiểm tra tiến độ trước lần xuất cuối.",
     deadlineTime: "Thời gian đến hạn", availableTime: "Thời gian có thể dành", days: "ngày", hours: "giờ",
@@ -431,6 +437,94 @@ function appendFact(list, label, value, iconType) {
   list.append(wrap);
 }
 
+function routeReason(route, evidence) {
+  const c = copy[currentLanguage];
+  if (route.status === "selected") {
+    if (route.reasonCode === "required-tool") return currentLanguage === "vi"
+      ? `${route.application} được giữ lại vì đây là ứng dụng bạn đã chọn cho dự án; đổi công cụ sẽ tạo thêm thời gian học không cần thiết.`
+      : `${route.application} stays because it is a tool you selected for this project; switching would add unnecessary learning time.`;
+    if (route.reasonCode === "existing-tool") return currentLanguage === "vi"
+      ? `${route.application} được ưu tiên vì bạn đã có kinh nghiệm liên quan, nên không cần học lại một ứng dụng mới.`
+      : `${route.application} is preferred because you already have relevant experience, so the route avoids learning a new application.`;
+    return currentLanguage === "vi"
+      ? `${route.application} phù hợp trực tiếp với loại sản phẩm đã chọn và là phương án mặc định ít ma sát nhất.`
+      : `${route.application} directly fits the selected output and is the lowest-friction default route.`;
+  }
+  const reasons = {
+    "required-tool-wins": currentLanguage === "vi" ? `Không chọn ${route.application} vì ứng dụng bắt buộc đã đủ để hoàn thành sản phẩm.` : `${route.application} was not selected because the required application already covers the deliverable.`,
+    "existing-tool-wins": currentLanguage === "vi" ? `Không chọn ${route.application} vì sẽ phải chuyển sang công cụ khác trong khi ${evidence.primaryApplication} đã phù hợp và bạn đã biết dùng.` : `${route.application} was not selected because switching away from ${evidence.primaryApplication} would add learning while your existing tool already fits.`,
+    "output-mismatch": currentLanguage === "vi" ? `Không chọn ${route.application} vì không khớp trực tiếp với loại sản phẩm này.` : `${route.application} was not selected because it does not directly match this output type.`,
+    "switch-cost": currentLanguage === "vi" ? `Không chọn ${route.application} vì sẽ thêm thiết lập và học công cụ mới mà chưa có lợi thế dự án rõ ràng.` : `${route.application} was not selected because it adds setup and new-tool learning without a clear project-specific advantage.`,
+    "no-need-to-switch": currentLanguage === "vi" ? `Không chọn ${route.application} vì không cần thêm một công cụ khi tuyến hiện tại đã đủ khả thi.` : `${route.application} was not selected because another viable tool already avoids an unnecessary switch.`,
+  };
+  return reasons[route.reasonCode] || c.rejectedRoute;
+}
+
+function stageReason(decision) {
+  if (currentLanguage === "vi") {
+    const reasons = {
+      setup: `Thiết lập trực tiếp trong ${decision.application} để giữ quy trình gọn và bảo vệ thời gian sản xuất.`,
+      "core-technique": `${decision.technique} là kỹ thuật trực tiếp tạo ra loại sản phẩm đã chọn, được thực hiện trong ${decision.application}.`,
+      "first-pass": `Tạo một bản hoàn chỉnh đầu tiên trong ${decision.application} để phát hiện vấn đề trước khi tinh chỉnh.`,
+      refinement: `Chỉ sửa các vấn đề có tác động lớn trong ${decision.application}, không mở rộng phạm vi bằng kỹ thuật mới.`,
+      handoff: `Xuất và kiểm tra tệp cuối trong ${decision.application} để tránh lỗi bàn giao vào sát hạn.`,
+    };
+    return reasons[decision.reasonCode];
+  }
+  const reasons = {
+    setup: `Set up directly in ${decision.application} to keep the workflow focused and protect production time.`,
+    "core-technique": `${decision.technique} directly creates the selected output and is executed in ${decision.application}.`,
+    "first-pass": `Build a complete first pass in ${decision.application} so problems surface before refinement.`,
+    refinement: `Fix only the highest-impact issues in ${decision.application} instead of expanding the scope with new techniques.`,
+    handoff: `Export and verify the final file in ${decision.application} to avoid last-minute delivery problems.`,
+  };
+  return reasons[decision.reasonCode];
+}
+
+function createRouteProof(evidence) {
+  const c = copy[currentLanguage];
+  const section = make("section", "route-proof-card");
+  const heading = make("div", "route-proof-heading");
+  heading.append(make("p", "eyebrow", c.routeProofEyebrow), make("h3", "", c.routeProofTitle), make("p", "route-proof-summary", c.routeProofSummary));
+
+  const grid = make("div", "route-proof-grid");
+  const selected = make("article", "route-decision route-decision-selected");
+  selected.append(make("p", "route-decision-label", c.selectedRoute), make("h4", "", `${evidence.coreTechnique} → ${evidence.primaryApplication}`), make("p", "route-decision-reason", routeReason(evidence.routes[0], evidence)));
+
+  const alternatives = make("article", "route-decision");
+  alternatives.append(make("p", "route-decision-label", c.routesConsidered), make("ul", "route-options"));
+  const optionList = alternatives.querySelector("ul");
+  evidence.routes.forEach((route) => {
+    const item = make("li", route.status === "selected" ? "route-option route-option-selected" : "route-option");
+    item.append(make("strong", "", route.status === "selected" ? `✓ ${route.application}` : route.application), make("span", "", route.status === "selected" ? c.selectedRoute : c.rejectedRoute), make("p", "", routeReason(route, evidence)));
+    optionList.append(item);
+  });
+
+  const removed = make("article", "route-decision route-decision-removed");
+  removed.append(make("p", "route-decision-label", c.skippedLearning));
+  const removedList = make("ul", "route-options");
+  evidence.skippedSteps.forEach((step) => removedList.append(make("li", "", step)));
+  removed.append(removedList);
+  const timeText = evidence.timeAvoidedHours === null
+    ? c.noTimeEstimate
+    : `${evidence.timeAvoidedHours} ${c.hours} — ${currentLanguage === "vi" ? `dựa trên mức ${levelLabel(evidence.primarySkillLevel)} đã cung cấp cho ${evidence.primaryApplication}.` : `based on the stated ${levelLabel(evidence.primarySkillLevel)} experience with ${evidence.primaryApplication}.`}`;
+  removed.append(make("p", "route-time-avoided", `${c.timeAvoided}: ${timeText}`));
+
+  const basis = make("article", "route-decision");
+  basis.append(make("p", "route-decision-label", c.decisionBasis));
+  const basisList = make("ul", "route-options");
+  const outputLabel = $("#outputType").options[$("#outputType").selectedIndex].textContent;
+  basisList.append(make("li", "", `${currentLanguage === "vi" ? "Sản phẩm" : "Output"}: ${outputLabel}`));
+  basisList.append(make("li", "", `${currentLanguage === "vi" ? "Hạn chót" : "Deadline"}: ${evidence.totalDays} ${c.days}, ${currentLanguage === "vi" ? "thời gian có thể dành" : "available time"}: ${evidence.availableHours} ${c.hours}`));
+  if (evidence.basis.requiredTools.length) basisList.append(make("li", "", `${currentLanguage === "vi" ? "Ứng dụng đã chọn" : "Selected applications"}: ${evidence.basis.requiredTools.join(", ")}`));
+  if (evidence.basis.existingTools.length) basisList.append(make("li", "", `${currentLanguage === "vi" ? "Kinh nghiệm đã khai báo" : "Stated experience"}: ${evidence.basis.existingTools.map((item) => `${item.application} (${levelLabel(item.level)})`).join(", ")}`));
+  basis.append(basisList);
+
+  grid.append(selected, alternatives, removed, basis);
+  section.append(heading, grid);
+  return section;
+}
+
 function createTutorialCard(tutorial, application, matchesProfile = true) {
   const c = copy[currentLanguage];
   const url = `https://www.youtube.com/watch?v=${tutorial.id}`;
@@ -457,12 +551,12 @@ function createTutorialCard(tutorial, application, matchesProfile = true) {
   return tutorialCard;
 }
 
-function createTutorialSearchCard(application, stage) {
+function createTutorialSearchCard(application, stage, decision) {
   const c = copy[currentLanguage];
   const level = currentSkillLevel();
   const preferredLanguage = $("#tutorialLanguage").value === "vi" ? "Vietnamese" : $("#tutorialLanguage").value === "en" ? "English" : currentLanguage === "vi" ? "Vietnamese" : "English";
   const output = $("#outputType").options[$("#outputType").selectedIndex].textContent;
-  const query = `${application} ${stage.skill} ${output} ${level} ${preferredLanguage} tutorial`;
+  const query = `${decision?.tutorialQuery || `${application} ${stage.skill}`} ${output} ${level} ${preferredLanguage} tutorial`;
   const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
   const card = make("article", "tutorial-card tutorial-search-card");
   const visual = make("div", "tutorial-search-visual");
@@ -479,7 +573,7 @@ function createTutorialSearchCard(application, stage) {
   searchLink.target = "_blank";
   searchLink.rel = "noreferrer";
   searchLink.append(document.createTextNode(c.searchYoutube), make("span", "tutorial-link-icon", "↗"));
-  card.append(visual, topLine, make("h5", "", `${application} · ${stage.skill}`), make("p", "", c.recommendationFor), details, searchLink);
+  card.append(visual, topLine, make("h5", "", `${decision?.technique || stage.skill} → ${application}`), make("p", "", decision ? stageReason(decision) : c.recommendationFor), details, searchLink);
   return card;
 }
 
@@ -524,6 +618,19 @@ function renderRoadmap() {
   const daysPerWeek = Number($("#daysPerWeek").value) || 5;
   const availableHours = Math.max(hoursPerDay, Math.round((totalDays / 7) * daysPerWeek * hoursPerDay));
   const stages = stageCopy[currentLanguage];
+  const outputType = $("#outputType").value;
+  const routeEvidence = buildRouteEvidence({
+    applications: selectedApplicationValues(),
+    experience: experience.value,
+    outputType,
+    totalDays,
+    availableHours,
+  });
+  const stageDecisions = buildStageDecisions({
+    outputType,
+    application: routeEvidence.primaryApplication,
+    skillLevel: routeEvidence.primarySkillLevel,
+  });
   const ratios = [.12, .32, .58, .8, 1];
   generatedMilestones = stages.map((stage, index) => {
     const date = new Date(today);
@@ -559,6 +666,7 @@ function renderRoadmap() {
   const timeline = make("div", "timeline");
   timeline.setAttribute("aria-label", c.roadmapEyebrow);
   stages.forEach((stage, index) => {
+    const decision = stageDecisions[index];
     const article = make("article", "stage-card");
     const rail = make("div", "stage-rail");
     rail.setAttribute("aria-hidden", "true");
@@ -582,11 +690,13 @@ function renderRoadmap() {
     stageHeading.append(stageTitle, completionLabel);
     const goals = make("div", "stage-goal");
     const goal = make("div"); goal.append(make("strong", "", c.goal), make("p", "", stage.goal));
-    const why = make("div"); why.append(make("strong", "", c.why), make("p", "", stage.why));
+    const why = make("div"); why.append(make("strong", "", c.why), make("p", "", stageReason(decision)));
     goals.append(goal, why);
+    const mapping = make("div", "stage-mapping");
+    mapping.append(make("strong", "", c.techniqueApplication), make("p", "", `${decision.technique} → ${decision.application}`), make("small", "", stageReason(decision)));
     const facts = make("dl", "stage-facts");
-    appendFact(facts, c.application, selectedApplications());
-    appendFact(facts, c.skill, stage.skill);
+    appendFact(facts, c.application, decision.application);
+    appendFact(facts, c.skill, decision.technique);
     appendFact(facts, c.learning, `${Math.max(30, Math.round(availableHours * 60 * .18 / stages.length))} min`);
     appendFact(facts, c.production, `${Math.max(45, Math.round(availableHours * 60 * .66 / stages.length))} min`);
     const lower = make("div", "stage-lower");
@@ -597,9 +707,8 @@ function renderRoadmap() {
     taskBlock.append(taskList);
     const tutorialList = make("div", "tutorial-list");
     tutorialList.append(make("h4", "", c.resources));
-    const chosenApplications = selectedApplicationValues();
-    const fallbackTopic = $("#outputType").options[$("#outputType").selectedIndex].textContent;
-    const tutorialApplications = (chosenApplications.length ? chosenApplications : [fallbackTopic]).slice(0, 3);
+    tutorialList.append(make("p", "stage-recommendation-reason", stageReason(decision)));
+    const tutorialApplications = [decision.application];
     const tutorialMatches = tutorialApplications.map((application) => {
       const verifiedTutorials = tutorialCatalog[application]?.[index] || [];
       const preferredTutorials = verifiedTutorials.filter(tutorialMatchesPreferences);
@@ -613,7 +722,7 @@ function renderRoadmap() {
     if (!tutorialMatches.some(({ hasVerifiedTutorials }) => hasVerifiedTutorials)) tutorialList.append(createQuandaGuide(stage, tutorialApplications));
     tutorialMatches.forEach(({ application, matches, matchesProfile }) => {
       if (matches.length) matches.forEach((tutorial) => tutorialList.append(createTutorialCard(tutorial, application, matchesProfile)));
-      else tutorialList.append(createTutorialSearchCard(application, stage));
+      else tutorialList.append(createTutorialSearchCard(application, stage, decision));
     });
     lower.append(taskBlock, tutorialList);
     content.append(stageHeading, goals, facts, lower);
@@ -651,7 +760,7 @@ function renderRoadmap() {
   const resetButton = make("button", "button button-text", `× ${c.startOver}`); resetButton.type = "button";
   resetButton.addEventListener("click", resetPlanning);
   actions.append(editButton, regenerateButton, resetButton);
-  results.append(hero, feasibility, timeline, resultsGrid, actions);
+  results.append(hero, feasibility, createRouteProof(routeEvidence), timeline, resultsGrid, actions);
 }
 
 function resetPlanning() {
