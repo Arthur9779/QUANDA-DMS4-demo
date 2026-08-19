@@ -113,8 +113,24 @@ export function RoadmapStageCard({
           <div>
             <h4>{t.results.tasks}</h4>
             <ul className="task-list">
-              {stage.tasks.map((task) => <li key={task}>{task}</li>)}
+              {(stage.productionTasks?.length ? stage.productionTasks : stage.tasks).map((task) => <li key={task}>{task}</li>)}
             </ul>
+            {stage.learningTasks && stage.learningTasks.length > 0 && (
+              <>
+                <h4>{t.results.learning}</h4>
+                <ul className="task-list">
+                  {stage.learningTasks.map((task) => <li key={task}>{task}</li>)}
+                </ul>
+              </>
+            )}
+            {stage.definitionOfDone && stage.definitionOfDone.length > 0 && (
+              <>
+                <h4>{t.results.definitionOfDone}</h4>
+                <ul className="task-list">
+                  {stage.definitionOfDone.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </>
+            )}
             {stage.dependsOnStageIds.length > 0 && (
               <p className="dependencies">
                 <Link2 aria-hidden="true" size={14} />

@@ -13,6 +13,12 @@ export const RoadmapStageSchema = z.object({
   productionMinutes: z.number().finite().positive().max(20_000),
   dependsOnStageIds: z.array(z.string().min(1).max(80)).max(7),
   tutorialIds: z.array(z.string().min(1).max(120)).max(3),
+  productionTasks: z.array(z.string().min(2).max(300)).max(8).default([]),
+  learningTasks: z.array(z.string().min(2).max(300)).max(6).default([]),
+  definitionOfDone: z.array(z.string().min(2).max(300)).max(6).default([]),
+  classification: z.enum(["required", "useful", "optional"]).default("required"),
+  creativeDnaIds: z.array(z.string().min(1).max(160)).max(30).default([]),
+  skillIds: z.array(z.string().min(1).max(160)).max(30).default([]),
 });
 
 export const RoadmapResponseSchema = z.object({
@@ -44,6 +50,8 @@ export const RoadmapResponseSchema = z.object({
     .max(14),
   source: z.enum(["ai", "demo", "fallback"]).optional(),
   notice: z.string().max(600).optional(),
+  roadmapGeneratorVersion: z.number().int().positive().optional(),
+  inputFingerprint: z.string().regex(/^[a-f0-9]{8}$/).optional(),
 });
 
 export type RoadmapResponseData = z.infer<typeof RoadmapResponseSchema>;

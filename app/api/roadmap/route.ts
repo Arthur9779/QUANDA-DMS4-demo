@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { applications } from "@/src/data/applications";
-import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import { buildRoadmapPrompt } from "@/src/lib/ai/buildRoadmapPrompt";
+import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import {
   callGoogleAiForRoadmap,
   repairGoogleAiRoadmap,
@@ -11,12 +10,14 @@ import {
   getDaysRemaining,
 } from "@/src/lib/feasibility";
 import { normalizeRoadmap } from "@/src/lib/normalizeRoadmap";
-import { selectCandidateTutorials } from "@/src/lib/tutorialMatcher";
-import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
-import type { RoadmapRequest, RoadmapResponse } from "@/src/types";
+import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
+import { createIntegratedFallback, createRoadmapInput, RoadmapGenerationRequestSchema, validateRoadmapForInput } from "@/src/roadmap";
+import type { RoadmapResponse } from "@/src/types";
 
-const MAX_BODY_BYTES = 30_000;
+// The confirmed learning plan includes ranked tutorial metadata; keep a bounded
+// but sufficiently large request envelope for the integrated roadmap input.
+const MAX_BODY_BYTES = 120_000;
 const RATE_LIMIT = process.env.NODE_ENV === "production" ? 8 : 100;
 const RATE_WINDOW_MS = 60_000;
 const requestBuckets = new Map<
@@ -61,8 +62,8 @@ function isRateLimited(ip: string): boolean {
 
 function fallbackNotice(language: "en" | "vi"): string {
   return language === "en"
-    ? "QUANDA could not reach the AI service, so a reliable demo roadmap has been generated instead."
-    : "QUANDA không thể kết nối với dịch vụ AI, nên hệ thống đã tạo một lộ trình mẫu đáng tin cậy để thay thế.";
+    ? "QUANDA could not reach the AI service, so it built a project-aware plan from your confirmed direction, skill gaps, and selected tutorials."
+    : "QUANDA không thể kết nối với dịch vụ AI, nên hệ thống đã tạo kế hoạch theo dự án từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã chọn.";
 }
 
 function validationSummary(error: unknown): string {
@@ -109,17 +110,15 @@ function aiDiagnosticCode(error: unknown): string {
   return "request_error";
 }
 
-function demoRoadmap(
-  request: RoadmapRequest,
-  source: "demo" | "fallback",
+function fallbackRoadmap(
+  input: ReturnType<typeof createRoadmapInput>,
+  source: "fallback",
 ): RoadmapResponse {
-  const roadmap = createSampleRoadmap(request);
+  const roadmap = createIntegratedFallback(input);
   return {
     ...roadmap,
     source,
-    ...(source === "fallback"
-      ? { notice: fallbackNotice(request.interfaceLanguage) }
-      : {}),
+    notice: fallbackNotice(input.projectInput.interfaceLanguage),
   };
 }
 
@@ -169,8 +168,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const parsedRequest = RoadmapRequestSchema.safeParse(input);
+  const parsedRequest = RoadmapGenerationRequestSchema.safeParse(input);
   if (!parsedRequest.success) {
+    // Keep the pre-PR6 API contract usable for saved links, integrations, and
+    // older clients that have not completed the Creative DNA review flow yet.
+    const legacyRequest = RoadmapRequestSchema.safeParse(input);
+    if (legacyRequest.success) {
+      // Legacy callers do not provide the confirmed Creative DNA and learning
+      // plan required by the integrated generator. Keep their historical,
+      // deterministic contract instead of rejecting the request.
+      const roadmap = createSampleRoadmap(legacyRequest.data);
+      return response(roadmap, 200, roadmap.source);
+    }
     return response(
       {
         error: "validation",
@@ -181,29 +190,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const roadmapRequest = parsedRequest.data;
+  const roadmapInput = createRoadmapInput(parsedRequest.data);
   if (!process.env.GEMINI_API_KEY) {
-    const roadmap = demoRoadmap(roadmapRequest, "demo");
+    const roadmap = fallbackRoadmap(roadmapInput, "fallback");
     return response(roadmap, 200, roadmap.source);
   }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25_000);
   try {
-    const supportedApplicationIds =
-      roadmapRequest.requiredApplications.length > 0
-        ? roadmapRequest.requiredApplications
-        : applications.map((application) => application.id);
     const prompt = buildRoadmapPrompt({
-      request: roadmapRequest,
-      daysRemaining: getDaysRemaining(roadmapRequest.deadline),
+      input: roadmapInput,
+      daysRemaining: getDaysRemaining(roadmapInput.projectInput.deadline),
       availableMinutes: calculateAvailableMinutes(
-        roadmapRequest.deadline,
-        roadmapRequest.hoursPerDay,
-        roadmapRequest.daysPerWeek,
+        roadmapInput.projectInput.deadline,
+        roadmapInput.projectInput.hoursPerDay,
+        roadmapInput.projectInput.daysPerWeek,
       ),
-      candidateTutorials: selectCandidateTutorials(roadmapRequest),
-      supportedApplicationIds,
     });
 
     const originalOutput = await callGoogleAiForRoadmap(
@@ -218,7 +221,7 @@ export async function POST(request: NextRequest) {
         const repairedOutput = await repairGoogleAiRoadmap(
           originalOutput,
           validationSummary(parsedRoadmap.error),
-          roadmapRequest.interfaceLanguage,
+          roadmapInput.projectInput.interfaceLanguage,
           controller.signal,
         );
         parsedRoadmap = parseRoadmap(repairedOutput);
@@ -230,7 +233,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!parsedRoadmap.success) {
-      const roadmap = demoRoadmap(roadmapRequest, "fallback");
+      const roadmap = fallbackRoadmap(roadmapInput, "fallback");
       return response(
         roadmap,
         200,
@@ -239,11 +242,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const roadmap = normalizeRoadmap(parsedRoadmap.data, roadmapRequest);
+    const validationErrors = validateRoadmapForInput(parsedRoadmap.data, roadmapInput);
+    if (validationErrors.length > 0) {
+      const roadmap = fallbackRoadmap(roadmapInput, "fallback");
+      return response(roadmap, 200, roadmap.source, "input_constraint_validation");
+    }
+    const roadmap = normalizeRoadmap(parsedRoadmap.data, roadmapInput.projectInput, {
+      allowedTutorialIds: new Set(roadmapInput.selectedTutorials.map((item) => item.tutorial.id)),
+    });
     return response(roadmap, 200, roadmap.source);
   } catch (error) {
     logAiFailure("generation request", error);
-    const roadmap = demoRoadmap(roadmapRequest, "fallback");
+    const roadmap = fallbackRoadmap(roadmapInput, "fallback");
     return response(
       roadmap,
       200,

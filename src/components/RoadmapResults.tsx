@@ -2,10 +2,13 @@
 
 import { ArrowLeft, Clock3, RotateCcw, Sprout, Trash2 } from "lucide-react";
 import type { Translation } from "@/src/i18n/translations";
-import type { RoadmapRequest, RoadmapResponse, TutorialLanguage } from "@/src/types";
+import type { RoadmapRequest, RoadmapResponse } from "@/src/types";
+import type { LearningPlan } from "@/src/tutorial-matching";
+import type { TutorialRecommendation } from "@/src/lib/tutorialMatcher";
 import { FeasibilityCard } from "./FeasibilityCard";
 import { RoadmapStageCard } from "./RoadmapStageCard";
-import { resolveRoadmapTutorialRecommendations } from "@/src/lib/tutorialMatcher";
+import { extractYouTubeVideoId } from "@/src/lib/tutorialMatcher";
+import { getApplicationName } from "@/src/data/applications";
 import { createQuandaGuide } from "@/src/lib/quandaGuide";
 
 interface RoadmapResultsProps {
@@ -13,11 +16,45 @@ interface RoadmapResultsProps {
   roadmapRequest: RoadmapRequest;
   completedStageIds: string[];
   t: Translation;
-  tutorialLanguage: TutorialLanguage;
+  learningPlan: LearningPlan | null;
   onEdit: () => void;
   onRegenerate: () => void;
   onStartOver: () => void;
   onToggleStage: (stageId: string) => void;
+}
+
+function selectedTutorialsByStage(
+  roadmap: RoadmapResponse,
+  plan: LearningPlan | null,
+): Record<string, TutorialRecommendation[]> {
+  const selected = new Map(
+    (plan?.tutorialMatches ?? []).flatMap((match) => {
+      const candidate = match.candidates.find(
+        (item) => item.tutorial.id === match.selectedTutorialId &&
+          !match.rejectedTutorialIds.includes(item.tutorial.id),
+      );
+      return candidate ? [[candidate.tutorial.id, candidate.tutorial] as const] : [];
+    }),
+  );
+  return Object.fromEntries(roadmap.stages.map((stage) => [stage.id, stage.tutorialIds.flatMap((id) => {
+    const tutorial = selected.get(id);
+    if (!tutorial) return [];
+    const videoId = tutorial.externalId ?? extractYouTubeVideoId(tutorial.url) ?? "";
+    return [{
+      id: tutorial.id,
+      title: tutorial.title,
+      creator: tutorial.creator ?? "YouTube",
+      url: tutorial.url,
+      thumbnailUrl: videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "",
+      language: tutorial.language === "vi" ? "vi" : "en",
+      applicationName: tutorial.softwareIds[0] ? getApplicationName(tutorial.softwareIds[0]) : "—",
+      level: tutorial.difficulty === "advanced" ? "advanced" : tutorial.difficulty === "intermediate" ? "intermediate" : "beginner",
+      durationMinutes: tutorial.durationMinutes ?? null,
+      versionLabel: tutorial.softwareVersions[0] ?? "—",
+      sourceType: "video" as const,
+      badge: "youtube" as const,
+    }];
+  })]));
 }
 
 function formatTotal(minutes: number, t: Translation) {
@@ -33,7 +70,7 @@ export function RoadmapResults({
   roadmapRequest,
   completedStageIds,
   t,
-  tutorialLanguage,
+  learningPlan,
   onEdit,
   onRegenerate,
   onStartOver,
@@ -42,11 +79,7 @@ export function RoadmapResults({
   const allComplete =
     roadmap.stages.length > 0 &&
     roadmap.stages.every((stage) => completedStageIds.includes(stage.id));
-  const tutorialsByStage = resolveRoadmapTutorialRecommendations(
-    roadmap.stages,
-    tutorialLanguage,
-    roadmap.language,
-  );
+  const tutorialsByStage = selectedTutorialsByStage(roadmap, learningPlan);
 
   return (
     <section className="results-section" id="roadmap-results" aria-labelledby="roadmap-title">

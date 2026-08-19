@@ -58,6 +58,13 @@ export interface RoadmapStage {
   productionMinutes: number;
   dependsOnStageIds: string[];
   tutorialIds: string[];
+  /** Production work stays distinct from just-in-time learning. */
+  productionTasks?: string[];
+  learningTasks?: string[];
+  definitionOfDone?: string[];
+  classification?: "required" | "useful" | "optional";
+  creativeDnaIds?: string[];
+  skillIds?: string[];
 }
 
 export interface RoadmapScheduleItem {
@@ -86,4 +93,6 @@ export interface RoadmapResponse {
   schedule: RoadmapScheduleItem[];
   source?: "ai" | "demo" | "fallback";
   notice?: string;
+  roadmapGeneratorVersion?: number;
+  inputFingerprint?: string;
 }

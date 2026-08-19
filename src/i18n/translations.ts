@@ -182,6 +182,7 @@ export interface Translation {
     application: string;
     skill: string;
     tasks: string;
+    definitionOfDone: string;
     dependencies: string;
     tutorials: string;
     noTutorial: string;
@@ -477,6 +478,7 @@ const en: Translation = {
     application: "Application",
     skill: "Skill to learn",
     tasks: "Production tasks",
+    definitionOfDone: "Definition of done",
     dependencies: "Depends on",
     tutorials: "Tutorials",
     noTutorial: "No verified YouTube video matches this stage yet.",
@@ -796,6 +798,7 @@ const vi: Translation = {
     application: "Ứng dụng",
     skill: "Kỹ năng cần học",
     tasks: "Nhiệm vụ sản xuất",
+    definitionOfDone: "Hoàn thành khi",
     dependencies: "Phụ thuộc",
     tutorials: "Video hướng dẫn",
     noTutorial: "Chưa có video YouTube đã xác minh phù hợp với giai đoạn này.",
