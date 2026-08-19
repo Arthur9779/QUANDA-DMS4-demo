@@ -214,6 +214,25 @@ export interface Translation {
     minutes: string;
     status: Record<"comfortable" | "tight" | "unrealistic", string>;
     priority: Record<"high" | "medium" | "low", string>;
+    routeEvidence: {
+      locale: "en" | "vi";
+      eyebrow: string;
+      title: string;
+      intro: string;
+      selectedRoute: string;
+      selected: string;
+      routesConsidered: string;
+      notSelected: string;
+      skippedLearning: string;
+      timeAvoided: string;
+      noTimeEstimate: string;
+      decisionBasis: string;
+      output: string;
+      deadline: string;
+      availableTime: string;
+      requiredApplications: string;
+      statedExperience: string;
+    };
   };
   calendar: {
     eyebrow: string;
@@ -524,6 +543,25 @@ const en: Translation = {
       high: "High priority",
       medium: "Medium priority",
       low: "Low priority",
+    },
+    routeEvidence: {
+      locale: "en",
+      eyebrow: "Route evidence",
+      title: "Why this is the shortest viable route",
+      intro: "QUANDA compared practical tool routes against your output, experience, deadline, and available time.",
+      selectedRoute: "Selected route",
+      selected: "Selected",
+      routesConsidered: "Routes considered",
+      notSelected: "Not selected",
+      skippedLearning: "What QUANDA removed",
+      timeAvoided: "Estimated learning avoided",
+      noTimeEstimate: "No time estimate shown because no relevant prior tool experience was provided.",
+      decisionBasis: "Decision evidence",
+      output: "Output",
+      deadline: "Deadline",
+      availableTime: "Available time",
+      requiredApplications: "Selected applications",
+      statedExperience: "Stated experience",
     },
   },
   calendar: {
@@ -844,6 +882,25 @@ const vi: Translation = {
       high: "Ưu tiên cao",
       medium: "Ưu tiên vừa",
       low: "Ưu tiên thấp",
+    },
+    routeEvidence: {
+      locale: "vi",
+      eyebrow: "Bằng chứng chọn lộ trình",
+      title: "Vì sao đây là lộ trình khả thi ngắn nhất",
+      intro: "QUANDA so sánh các tuyến công cụ dựa trên sản phẩm, kinh nghiệm, hạn chót và thời gian bạn có.",
+      selectedRoute: "Lộ trình được chọn",
+      selected: "Được chọn",
+      routesConsidered: "Các lộ trình đã cân nhắc",
+      notSelected: "Không chọn",
+      skippedLearning: "QUANDA đã loại bỏ",
+      timeAvoided: "Thời gian học ước tính tránh được",
+      noTimeEstimate: "Không hiển thị ước tính vì chưa có kinh nghiệm công cụ liên quan.",
+      decisionBasis: "Cơ sở quyết định",
+      output: "Sản phẩm",
+      deadline: "Hạn chót",
+      availableTime: "Thời gian có thể dành",
+      requiredApplications: "Ứng dụng đã chọn",
+      statedExperience: "Kinh nghiệm đã khai báo",
     },
   },
   calendar: {

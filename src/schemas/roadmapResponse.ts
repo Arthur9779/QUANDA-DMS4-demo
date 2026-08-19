@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RouteEvidenceSchema } from "@/src/roadmap/routeEvidence";
 
 export const RoadmapStageSchema = z.object({
   id: z.string().min(1).max(80),
@@ -37,6 +38,7 @@ export const RoadmapResponseSchema = z.object({
   assumptions: z.array(z.string().min(2).max(400)).max(8),
   warnings: z.array(z.string().min(2).max(400)).max(8),
   stages: z.array(RoadmapStageSchema).min(4).max(8),
+  routeEvidence: RouteEvidenceSchema.optional(),
   schedule: z
     .array(
       z.object({
