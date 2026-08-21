@@ -50,7 +50,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
     projectIntent: { type: "string" },
     concepts: {
       type: "array",
-      maxItems: 120,
       items: {
         type: "object",
         properties: {
@@ -64,7 +63,7 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
               "ai_inferred",
             ],
           },
-          confidence: { type: "number", minimum: 0, maximum: 1 },
+          confidence: { type: "number" },
         },
         required: [
           "ontologyId",
@@ -76,14 +75,12 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
     },
     unknownConcepts: {
       type: "array",
-      maxItems: 40,
       items: {
         type: "object",
         properties: {
           raw: { type: "string" },
           nearestOntologyIds: {
             type: "array",
-            maxItems: 8,
             items: { type: "string" },
           },
           source: {
@@ -100,7 +97,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
     },
     constraints: {
       type: "array",
-      maxItems: 40,
       items: {
         type: "object",
         properties: {

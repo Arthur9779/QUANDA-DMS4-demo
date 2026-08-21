@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { analyzeProject } from "@/src/project-analysis/analyzeProject";
-import type { CreativeDnaClassifier } from "@/src/project-analysis/geminiClassifier";
+import {
+  CreativeDnaClassifierError,
+  type CreativeDnaClassifier,
+} from "@/src/project-analysis/geminiClassifier";
 import type { OntologyCandidate, OntologyRetrievalResult } from "@/src/ontology/retrieval";
 import { ontologyArtifact } from "@/src/ontology/runtime";
 
@@ -121,6 +124,28 @@ describe("project analysis service", () => {
     expect(result.source).toBe("fallback");
     expect(result.diagnostics.failureCode).toBe("CLASSIFICATION_FAILED");
     expect(result.creativeDna.projectIntent).toContain("assignment requires Blender");
+  });
+
+  it("logs only a bounded classifier failure detail", async () => {
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const classifier: CreativeDnaClassifier = {
+      classify: vi.fn().mockRejectedValue(
+        new CreativeDnaClassifierError(
+          "HTTP_ERROR",
+          "Gemini Creative DNA classification failed (400_INVALID_ARGUMENT)",
+        ),
+      ),
+    };
+
+    await analyzeProject(baseRequest, {
+      retriever: retrieval(),
+      classifier,
+    });
+
+    expect(warning).toHaveBeenCalledWith(
+      expect.stringContaining("detail=Gemini Creative DNA classification failed (400_INVALID_ARGUMENT)"),
+    );
+    warning.mockRestore();
   });
 
   it("preserves Vietnamese input and provenance", async () => {
