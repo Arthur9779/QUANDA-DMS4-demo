@@ -13,7 +13,7 @@ const newsreader = Newsreader({
   subsets: ["latin"],
 });
 
-const title = "QUANDA — From brief to learning path";
+const title = "Agentic planner find the most optimal path for the deadline";
 const description =
   "Turn a creative project brief into a practical, deadline-aware learning and production roadmap.";
 
