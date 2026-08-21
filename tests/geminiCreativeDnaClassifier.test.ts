@@ -48,6 +48,12 @@ describe("Gemini Creative DNA classifier", () => {
       responseJsonSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
     });
     expect(body.generationConfig).not.toHaveProperty("responseSchema");
+    expect(JSON.stringify(CREATIVE_DNA_RESPONSE_JSON_SCHEMA).length).toBeLessThan(
+      2_500,
+    );
+    expect(JSON.stringify(CREATIVE_DNA_RESPONSE_JSON_SCHEMA)).not.toContain(
+      '"evidence"',
+    );
     expect(String(options.body)).not.toContain("quanda.skills");
   });
 

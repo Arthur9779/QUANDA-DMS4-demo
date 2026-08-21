@@ -41,9 +41,11 @@ export interface GeminiCreativeDnaClassifierOptions {
   fetchImpl?: typeof fetch;
 }
 
+// Keep the transport schema deliberately compact: Gemini can reject large or
+// deeply nested structured-output schemas. Optional evidence is restored by
+// normalization, while the complete Zod contract still validates the response.
 export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
   type: "object",
-  additionalProperties: false,
   properties: {
     projectIntent: { type: "string" },
     concepts: {
@@ -51,7 +53,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
       maxItems: 120,
       items: {
         type: "object",
-        additionalProperties: false,
         properties: {
           ontologyId: { type: "string" },
           rawLabel: { type: "string" },
@@ -64,25 +65,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
             ],
           },
           confidence: { type: "number", minimum: 0, maximum: 1 },
-          evidence: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              sourceField: {
-                type: "string",
-                enum: [
-                  "projectBrief",
-                  "currentExperience",
-                  "requiredApplications",
-                  "outputType",
-                  "reference",
-                  "other",
-                ],
-              },
-              excerpt: { type: "string" },
-            },
-            required: ["sourceField"],
-          },
         },
         required: [
           "ontologyId",
@@ -97,16 +79,13 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
       maxItems: 40,
       items: {
         type: "object",
-        additionalProperties: false,
         properties: {
           raw: { type: "string" },
-          suggestedCategory: { type: "string" },
           nearestOntologyIds: {
             type: "array",
             maxItems: 8,
             items: { type: "string" },
           },
-          confidence: { type: "number", minimum: 0, maximum: 1 },
           source: {
             type: "string",
             enum: [
@@ -114,25 +93,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
               "user_preference",
               "ai_inferred",
             ],
-          },
-          evidence: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              sourceField: {
-                type: "string",
-                enum: [
-                  "projectBrief",
-                  "currentExperience",
-                  "requiredApplications",
-                  "outputType",
-                  "reference",
-                  "other",
-                ],
-              },
-              excerpt: { type: "string" },
-            },
-            required: ["sourceField"],
           },
         },
         required: ["raw", "nearestOntologyIds", "source"],
@@ -143,7 +103,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
       maxItems: 40,
       items: {
         type: "object",
-        additionalProperties: false,
         properties: {
           label: { type: "string" },
           kind: {
@@ -166,25 +125,6 @@ export const CREATIVE_DNA_RESPONSE_JSON_SCHEMA = {
               "user_preference",
               "ai_inferred",
             ],
-          },
-          evidence: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              sourceField: {
-                type: "string",
-                enum: [
-                  "projectBrief",
-                  "currentExperience",
-                  "requiredApplications",
-                  "outputType",
-                  "reference",
-                  "other",
-                ],
-              },
-              excerpt: { type: "string" },
-            },
-            required: ["sourceField"],
           },
         },
         required: ["label", "kind", "source"],
