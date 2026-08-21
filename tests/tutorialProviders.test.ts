@@ -44,6 +44,8 @@ describe("tutorial discovery and classification", () => {
       query: "Blender toon shading",
       language: "en",
       softwareIds: ["blender"],
+      skillIds: ["tutorial-content-classification.tutorial-technique.toon-shading"],
+      techniqueIds: ["3d-production.material-technique.toon-material"],
       maxResults: 5,
     });
     expect(result.tutorial.externalId).toBe("abcDEF12345");
@@ -51,5 +53,11 @@ describe("tutorial discovery and classification", () => {
       "https://www.youtube.com/watch?v=abcDEF12345",
     );
     expect(result.sourceTier).toBe("live");
+    expect(result.tutorial.skillIds).toEqual([
+      "tutorial-content-classification.tutorial-technique.toon-shading",
+    ]);
+    expect(result.tutorial.techniqueIds).toEqual([
+      "3d-production.material-technique.toon-material",
+    ]);
   });
 });

@@ -14,6 +14,8 @@ export const TutorialDiscoveryRequestSchema = z.object({
   query: z.string().trim().min(3).max(180),
   language: z.enum(["en", "vi", "either"]).optional(),
   softwareIds: z.array(z.string().trim().min(1).max(160)).max(20).default([]),
+  skillIds: z.array(z.string().trim().min(1).max(160)).max(40).optional(),
+  techniqueIds: z.array(z.string().trim().min(1).max(160)).max(40).optional(),
   maxResults: z.number().int().min(1).max(15).default(10),
 });
 

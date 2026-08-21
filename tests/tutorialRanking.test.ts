@@ -97,4 +97,22 @@ describe("deterministic tutorial ranking", () => {
       rankTutorials(need, candidates, context),
     );
   });
+
+  it("matches named Other applications without case-sensitive ID failures", () => {
+    const customNeed = TutorialNeedSchema.parse({
+      ...need,
+      id: "need:touchdesigner-hand-tracking",
+      softwareIds: ["custom:TouchDesigner"],
+    });
+    const candidate = tutorial({
+      id: "catalog:touchdesigner",
+      software: "custom:touchdesigner",
+      type: "focused",
+      duration: 15,
+    });
+    expect(rankTutorials(customNeed, [
+      { tutorial: candidate, sourceTier: "curated" },
+    ], { knownSkillIds: new Set(), today: "2026-08-16" }))
+      .toHaveLength(1);
+  });
 });

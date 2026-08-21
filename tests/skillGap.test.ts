@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { deriveSkillGaps, buildTutorialNeeds } from "@/src/tutorial-matching/skillGap";
 import type { CreativeDNA } from "@/src/contracts/knowledge";
+import { applications } from "@/src/data/applications";
 import type { RoadmapRequest } from "@/src/types";
 
 function project(overrides: Partial<RoadmapRequest> = {}): RoadmapRequest {
@@ -34,9 +35,14 @@ describe("contextual skill-gap analysis", () => {
     const gaps = deriveSkillGaps(project(), creativeDna("Toon-shaded product animation"));
     expect(gaps.map((gap) => gap.label)).toEqual([
       "Basic viewport navigation",
+      "Product modelling and scene assembly",
       "Shader Editor and material basics",
-      "Toon shading",
+      "Lighting the product",
       "Camera basics",
+      "Object and keyframe animation",
+      "Render settings",
+      "Final render and export",
+      "Toon shading",
       "Camera animation",
     ]);
     expect(new Set(gaps.map((gap) => gap.skillId)).size).toBe(gaps.length);
@@ -68,6 +74,8 @@ describe("contextual skill-gap analysis", () => {
     });
     const gaps = deriveSkillGaps(codingProject, creativeDna(codingProject.projectBrief));
     expect(gaps.map((gap) => gap.label)).toEqual([
+      "Application workspace and project setup",
+      "Project export and delivery",
       "Minimal JavaScript basics",
       "p5.js canvas and drawing basics",
       "Audio input and FFT",
@@ -75,5 +83,101 @@ describe("contextual skill-gap analysis", () => {
     ]);
     expect(gaps.some((gap) => /React|database|authentication/i.test(gap.label)))
       .toBe(false);
+  });
+
+  it("decomposes Figma work into a complete interface workflow", () => {
+    const figmaProject = project({
+      projectBrief: "Design and prototype a responsive mobile banking app in Figma.",
+      currentExperience: "I am new to Figma.",
+      requiredApplications: ["figma"],
+      outputType: "uiux",
+    });
+    const gaps = deriveSkillGaps(
+      figmaProject,
+      creativeDna(figmaProject.projectBrief),
+    );
+    expect(gaps.map((gap) => gap.label)).toEqual([
+      "Figma workspace basics",
+      "Interface layout",
+      "Responsive Auto Layout",
+      "Components and design systems",
+      "User-flow planning",
+      "Interactive prototyping",
+      "Asset and prototype export",
+    ]);
+  });
+
+  it("decomposes editing work through colour, sound, and delivery", () => {
+    const resolveProject = project({
+      projectBrief: "Edit an interview, clean its sound, colour grade it, and deliver an MP4.",
+      currentExperience: "DaVinci Resolve beginner",
+      requiredApplications: ["davinci-resolve"],
+      outputType: "video",
+    });
+    const gaps = deriveSkillGaps(
+      resolveProject,
+      creativeDna(resolveProject.projectBrief),
+    );
+    expect(gaps.map((gap) => gap.label)).toEqual([
+      "DaVinci Resolve workspace basics",
+      "Timeline navigation",
+      "Video editing and trimming",
+      "Colour correction and grading",
+      "Fairlight audio mixing",
+      "Delivery page and export",
+    ]);
+  });
+
+  it("turns a confirmed quanda.skills concept into a tutorial need", () => {
+    const installationProject = project({
+      projectBrief: "Build an interactive projected installation in TouchDesigner.",
+      currentExperience: "I know TouchDesigner basics.",
+      requiredApplications: ["custom:TouchDesigner"],
+      outputType: "other",
+    });
+    const dna = creativeDna(installationProject.projectBrief);
+    dna.concepts.push({
+      ontologyId: "experience-installation-physical-interaction.projection-technique.projection-mapping",
+      label: "projection mapping",
+      family: "Experience / Installation / Physical Interaction",
+      category: "Projection Technique",
+      source: "user_added",
+      status: "user_confirmed",
+      confidence: 1,
+    });
+    const gaps = deriveSkillGaps(installationProject, dna);
+    const projection = gaps.find((gap) => gap.label === "projection mapping");
+    expect(projection?.skillId).toBe(
+      "experience-installation-physical-interaction.projection-technique.projection-mapping",
+    );
+    expect(projection?.priority).toBe("required");
+    expect(projection?.softwareIds).toEqual(["custom:TouchDesigner"]);
+    expect(buildTutorialNeeds(installationProject, dna, gaps))
+      .toContainEqual(expect.objectContaining({
+        label: "projection mapping",
+        skillIds: [
+          "experience-installation-physical-interaction.projection-technique.projection-mapping",
+        ],
+      }));
+  });
+
+  it("provides a production-to-export decomposition for every built-in application", () => {
+    for (const application of applications) {
+      const applicationProject = project({
+        projectBrief: `Create and deliver a finished project using ${application.name}.`,
+        currentExperience: `I am new to ${application.name}.`,
+        requiredApplications: [application.id],
+        outputType: application.category === "audio" ? "audio" : "other",
+      });
+      const gaps = deriveSkillGaps(
+        applicationProject,
+        creativeDna(applicationProject.projectBrief),
+      );
+      expect(gaps.length, application.id).toBeGreaterThanOrEqual(4);
+      expect(
+        gaps.some((gap) => /export|delivery/i.test(gap.label)),
+        `${application.id} export coverage`,
+      ).toBe(true);
+    }
   });
 });
