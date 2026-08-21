@@ -45,9 +45,9 @@ describe("Gemini Creative DNA classifier", () => {
     expect(body.generationConfig).toMatchObject({
       temperature: 0.15,
       responseMimeType: "application/json",
-      responseJsonSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
+      responseSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
     });
-    expect(body.generationConfig).not.toHaveProperty("responseSchema");
+    expect(body.generationConfig).not.toHaveProperty("responseJsonSchema");
     expect(JSON.stringify(CREATIVE_DNA_RESPONSE_JSON_SCHEMA).length).toBeLessThan(
       2_500,
     );
