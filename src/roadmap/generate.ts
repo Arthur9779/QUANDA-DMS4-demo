@@ -57,6 +57,11 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
   const locale = project.interfaceLanguage;
   const isProductAnimationExample = /20[- ]second product animation|hoạt hình sản phẩm.*20 giây/i.test(project.projectBrief);
   const stages: RoadmapStage[] = [];
+  const handoffApplicationIds = appIds.slice(1, 3);
+  // RoadmapResponseSchema deliberately caps the user-facing plan at eight
+  // stages. Reserve space for scope, core output, review, delivery, and any
+  // required application handoffs before adding just-in-time learning stages.
+  const learningStageLimit = Math.max(1, 4 - handoffApplicationIds.length);
   const add = (stage: Omit<RoadmapStage, "order" | "dependsOnStageIds">) => {
     stages.push(makeStage(stage, stages.length + 1, stages.length ? [stages.at(-1)!.id] : []));
   };
@@ -113,7 +118,7 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     tutorialIds: [],
   });
 
-  for (const gap of activeGaps(input).slice(0, 4)) {
+  for (const gap of activeGaps(input).slice(0, learningStageLimit)) {
     const tutorial = selectedForSkill(input, gap.skillId);
     add({
       id: `apply-${gap.id}`.slice(0, 80),
@@ -138,7 +143,7 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     });
   }
 
-  for (const applicationId of appIds.slice(1, 3)) {
+  for (const applicationId of handoffApplicationIds) {
     add({
       id: `handoff-${applicationId}`.replace(/[^a-z0-9-]/gi, "-").slice(0, 80),
       title: copy(input, `Hand off work to ${getApplicationName(applicationId)}`, `Chuyển giao công việc sang ${getApplicationName(applicationId)}`),
@@ -179,35 +184,16 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
   });
 
   add({
-    id: "presentation-and-backup",
-    title: copy(input, "Prepare presentation and backup", "Chuẩn bị trình bày và sao lưu"),
-    goal: copy(input, "Make the result easy to review and recover before delivery.", "Làm sản phẩm dễ xem xét và có thể khôi phục trước khi bàn giao."),
-    why: copy(input, "A clear presentation and backup prevent avoidable delivery failures.", "Trình bày rõ ràng và sao lưu giúp tránh lỗi bàn giao có thể phòng ngừa."),
-    applicationId: primaryApplication,
-    skillToLearn: copy(input, "Presentation and project backup", "Trình bày và sao lưu dự án"),
-    tasks: [copy(input, "Prepare the review version", "Chuẩn bị phiên bản để xem xét"), copy(input, "Save a dated backup copy", "Lưu một bản sao lưu có ngày tháng")],
-    productionTasks: [copy(input, "Package the review-ready files", "Đóng gói các tệp sẵn sàng để xem xét")],
-    learningTasks: [],
-    definitionOfDone: [copy(input, "The review version and a recoverable backup are both available.", "Phiên bản xem xét và bản sao lưu có thể khôi phục đều đã sẵn sàng.")],
-    classification: "useful",
-    creativeDnaIds: [],
-    skillIds: [],
-    learningMinutes: 1,
-    productionMinutes: 20,
-    tutorialIds: [],
-  });
-
-  add({
     id: "quality-and-delivery",
     title: copy(input, "Quality-check and deliver", "Kiểm tra chất lượng và bàn giao"),
     goal: copy(input, "Verify the final output, export the required format, and retain a backup.", "Kiểm tra đầu ra cuối, xuất đúng định dạng yêu cầu và giữ bản sao lưu."),
     why: copy(input, "Technical delivery mistakes are easiest to fix before submission.", "Lỗi bàn giao kỹ thuật dễ sửa nhất trước khi nộp."),
     applicationId: appIds.at(-1) ?? primaryApplication,
     skillToLearn: copy(input, "Export and quality assurance", "Xuất tệp và đảm bảo chất lượng"),
-    tasks: [copy(input, "Check every required criterion", "Kiểm tra từng tiêu chí bắt buộc"), copy(input, "Export and open the final file", "Xuất và mở tệp cuối")],
-    productionTasks: [copy(input, "Run final QA", "Kiểm tra chất lượng cuối"), copy(input, "Export the required deliverable", "Xuất đúng đầu ra yêu cầu")],
+    tasks: [copy(input, "Check every required criterion", "Kiểm tra từng tiêu chí bắt buộc"), copy(input, "Export and open the final file", "Xuất và mở tệp cuối"), copy(input, "Save a dated backup copy", "Lưu một bản sao lưu có ngày tháng")],
+    productionTasks: [copy(input, "Run final QA", "Kiểm tra chất lượng cuối"), copy(input, "Export the required deliverable", "Xuất đúng đầu ra yêu cầu"), copy(input, "Package the deliverable and recoverable source files", "Đóng gói sản phẩm bàn giao và tệp nguồn có thể khôi phục")],
     learningTasks: [],
-    definitionOfDone: [copy(input, "The output opens correctly and meets the stated delivery requirements.", "Đầu ra mở đúng và đáp ứng các yêu cầu bàn giao đã nêu.")],
+    definitionOfDone: [copy(input, "The output opens correctly, meets the stated delivery requirements, and has a recoverable backup.", "Đầu ra mở đúng, đáp ứng yêu cầu bàn giao và có bản sao lưu có thể khôi phục.")],
     classification: "required",
     creativeDnaIds: [],
     skillIds: [],

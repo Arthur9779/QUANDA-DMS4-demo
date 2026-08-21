@@ -5,9 +5,23 @@ import {
   clearTutorialClassificationCache,
   getTutorialClassificationCacheSize,
 } from "@/src/tutorial-matching/classifier";
+import { tutorials } from "@/src/lib/tutorialMatcher";
+import { canonicalSkillIdsForTopics } from "@/src/tutorial-matching/skillTaxonomy";
 import { YouTubeDataApiProvider } from "@/src/tutorial-matching/providers";
 
 describe("tutorial discovery and classification", () => {
+  it("maps every curated tutorial to at least one quanda.skills concept", () => {
+    expect(
+      tutorials.filter(
+        (tutorial) => canonicalSkillIdsForTopics(tutorial.topics).length === 0,
+      ),
+    ).toEqual([]);
+  });
+
+  it("keeps curated IDs stable when tutorials move into the learning plan", () => {
+    expect(classifyTutorial(tutorials[0]).id).toBe(tutorials[0].id);
+  });
+
   it("keeps stable provider IDs and direct discovered URLs", () => {
     for (const tutorial of preciseTutorials) {
       expect(tutorial.externalId).toBeTruthy();

@@ -21,7 +21,10 @@ function legacyMetadata(tutorial: Tutorial): TutorialMetadata {
     /\b(?:full|complete|course|beginner tutorial)\b/i.test(tutorial.title.en);
   return {
     tutorialMetadataVersion: 1,
-    id: `quanda:${tutorial.id}`,
+    // Keep the catalogue ID stable across the learning-path and roadmap
+    // systems. Sample/fallback roadmaps already store this ID, so adding a
+    // provider prefix here makes selected tutorials disappear at handoff.
+    id: tutorial.id,
     provider: "quanda_catalog",
     externalId: tutorial.youtubeVideoId,
     title: tutorial.title.en,

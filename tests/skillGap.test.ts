@@ -107,6 +107,28 @@ describe("contextual skill-gap analysis", () => {
     ]);
   });
 
+  it("understands a negated list of skills instead of marking them as known", () => {
+    const figmaProject = project({
+      projectBrief: "Design and prototype a responsive mobile banking app in Figma.",
+      currentExperience:
+        "I know Figma basics but not Auto Layout, components, user flows, or prototyping.",
+      requiredApplications: ["figma"],
+      outputType: "uiux",
+    });
+    const gaps = deriveSkillGaps(
+      figmaProject,
+      creativeDna(figmaProject.projectBrief),
+    );
+    for (const label of [
+      "Responsive Auto Layout",
+      "Components and design systems",
+      "User-flow planning",
+      "Interactive prototyping",
+    ]) {
+      expect(gaps.find((gap) => gap.label === label)?.status).toBe("needs_learning");
+    }
+  });
+
   it("decomposes editing work through colour, sound, and delivery", () => {
     const resolveProject = project({
       projectBrief: "Edit an interview, clean its sound, colour grade it, and deliver an MP4.",
@@ -179,5 +201,26 @@ describe("contextual skill-gap analysis", () => {
         `${application.id} export coverage`,
       ).toBe(true);
     }
+  });
+
+  it("does not leak creative-coding prerequisites into Procreate", () => {
+    const procreateProject = project({
+      projectBrief: "Draw and export a finished editorial illustration in Procreate.",
+      currentExperience: "I am new to Procreate.",
+      requiredApplications: ["procreate"],
+      outputType: "graphic",
+    });
+    const gaps = deriveSkillGaps(
+      procreateProject,
+      creativeDna(procreateProject.projectBrief),
+    );
+    expect(gaps.map((gap) => gap.label)).toEqual([
+      "Canvas and gesture basics",
+      "Brush control",
+      "Layer workflow",
+      "Digital illustration workflow",
+      "Artwork and animation export",
+    ]);
+    expect(gaps.some((gap) => /JavaScript|p5\.js/i.test(gap.label))).toBe(false);
   });
 });

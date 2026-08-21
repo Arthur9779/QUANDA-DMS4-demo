@@ -276,12 +276,15 @@ const APPLICATION_WORKFLOWS: Record<string, WorkflowStep[]> = {
     { topic: "layout", label: "Interface layout", minutes: 18 },
     { topic: "auto layout", label: "Responsive Auto Layout", minutes: 20 },
     { topic: "components", label: "Components and design systems", minutes: 20 },
-    { topic: "user flow", label: "User-flow planning", minutes: 15, priority: "useful" },
+    { topic: "user flow", label: "User-flow planning", minutes: 15, priority: "useful", aliases: ["user flows"] },
     { topic: "prototyping", label: "Interactive prototyping", minutes: 20 },
     { topic: "export", label: "Asset and prototype export", minutes: 10 },
   ],
   procreate: [
-    { topic: "canvas", label: "Canvas and gesture basics", minutes: 12, foundation: true },
+    // A Procreate canvas is not the coding prerequisite named "canvas" in the
+    // ontology. Using workspace navigation avoids importing p5.js/JavaScript
+    // prerequisites into an illustration project.
+    { topic: "workspace", label: "Canvas and gesture basics", minutes: 12, foundation: true },
     { topic: "brushes", label: "Brush control", minutes: 15 },
     { topic: "layers", label: "Layer workflow", minutes: 15 },
     { topic: "illustration", label: "Digital illustration workflow", minutes: 25 },
@@ -465,10 +468,14 @@ function containsAny(text: string, values: string[]): boolean {
 }
 
 function hasNegated(text: string, phrase: string): boolean {
-  const escaped = normalizeOntologyLabel(phrase).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const normalizedText = normalizeOntologyLabel(text)
+    .replace(/[^\p{L}\p{N}+#]+/gu, " ");
+  const escaped = normalizeOntologyLabel(phrase)
+    .replace(/[^\p{L}\p{N}+#]+/gu, " ")
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(
-    `(?:never|not|no|without|chua|khong)(?:\\s+\\w+){0,4}\\s+${escaped}|${escaped}(?:\\s+\\w+){0,3}\\s+(?:beginner|new|chua|khong)`,
-  ).test(text);
+    `\\b(?:never|not|no|without|chua|khong)\\b(?:(?!\\b(?:but|however|yet|nhung)\\b).){0,120}\\b${escaped}\\b|\\b${escaped}\\b(?:\\s+\\w+){0,3}\\s+(?:beginner|new|chua|khong)`,
+  ).test(normalizedText);
 }
 
 function softwareHasLevel(
