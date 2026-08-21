@@ -111,10 +111,18 @@ function logDiagnostics(input: {
   candidates: OntologyCandidate[];
   response: ProjectAnalysisResponse;
 }) {
-  if (process.env.NODE_ENV === "production") return;
-  console.info(
-    `[QUANDA] Creative DNA candidates=${input.candidates.length} accepted=${input.response.diagnostics.acceptedOntologyIds.length} rejected=${input.response.diagnostics.rejectedOntologyIds.length} unknown=${input.response.diagnostics.unknownConceptCount} fallback=${input.response.diagnostics.fallbackUsed}`,
-  );
+  const message =
+    `[QUANDA] Creative DNA candidates=${input.candidates.length} ` +
+    `accepted=${input.response.diagnostics.acceptedOntologyIds.length} ` +
+    `rejected=${input.response.diagnostics.rejectedOntologyIds.length} ` +
+    `unknown=${input.response.diagnostics.unknownConceptCount} ` +
+    `fallback=${input.response.diagnostics.fallbackUsed} ` +
+    `failure=${input.response.diagnostics.failureCode ?? "none"}`;
+  if (input.response.diagnostics.fallbackUsed) {
+    console.warn(message);
+    return;
+  }
+  if (process.env.NODE_ENV !== "production") console.info(message);
 }
 
 export async function analyzeProject(

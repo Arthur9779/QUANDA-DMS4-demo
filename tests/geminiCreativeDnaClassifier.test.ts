@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
   GeminiCreativeDnaClassifier,
   CreativeDnaClassifierError,
 } from "@/src/project-analysis/geminiClassifier";
@@ -44,6 +45,7 @@ describe("Gemini Creative DNA classifier", () => {
     expect(body.generationConfig).toMatchObject({
       temperature: 0.15,
       responseMimeType: "application/json",
+      responseJsonSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
     });
     expect(body.generationConfig).not.toHaveProperty("responseSchema");
     expect(String(options.body)).not.toContain("quanda.skills");
@@ -102,6 +104,37 @@ describe("Gemini Creative DNA classifier", () => {
       ),
     });
     await expect(classifier.classify("prompt")).resolves.toEqual(validOutput);
+  });
+
+  it("reports safe schema paths for invalid structured output", async () => {
+    const classifier = new GeminiCreativeDnaClassifier({
+      apiKey: "test-key",
+      fetchImpl: vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: JSON.stringify({
+                        ...validOutput,
+                        concepts: [{ rawLabel: "Bauhaus" }],
+                      }),
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      ),
+    });
+    await expect(classifier.classify("prompt")).rejects.toMatchObject({
+      code: "INVALID_RESPONSE",
+      message: expect.stringContaining("concepts.0.ontologyId"),
+    });
   });
 
   it("requires a server-side API key", () => {

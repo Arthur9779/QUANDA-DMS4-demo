@@ -6,6 +6,10 @@ import {
   repairGoogleAiRoadmap,
 } from "@/src/lib/ai/googleAi";
 import {
+  configuredTimeoutMs,
+  withAbortTimeout,
+} from "@/src/lib/ai/withAbortTimeout";
+import {
   calculateAvailableMinutes,
   getDaysRemaining,
 } from "@/src/lib/feasibility";
@@ -196,8 +200,6 @@ export async function POST(request: NextRequest) {
     return response(roadmap, 200, roadmap.source);
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25_000);
   try {
     const prompt = buildRoadmapPrompt({
       input: roadmapInput,
@@ -209,20 +211,30 @@ export async function POST(request: NextRequest) {
       ),
     });
 
-    const originalOutput = await callGoogleAiForRoadmap(
-      prompt,
-      controller.signal,
+    const originalOutput = await withAbortTimeout(
+      configuredTimeoutMs(
+        process.env.GEMINI_ROADMAP_GENERATION_TIMEOUT_MS,
+        25_000,
+      ),
+      (signal) => callGoogleAiForRoadmap(prompt, signal),
     );
     let parsedRoadmap = parseRoadmap(originalOutput);
     let repairDiagnostic: string | undefined;
 
     if (!parsedRoadmap.success) {
       try {
-        const repairedOutput = await repairGoogleAiRoadmap(
-          originalOutput,
-          validationSummary(parsedRoadmap.error),
-          roadmapInput.projectInput.interfaceLanguage,
-          controller.signal,
+        const repairedOutput = await withAbortTimeout(
+          configuredTimeoutMs(
+            process.env.GEMINI_ROADMAP_REPAIR_TIMEOUT_MS,
+            25_000,
+          ),
+          (signal) =>
+            repairGoogleAiRoadmap(
+              originalOutput,
+              validationSummary(parsedRoadmap.error),
+              roadmapInput.projectInput.interfaceLanguage,
+              signal,
+            ),
         );
         parsedRoadmap = parseRoadmap(repairedOutput);
       } catch (error) {
@@ -260,7 +272,5 @@ export async function POST(request: NextRequest) {
       roadmap.source,
       aiDiagnosticCode(error),
     );
-  } finally {
-    clearTimeout(timeout);
   }
 }

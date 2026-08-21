@@ -260,6 +260,7 @@ export class GeminiCreativeDnaClassifier implements CreativeDnaClassifier {
               temperature: 0.15,
               maxOutputTokens: 6_000,
               responseMimeType: "application/json",
+              responseJsonSchema: CREATIVE_DNA_RESPONSE_JSON_SCHEMA,
             },
           }),
           signal: requestSignal,
@@ -296,14 +297,27 @@ export class GeminiCreativeDnaClassifier implements CreativeDnaClassifier {
         "Gemini Creative DNA classification returned no content",
       );
     }
+    let structuredOutput: unknown;
     try {
-      return CreativeDnaModelOutputSchema.parse(parseStructuredOutput(text));
+      structuredOutput = parseStructuredOutput(text);
     } catch {
       throw new CreativeDnaClassifierError(
         "INVALID_RESPONSE",
-        "Gemini Creative DNA classification returned invalid structured output",
+        "Gemini Creative DNA classification returned invalid JSON",
       );
     }
+    const parsed = CreativeDnaModelOutputSchema.safeParse(structuredOutput);
+    if (!parsed.success) {
+      const issuePaths = parsed.error.issues
+        .slice(0, 8)
+        .map((issue) => issue.path.join(".") || "root")
+        .join(",");
+      throw new CreativeDnaClassifierError(
+        "INVALID_RESPONSE",
+        `Gemini Creative DNA classification failed schema validation (${issuePaths})`,
+      );
+    }
+    return parsed.data;
   }
 }
 
