@@ -294,7 +294,7 @@ a:focus-visible {
   max-width: 720px;
   font-size: clamp(2.75rem, 5.8vw, 5rem);
   letter-spacing: -0.025em;
-  line-height: 1.02;
+  line-height: 1.1;
   text-wrap: balance;
 }
 
@@ -2638,7 +2638,7 @@ footer {
   .hero-vi h1 {
     font-size: clamp(2.35rem, 11.5vw, 3.35rem);
     letter-spacing: -0.02em;
-    line-height: 1.05;
+    line-height: 1.12;
   }
 
   .hero-actions {
