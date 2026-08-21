@@ -591,7 +591,7 @@ export function QuandaApp() {
 
         <section className={`hero hero-${locale}`} aria-labelledby="hero-title">
           <h1 id="hero-title">
-            {t.hero.titleLead} <em>{t.hero.titleAccent}</em>
+            {t.hero.titleLead}{t.hero.titleAccent ? <> <em>{t.hero.titleAccent}</em></> : null}
           </h1>
           <p className="hero-tagline">{t.hero.tagline}</p>
           <p className="hero-description">{t.hero.description}</p>

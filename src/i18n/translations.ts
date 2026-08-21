@@ -620,8 +620,8 @@ const vi: Translation = {
   },
   hero: {
     eyebrow: "Trợ lý thực tế cho dự án sáng tạo",
-    titleLead: "Agentic planner tìm ra lộ trình tối ưu nhất",
-    titleAccent: "cho deadline",
+    titleLead: "Trợ lý lập kế hoạch chủ động",
+    titleAccent: "",
     tagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
     description:
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
