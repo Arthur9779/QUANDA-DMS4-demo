@@ -54,7 +54,7 @@ Open `http://localhost:3000`.
 | `YOUTUBE_API_KEY` | No | Server-only YouTube Data API key for optional live video discovery. Curated and indexed matching works without it. |
 | `NEXT_PUBLIC_APP_URL` | No | Public app origin for local documentation and deployment configuration. |
 
-Creative DNA uses a compact Gemini structured-output schema, then validates the complete response against the stricter server-side contract.
+Creative DNA uses a compact, OpenAPI-compatible Gemini structured-output schema, then validates the complete response against the stricter server-side contract.
 
 Never prefix the Gemini key with `NEXT_PUBLIC_` and never place it in client-side code. `.env.local` is ignored by Git.
 
