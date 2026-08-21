@@ -44,6 +44,11 @@ function fallbackCode(error: unknown): string {
   return "CLASSIFICATION_FAILED";
 }
 
+function safeFailureDetail(error: unknown): string | undefined {
+  if (!(error instanceof CreativeDnaClassifierError)) return undefined;
+  return error.message.replace(/[^A-Za-z0-9_(),. -]/g, "").slice(0, 180);
+}
+
 function localRetrievalResult(
   request: ProjectAnalysisRequest,
 ): Promise<OntologyRetrievalResult> {
@@ -110,11 +115,21 @@ function classifierFor(options: AnalyzeProjectOptions) {
 function logDiagnostics(input: {
   candidates: OntologyCandidate[];
   response: ProjectAnalysisResponse;
+  failureDetail?: string;
 }) {
-  if (process.env.NODE_ENV === "production") return;
-  console.info(
-    `[QUANDA] Creative DNA candidates=${input.candidates.length} accepted=${input.response.diagnostics.acceptedOntologyIds.length} rejected=${input.response.diagnostics.rejectedOntologyIds.length} unknown=${input.response.diagnostics.unknownConceptCount} fallback=${input.response.diagnostics.fallbackUsed}`,
-  );
+  const message =
+    `[QUANDA] Creative DNA candidates=${input.candidates.length} ` +
+    `accepted=${input.response.diagnostics.acceptedOntologyIds.length} ` +
+    `rejected=${input.response.diagnostics.rejectedOntologyIds.length} ` +
+    `unknown=${input.response.diagnostics.unknownConceptCount} ` +
+    `fallback=${input.response.diagnostics.fallbackUsed} ` +
+    `failure=${input.response.diagnostics.failureCode ?? "none"}` +
+    (input.failureDetail ? ` detail=${input.failureDetail}` : "");
+  if (input.response.diagnostics.fallbackUsed) {
+    console.warn(message);
+    return;
+  }
+  if (process.env.NODE_ENV !== "production") console.info(message);
 }
 
 export async function analyzeProject(
@@ -127,6 +142,7 @@ export async function analyzeProject(
   const classifier = classifierFor(options);
   let source: "ai" | "fallback" = "fallback";
   let failureCode: string | undefined;
+  let failureDetail: string | undefined;
   let normalized;
 
   if (classifier) {
@@ -146,6 +162,7 @@ export async function analyzeProject(
       source = "ai";
     } catch (error) {
       failureCode = fallbackCode(error);
+      failureDetail = safeFailureDetail(error);
     }
   } else {
     failureCode = "NOT_CONFIGURED";
@@ -182,7 +199,7 @@ export async function analyzeProject(
     },
   });
   if (options.logDiagnostics !== false) {
-    logDiagnostics({ candidates: retrieval.candidates, response });
+    logDiagnostics({ candidates: retrieval.candidates, response, failureDetail });
   }
   return response;
 }
