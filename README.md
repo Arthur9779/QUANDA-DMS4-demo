@@ -45,7 +45,7 @@ Open `http://localhost:3000`.
 | `GEMINI_CLASSIFICATION_MODEL` | No | Model used for Creative DNA classification; falls back to `GEMINI_MODEL`. |
 | `GEMINI_CLASSIFICATION_TIMEOUT_MS` | No | Creative DNA classification timeout, clamped to 500–25,000 ms. |
 | `GEMINI_ROADMAP_GENERATION_TIMEOUT_MS` | No | Timeout for the initial roadmap request, clamped to 1,000–60,000 ms. |
-| `GEMINI_ROADMAP_REPAIR_TIMEOUT_MS` | No | Independent timeout for repairing an invalid roadmap response, clamped to 1,000–60,000 ms. |
+| `GEMINI_ROADMAP_REPAIR_TIMEOUT_MS` | No | Independent fresh timeout for repairing an invalid roadmap response, clamped to 1,000–60,000 ms. |
 | `GEMINI_FILE_SEARCH_STORE` | For semantic retrieval | Indexed Gemini File Search store resource name. |
 | `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` | For semantic retrieval | Source hash of the ontology indexed in that store. |
 | `GEMINI_FILE_SEARCH_EMBEDDING_MODEL` | No | Store embedding model. Defaults to `models/gemini-embedding-2`. |
