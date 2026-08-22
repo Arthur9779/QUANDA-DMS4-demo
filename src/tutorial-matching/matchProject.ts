@@ -208,6 +208,40 @@ export function replaceTutorial(
   });
 }
 
+/**
+ * Undo the most recent tutorial replacement for one learning need.
+ * Rejected IDs are kept in selection order, so walking backwards restores the
+ * exact option the user just left instead of restarting the entire matcher.
+ */
+export function restorePreviousTutorial(
+  plan: LearningPlan,
+  needId: string,
+): LearningPlan {
+  return LearningPlanSchema.parse({
+    ...plan,
+    tutorialMatches: plan.tutorialMatches.map((match) => {
+      if (match.needId !== needId || match.rejectedTutorialIds.length === 0) {
+        return match;
+      }
+      const rejectedTutorialIds = match.rejectedTutorialIds.slice(0, -1);
+      const previousTutorialId = match.rejectedTutorialIds.at(-1) ?? null;
+      const previousStillAvailable = match.candidates.some(
+        (candidate) => candidate.tutorial.id === previousTutorialId,
+      );
+      return {
+        ...match,
+        rejectedTutorialIds,
+        selectedTutorialId: previousStillAvailable
+          ? previousTutorialId
+          : match.candidates.find(
+              (candidate) => !rejectedTutorialIds.includes(candidate.tutorial.id),
+            )?.tutorial.id ?? null,
+        feedback: "none" as const,
+      };
+    }),
+  });
+}
+
 export function mergeLearningDecisions(
   previous: LearningPlan | null,
   next: LearningPlan,

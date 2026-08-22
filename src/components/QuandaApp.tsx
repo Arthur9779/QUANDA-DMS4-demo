@@ -67,6 +67,7 @@ import {
   markSkillGap,
   mergeLearningDecisions,
   replaceTutorial,
+  restorePreviousTutorial,
   type LearningPlan,
 } from "@/src/tutorial-matching";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
@@ -779,6 +780,14 @@ export function QuandaApp() {
                   current ? replaceTutorial(current, needId, feedback) : current,
                 );
                 trackEvent("tutorial_replaced", { feedback: feedback ?? "none" });
+              }}
+              onRestoreTutorial={(needId) => {
+                setRoadmap(null);
+                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+                setLearningPlan((current) =>
+                  current ? restorePreviousTutorial(current, needId) : current,
+                );
+                trackEvent("tutorial_replacement_undone");
               }}
               onSkillStatus={(skillId, status) => {
                 setRoadmap(null);

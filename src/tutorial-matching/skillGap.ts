@@ -343,6 +343,12 @@ const ACTIONABLE_FAMILIES = new Set([
 
 const NON_PROJECT_FAMILIES = /metadata|classification|recommendation|project state|suggested data schema|agent classification|quality reliability/i;
 
+// These Creative DNA categories describe the desired character of the work;
+// they are useful context for ranking tutorials, but are not independently
+// teachable skills. Concrete techniques inferred from them are still included
+// through application workflows and SPECIALIZED_SKILLS.
+const DIRECTION_ONLY_CATEGORIES = /^(?:interaction complexity|visual complexity|visual noise|detail density|silhouette|shape language|form language|motion quality|motion style|rendering style|shading style|painting style|drawing style|illustration style|focus style|framing style|exposure style|cinematic look|color palette|color relationship|color temperature|saturation|value range|contrast|brightness|lighting mood|surface quality|material appearance)$/i;
+
 function mergeDefinition(
   target: Map<string, SkillDefinition>,
   definition: SkillDefinition,
@@ -426,6 +432,7 @@ function conceptDefinitions(
     const explicitlyChosen = concept.source === "explicit_requirement" || concept.source === "user_added";
     if (!ACTIONABLE_FAMILIES.has(family) && !explicitlyChosen) return [];
     if (NON_PROJECT_FAMILIES.test(node.family) && !explicitlyChosen) return [];
+    if (DIRECTION_ONLY_CATEGORIES.test(node.category)) return [];
     const canonicalId = canonicalSkillIdForTopic(node.label) ?? node.id;
     // Prefer the contextual application workflow card when the same ontology
     // skill has already been decomposed there. This prevents broad Creative

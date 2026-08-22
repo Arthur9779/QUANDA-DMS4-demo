@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { LearningPlanSchema } from "@/src/tutorial-matching/contracts";
-import { markSkillGap, replaceTutorial } from "@/src/tutorial-matching/matchProject";
+import {
+  markSkillGap,
+  replaceTutorial,
+  restorePreviousTutorial,
+} from "@/src/tutorial-matching/matchProject";
 
 const skillId = "tutorial-content-classification.tutorial-technique.toon-shading";
 const plan = LearningPlanSchema.parse({
@@ -90,5 +94,21 @@ describe("learning-plan corrections", () => {
     const updated = replaceTutorial(plan, `need:${skillId}`);
     expect(updated.tutorialMatches[0].selectedTutorialId).toBe("catalog:second");
     expect(updated.tutorialMatches[0].rejectedTutorialIds).toContain("catalog:first");
+  });
+
+  it("walks back through previous tutorials after replacement options run out", () => {
+    const exhausted = replaceTutorial(
+      replaceTutorial(plan, `need:${skillId}`),
+      `need:${skillId}`,
+    );
+    expect(exhausted.tutorialMatches[0].selectedTutorialId).toBeNull();
+
+    const previous = restorePreviousTutorial(exhausted, `need:${skillId}`);
+    expect(previous.tutorialMatches[0].selectedTutorialId).toBe("catalog:second");
+    expect(previous.tutorialMatches[0].rejectedTutorialIds).toEqual(["catalog:first"]);
+
+    const original = restorePreviousTutorial(previous, `need:${skillId}`);
+    expect(original.tutorialMatches[0].selectedTutorialId).toBe("catalog:first");
+    expect(original.tutorialMatches[0].rejectedTutorialIds).toEqual([]);
   });
 });

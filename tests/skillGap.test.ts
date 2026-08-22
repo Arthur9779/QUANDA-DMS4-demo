@@ -212,6 +212,22 @@ describe("contextual skill-gap analysis", () => {
       }));
   });
 
+  it("keeps Creative DNA descriptors out of the teachable skill list", () => {
+    const dna = creativeDna("A simple product animation");
+    dna.concepts.push({
+      ontologyId: "ui-ux-interaction.interaction-complexity.simple",
+      label: "simple",
+      family: "UI / UX / Interaction",
+      category: "Interaction Complexity",
+      source: "ai_inferred",
+      status: "user_confirmed",
+      confidence: 0.92,
+    });
+    const gaps = deriveSkillGaps(project(), dna);
+    expect(gaps.some((gap) => gap.label.toLowerCase() === "simple")).toBe(false);
+    expect(gaps.some((gap) => gap.label === "Object and keyframe animation")).toBe(true);
+  });
+
   it("provides a production-to-export decomposition for every built-in application", () => {
     for (const application of applications) {
       const applicationProject = project({

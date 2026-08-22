@@ -150,11 +150,22 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
 
   learningGroups.forEach((group, groupIndex) => {
     const labels = group.gaps.map((gap) => gap.label);
-    const compactLabel = labels.length <= 2
-      ? labels.join(" and ")
-      : `${labels.slice(0, 2).join(", ")} +${labels.length - 2} more`;
     const tutorialTitles = group.tutorials.map((tutorial) => tutorial.tutorial.title);
-    const stageLabel = compactLabel || tutorialTitles[0] || copy(input, "selected learning", "nội dung học đã chọn");
+    const stageNames = input.projectInput.interfaceLanguage === "vi"
+      ? [
+          "Xây dựng quy trình cốt lõi",
+          "Phát triển các kỹ thuật chính",
+          "Tinh chỉnh kỹ thuật dự án",
+          "Hoàn thiện quy trình sản xuất",
+        ]
+      : [
+          "Build the core workflow",
+          "Develop the key techniques",
+          "Refine the project craft",
+          "Complete the production workflow",
+        ];
+    const stageLabel = stageNames[Math.min(groupIndex, stageNames.length - 1)];
+    const skillSummary = labels.join(", ") || tutorialTitles.join(", ") || copy(input, "selected learning", "nội dung học đã chọn");
     const applicationId =
       group.gaps.flatMap((gap) => gap.softwareIds).find((id) => appIds.includes(id)) ??
       group.tutorials.flatMap((tutorial) => tutorial.tutorial.softwareIds).find((id) => appIds.includes(id)) ??
@@ -176,18 +187,18 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     );
     add({
       id: `apply-learning-${groupIndex + 1}`,
-      title: copy(input, `Apply ${stageLabel}`, `Áp dụng ${stageLabel}`),
-      goal: copy(input, `Use ${stageLabel} directly in the required project output.`, `Dùng ${stageLabel} trực tiếp trong sản phẩm bắt buộc.`),
+      title: stageLabel,
+      goal: copy(input, "Apply this stage's selected skills directly in the required project output.", "Áp dụng trực tiếp các kỹ năng đã chọn của giai đoạn này vào sản phẩm bắt buộc."),
       why: group.gaps.map((gap) => gap.reason).join(" ").slice(0, 600) || copy(input, "These selected tutorials support the confirmed production direction.", "Các tutorial đã chọn hỗ trợ định hướng sản xuất đã xác nhận."),
       applicationId,
-      skillToLearn: (labels.join(", ") || stageLabel).slice(0, 240),
+      skillToLearn: skillSummary.slice(0, 240),
       tasks: [
         copy(input, "Complete the selected just-in-time tutorials for this work block", "Hoàn thành các tutorial vừa đủ cho khối công việc này"),
         copy(input, "Apply it directly to the project output", "Áp dụng trực tiếp vào sản phẩm dự án"),
       ],
-      productionTasks: [copy(input, `Apply ${stageLabel} in the project file`, `Áp dụng ${stageLabel} trong tệp dự án`)],
+      productionTasks: [copy(input, "Apply the selected techniques in the project file", "Áp dụng các kỹ thuật đã chọn trong tệp dự án")],
       learningTasks: (tutorialTitles.length > 0 ? tutorialTitles : labels).slice(0, 12),
-      definitionOfDone: [copy(input, `${stageLabel} is visible in the project output and checked against the brief.`, `${stageLabel} xuất hiện trong sản phẩm và đã được đối chiếu với đề bài.`)],
+      definitionOfDone: [copy(input, "The selected techniques are visible in the project output and checked against the brief.", "Các kỹ thuật đã chọn xuất hiện trong sản phẩm và đã được đối chiếu với đề bài.")],
       classification,
       creativeDnaIds: [...new Set(group.gaps.flatMap((gap) => gap.relatedTechniqueIds))].slice(0, 30),
       skillIds: group.gaps.map((gap) => gap.skillId).slice(0, 30),
