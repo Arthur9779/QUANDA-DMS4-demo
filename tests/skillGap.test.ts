@@ -50,6 +50,35 @@ describe("contextual skill-gap analysis", () => {
       .toHaveLength(gaps.length);
   });
 
+  it("does not turn required software or a duplicated rendering concept into learning nodes", () => {
+    const dna = creativeDna("A 20-second product animation rendered in Blender");
+    dna.concepts.push(
+      {
+        ontologyId: "project-requirements.required-software.blender",
+        label: "Blender",
+        family: "Project Requirements",
+        category: "Required Software",
+        source: "explicit_requirement",
+        status: "user_confirmed",
+        confidence: 1,
+      },
+      {
+        ontologyId: "production-workflow.production-stage.rendering",
+        label: "rendering",
+        family: "Production Workflow",
+        category: "Production Stage",
+        source: "ai_inferred",
+        status: "user_confirmed",
+        confidence: 0.9,
+      },
+    );
+    const gaps = deriveSkillGaps(project(), dna);
+    expect(gaps.some((gap) => gap.label === "Blender")).toBe(false);
+    expect(gaps.filter((gap) => gap.label === "Render settings")).toHaveLength(1);
+    expect(gaps.filter((gap) => gap.label === "Final render and export")).toHaveLength(1);
+    expect(new Set(gaps.map((gap) => gap.skillId)).size).toBe(gaps.length);
+  });
+
   it("does not repeat explicitly known navigation or materials", () => {
     const gaps = deriveSkillGaps(
       project({

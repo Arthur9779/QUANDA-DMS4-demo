@@ -13,6 +13,23 @@ test("corrects and persists the focused learning path", async ({ page }) => {
   const learning = page.locator("#learning-path-review");
   await expect(learning).toBeVisible();
   await expect(learning.getByText("Toon shading", { exact: true })).toBeVisible();
+  await expect(learning.getByRole("heading", { name: "Blender", exact: true }))
+    .toHaveCount(0);
+  for (const label of [
+    "Lighting the product",
+    "Camera basics",
+    "Render settings",
+    "Final render and export",
+    "Camera animation",
+  ]) {
+    const card = learning.locator(".learning-need-card").filter({
+      has: page.getByRole("heading", { name: label, exact: true }),
+    });
+    await expect(card).toHaveCount(1);
+    await expect(card.locator(".matched-tutorial-card")).toBeVisible();
+    await expect(card.getByText("No suitable verified tutorial found"))
+      .toHaveCount(0);
+  }
   await expect(learning.getByText("Complete Blender Beginner Course — 6 Hours"))
     .toHaveCount(0);
 

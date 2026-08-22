@@ -64,10 +64,20 @@ function isRateLimited(ip: string): boolean {
   return bucket.count > RATE_LIMIT;
 }
 
-function fallbackNotice(language: "en" | "vi"): string {
+type FallbackReason = "not_configured" | "unavailable";
+
+function fallbackNotice(
+  language: "en" | "vi",
+  reason: FallbackReason,
+): string {
+  if (reason === "not_configured") {
+    return language === "en"
+      ? "AI enhancement is not configured for this deployment. QUANDA built this deterministic plan from your confirmed direction, skill gaps, and verified tutorials."
+      : "Tính năng tăng cường bằng AI chưa được cấu hình cho bản triển khai này. QUANDA đã tạo kế hoạch xác định từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã kiểm chứng.";
+  }
   return language === "en"
-    ? "QUANDA could not reach the AI service, so it built a project-aware plan from your confirmed direction, skill gaps, and selected tutorials."
-    : "QUANDA không thể kết nối với dịch vụ AI, nên hệ thống đã tạo kế hoạch theo dự án từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã chọn.";
+    ? "AI enhancement was temporarily unavailable. QUANDA built this deterministic plan from your confirmed direction, skill gaps, and verified tutorials."
+    : "Tính năng tăng cường bằng AI tạm thời không khả dụng. QUANDA đã tạo kế hoạch xác định từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã kiểm chứng.";
 }
 
 function validationSummary(error: unknown): string {
@@ -117,12 +127,13 @@ function aiDiagnosticCode(error: unknown): string {
 function fallbackRoadmap(
   input: ReturnType<typeof createRoadmapInput>,
   source: "fallback",
+  reason: FallbackReason = "unavailable",
 ): RoadmapResponse {
   const roadmap = createIntegratedFallback(input);
   return {
     ...roadmap,
     source,
-    notice: fallbackNotice(input.projectInput.interfaceLanguage),
+    notice: fallbackNotice(input.projectInput.interfaceLanguage, reason),
   };
 }
 
@@ -196,7 +207,7 @@ export async function POST(request: NextRequest) {
 
   const roadmapInput = createRoadmapInput(parsedRequest.data);
   if (!process.env.GEMINI_API_KEY) {
-    const roadmap = fallbackRoadmap(roadmapInput, "fallback");
+    const roadmap = fallbackRoadmap(roadmapInput, "fallback", "not_configured");
     return response(roadmap, 200, roadmap.source);
   }
 
