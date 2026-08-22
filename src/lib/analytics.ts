@@ -11,6 +11,7 @@ export type AnalyticsEvent =
   | "tutorial_matching_started"
   | "tutorial_matching_succeeded"
   | "tutorial_replaced"
+  | "tutorial_replacement_undone"
   | "skill_gap_updated"
   | "roadmap_generate_started"
   | "roadmap_generate_succeeded"

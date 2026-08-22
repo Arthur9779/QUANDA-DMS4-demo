@@ -148,6 +148,11 @@ describe("project-oriented roadmap integration", () => {
     }));
     expect(roadmap.stages.length).toBeLessThanOrEqual(8);
     expect(RoadmapResponseSchema.safeParse(roadmap).success).toBe(true);
+    const learningStages = roadmap.stages.filter((stage) =>
+      stage.id.startsWith("apply-learning-"),
+    );
+    expect(learningStages.every((stage) => !/\+\d+ more/i.test(stage.title))).toBe(true);
+    expect(learningStages.every((stage) => stage.title.length <= 40)).toBe(true);
   });
 
   it("carries every selected tutorial into a bounded roadmap for any application stack", () => {

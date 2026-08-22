@@ -5,12 +5,15 @@ import {
   BookOpenCheck,
   Check,
   Clock3,
+  Play,
   RefreshCw,
+  RotateCcw,
   Sparkles,
 } from "lucide-react";
 import type { SkillGap } from "@/src/contracts/knowledge";
 import type { Translation } from "@/src/i18n/translations";
 import type { LearningPlan } from "@/src/tutorial-matching";
+import { extractYouTubeVideoId } from "@/src/lib/tutorialMatcher";
 
 interface LearningPathReviewProps {
   plan: LearningPlan;
@@ -21,6 +24,7 @@ interface LearningPathReviewProps {
     needId: string,
     feedback?: "none" | "too_advanced" | "too_long",
   ) => void;
+  onRestoreTutorial: (needId: string) => void;
   onSkillStatus: (skillId: string, status: SkillGap["status"]) => void;
 }
 
@@ -30,6 +34,7 @@ export function LearningPathReview({
   isBusy,
   onContinue,
   onReplace,
+  onRestoreTutorial,
   onSkillStatus,
 }: LearningPathReviewProps) {
   const known = plan.skillGaps.filter((gap) => gap.status === "known");
@@ -87,6 +92,13 @@ export function LearningPathReview({
           const selected = match?.candidates.find(
             (candidate) => candidate.tutorial.id === match.selectedTutorialId,
           );
+          const videoId = selected
+            ? selected.tutorial.externalId ?? extractYouTubeVideoId(selected.tutorial.url)
+            : null;
+          const thumbnailUrl = videoId
+            ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+            : null;
+          const canRestore = Boolean(match?.rejectedTutorialIds.length);
           return (
             <article className="learning-need-card" key={gap.id}>
               <div className="learning-need-number" aria-hidden="true">
@@ -134,9 +146,19 @@ export function LearningPathReview({
 
                 {selected ? (
                   <article className="matched-tutorial-card">
-                    <div className="matched-tutorial-icon" aria-hidden="true">
-                      <BookOpenCheck size={20} />
-                    </div>
+                    <a
+                      aria-label={`${t.learning.useThis}: ${selected.tutorial.title}`}
+                      className={`matched-tutorial-thumbnail${thumbnailUrl ? " has-image" : ""}`}
+                      href={selected.tutorial.url}
+                      rel="noreferrer"
+                      style={thumbnailUrl ? { backgroundImage: `url(${thumbnailUrl})` } : undefined}
+                      target="_blank"
+                    >
+                      {!thumbnailUrl && <BookOpenCheck aria-hidden="true" size={34} />}
+                      <span aria-hidden="true" className="matched-tutorial-play">
+                        <Play fill="currentColor" size={18} />
+                      </span>
+                    </a>
                     <div className="matched-tutorial-main">
                       <span className="source-badge">
                         {selected.sourceTier === "curated"
@@ -172,6 +194,11 @@ export function LearningPathReview({
                         <button onClick={() => need && onReplace(need.id)} type="button">
                           <RefreshCw aria-hidden="true" size={13} />{t.learning.replace}
                         </button>
+                        {canRestore && (
+                          <button onClick={() => need && onRestoreTutorial(need.id)} type="button">
+                            <RotateCcw aria-hidden="true" size={13} />{t.learning.previousTutorial}
+                          </button>
+                        )}
                         <button onClick={() => need && onReplace(need.id, "too_advanced")} type="button">
                           {t.learning.tooAdvanced}
                         </button>
@@ -191,6 +218,16 @@ export function LearningPathReview({
                   <div className="tutorial-no-match" role="status">
                     <strong>{t.learning.noTutorial}</strong>
                     <p>{t.learning.noTutorialHelp}</p>
+                    {canRestore && need && (
+                      <button
+                        className="tutorial-restore-button"
+                        onClick={() => onRestoreTutorial(need.id)}
+                        type="button"
+                      >
+                        <RotateCcw aria-hidden="true" size={14} />
+                        {t.learning.previousTutorial}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

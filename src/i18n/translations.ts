@@ -154,6 +154,7 @@ export interface Translation {
     whyTutorialCopy: string;
     useThis: string;
     replace: string;
+    previousTutorial: string;
     alreadyKnowThis: string;
     needHelp: string;
     notRelevant: string;
@@ -445,6 +446,7 @@ const en: Translation = {
     whyTutorialCopy: "It is the strongest focused match for this skill, software, level, and available time.",
     useThis: "Use this",
     replace: "Replace",
+    previousTutorial: "Previous tutorial",
     alreadyKnowThis: "I already know this",
     needHelp: "Need help",
     notRelevant: "Not relevant",
@@ -765,6 +767,7 @@ const vi: Translation = {
     whyTutorialCopy: "Đây là lựa chọn tập trung phù hợp nhất với kỹ năng, phần mềm, trình độ và quỹ thời gian của bạn.",
     useThis: "Dùng video này",
     replace: "Đổi video",
+    previousTutorial: "Video trước đó",
     alreadyKnowThis: "Tôi đã biết kỹ năng này",
     needHelp: "Tôi cần hỗ trợ",
     notRelevant: "Không liên quan",

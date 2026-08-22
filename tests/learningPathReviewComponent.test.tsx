@@ -13,6 +13,7 @@ describe("LearningPathReview", () => {
         isBusy={false}
         onContinue={() => undefined}
         onReplace={() => undefined}
+        onRestoreTutorial={() => undefined}
         onSkillStatus={() => undefined}
         plan={results[0].plan}
         t={getTranslation("en")}
