@@ -167,7 +167,12 @@ export async function evaluateTutorialMatching() {
         tutorial.techniqueIds.some((id) => need.techniqueIds.includes(id));
       const software =
         need.softwareIds.length === 0 ||
-        tutorial.softwareIds.some((id) => need.softwareIds.includes(id));
+        tutorial.softwareIds.some((id) =>
+          need.softwareIds.some(
+            (requiredId) =>
+              requiredId.toLocaleLowerCase() === id.toLocaleLowerCase(),
+          ),
+        );
       if (!relevant || !software) irrelevant += 1;
       if (selected.indexOf(selected.find((item) => item.candidate === candidate)!) < 3 && relevant && software) {
         precisionHits += 1;

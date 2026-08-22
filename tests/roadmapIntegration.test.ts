@@ -6,6 +6,7 @@ import {
   type RoadmapGenerationInput,
   type SelectedTutorial,
 } from "@/src/roadmap";
+import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 
 const knownSkill: SkillGap = {
   skillGapVersion: 1,
@@ -126,6 +127,27 @@ describe("project-oriented roadmap integration", () => {
     expect(roadmap.stages.every((stage) => stage.productionTasks?.length)).toBe(true);
     expect(roadmap.stages.every((stage) => stage.definitionOfDone?.length)).toBe(true);
     expect(roadmap.stages.flatMap((stage) => stage.skillIds ?? [])).not.toContain(knownSkill.skillId);
+  });
+
+  it("keeps the deterministic roadmap inside the eight-stage response contract", () => {
+    const roadmap = createIntegratedFallback(input({
+      projectInput: {
+        ...input().projectInput,
+        requiredApplications: ["blender", "after-effects", "premiere-pro"],
+      },
+      skillGaps: [
+        knownSkill,
+        ...Array.from({ length: 8 }, (_, index) => ({
+          ...missingSkill,
+          id: `gap-${index}`,
+          skillId: `skill-${index}`,
+          label: `Required skill ${index}`,
+          softwareIds: ["blender"],
+        })),
+      ],
+    }));
+    expect(roadmap.stages.length).toBeLessThanOrEqual(8);
+    expect(RoadmapResponseSchema.safeParse(roadmap).success).toBe(true);
   });
 
   it("preserves unknown confirmed wording and flags an infeasible deadline", () => {

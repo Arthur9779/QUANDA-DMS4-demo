@@ -43,6 +43,13 @@ function coverage(required: string[], actual: string[]): number {
   return required.filter((id) => values.has(id)).length / required.length;
 }
 
+function softwareCoverage(required: string[], actual: string[]): number {
+  if (required.length === 0) return 0;
+  const values = new Set(actual.map((id) => id.toLocaleLowerCase()));
+  return required.filter((id) => values.has(id.toLocaleLowerCase())).length /
+    required.length;
+}
+
 function matchesLevel(need: TutorialNeed, tutorial: TutorialDNA): number {
   if (!need.userLevel || !tutorial.difficulty || tutorial.difficulty === "mixed") {
     return 0.65;
@@ -107,7 +114,7 @@ function scoreOne(
   }
 
   const prerequisiteScore = prerequisiteFit(tutorial, context.knownSkillIds);
-  const softwareScore = coverage(need.softwareIds, tutorial.softwareIds);
+  const softwareScore = softwareCoverage(need.softwareIds, tutorial.softwareIds);
   if (need.softwareIds.length > 0 && softwareScore === 0) return null;
   const skillScore = coverage(need.skillIds, tutorial.skillIds);
   const techniqueScore = coverage(need.techniqueIds, tutorial.techniqueIds);

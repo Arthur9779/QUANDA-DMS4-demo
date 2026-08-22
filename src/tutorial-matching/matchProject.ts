@@ -34,6 +34,8 @@ async function discoverForNeed(
       query,
       language: need.preferredLanguage,
       softwareIds: need.softwareIds,
+      skillIds: need.skillIds,
+      techniqueIds: need.techniqueIds,
       maxResults: 12,
     });
     for (const result of results) byId.set(result.tutorial.id, result);
@@ -56,7 +58,10 @@ function broadCourseCanHelp(need: TutorialNeed, gaps: SkillGap[]): boolean {
       gap.status !== "known" &&
       gap.softwareIds.some((id) => need.softwareIds.includes(id)),
   );
-  return need.userLevel === "beginner" && sameSoftware.length >= 4;
+  const foundationNeed = need.skillIds.some((id) =>
+    /prerequisite-(?:software|coding|technique)-knowledge|workspace-navigation|viewport-navigation/.test(id),
+  );
+  return need.userLevel === "beginner" && foundationNeed && sameSoftware.length >= 4;
 }
 
 export async function matchProjectTutorials(
@@ -78,6 +83,7 @@ export async function matchProjectTutorials(
   ).slice(0, 12);
   const knownSkillIds = knownIds(skillGaps);
   const usedTutorialIds = new Set<string>();
+  const usedBroadCourseSoftwareIds = new Set<string>();
   let usedLive = false;
   const tutorialMatches = [];
 
@@ -91,9 +97,20 @@ export async function matchProjectTutorials(
       rejectedTutorialIds: usedTutorialIds,
       allowBroadCourse: broadCourseCanHelp(need, skillGaps),
       today: (options.now ?? (() => new Date()))().toISOString().slice(0, 10),
-    }).slice(0, 8);
+    }).filter((candidate) =>
+      candidate.tutorial.tutorialType !== "broad_course" ||
+      !candidate.tutorial.softwareIds.some((id) =>
+        usedBroadCourseSoftwareIds.has(id),
+      ),
+    ).slice(0, 8);
     const selectedTutorialId = candidates[0]?.tutorial.id ?? null;
-    if (selectedTutorialId) usedTutorialIds.add(selectedTutorialId);
+    if (selectedTutorialId) {
+      usedTutorialIds.add(selectedTutorialId);
+      const selected = candidates[0]?.tutorial;
+      if (selected?.tutorialType === "broad_course") {
+        selected.softwareIds.forEach((id) => usedBroadCourseSoftwareIds.add(id));
+      }
+    }
     tutorialMatches.push({
       needId: need.id,
       selectedTutorialId,

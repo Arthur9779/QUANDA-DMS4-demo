@@ -40,7 +40,11 @@ function catalogueScore(
   for (const term of queryTerms) if (candidateTerms.has(term)) score += 2;
   if (
     request.softwareIds.length > 0 &&
-    candidate.tutorial.softwareIds.some((id) => request.softwareIds.includes(id))
+    candidate.tutorial.softwareIds.some((id) =>
+      request.softwareIds.some(
+        (requiredId) => requiredId.toLocaleLowerCase() === id.toLocaleLowerCase(),
+      ),
+    )
   ) {
     score += 8;
   }
@@ -157,8 +161,10 @@ export class YouTubeDataApiProvider implements TutorialDiscoveryProvider {
           : {}),
         softwareIds: request.softwareIds,
         softwareVersions: [],
-        skillIds: [],
-        techniqueIds: [],
+        // Live results are query-derived and remain unverified, but retaining
+        // the requested ontology IDs lets the normal ranker evaluate them.
+        skillIds: request.skillIds ?? [],
+        techniqueIds: request.techniqueIds ?? [],
         prerequisiteIds: [],
         aestheticIds: [],
         productionStageIds: [],

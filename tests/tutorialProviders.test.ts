@@ -5,9 +5,23 @@ import {
   clearTutorialClassificationCache,
   getTutorialClassificationCacheSize,
 } from "@/src/tutorial-matching/classifier";
+import { tutorials } from "@/src/lib/tutorialMatcher";
+import { canonicalSkillIdsForTopics } from "@/src/tutorial-matching/skillTaxonomy";
 import { YouTubeDataApiProvider } from "@/src/tutorial-matching/providers";
 
 describe("tutorial discovery and classification", () => {
+  it("maps every curated tutorial to at least one quanda.skills concept", () => {
+    expect(
+      tutorials.filter(
+        (tutorial) => canonicalSkillIdsForTopics(tutorial.topics).length === 0,
+      ),
+    ).toEqual([]);
+  });
+
+  it("keeps curated IDs stable when tutorials move into the learning plan", () => {
+    expect(classifyTutorial(tutorials[0]).id).toBe(tutorials[0].id);
+  });
+
   it("keeps stable provider IDs and direct discovered URLs", () => {
     for (const tutorial of preciseTutorials) {
       expect(tutorial.externalId).toBeTruthy();
@@ -44,6 +58,8 @@ describe("tutorial discovery and classification", () => {
       query: "Blender toon shading",
       language: "en",
       softwareIds: ["blender"],
+      skillIds: ["tutorial-content-classification.tutorial-technique.toon-shading"],
+      techniqueIds: ["3d-production.material-technique.toon-material"],
       maxResults: 5,
     });
     expect(result.tutorial.externalId).toBe("abcDEF12345");
@@ -51,5 +67,11 @@ describe("tutorial discovery and classification", () => {
       "https://www.youtube.com/watch?v=abcDEF12345",
     );
     expect(result.sourceTier).toBe("live");
+    expect(result.tutorial.skillIds).toEqual([
+      "tutorial-content-classification.tutorial-technique.toon-shading",
+    ]);
+    expect(result.tutorial.techniqueIds).toEqual([
+      "3d-production.material-technique.toon-material",
+    ]);
   });
 });
