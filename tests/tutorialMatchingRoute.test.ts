@@ -32,7 +32,26 @@ describe("tutorial matching route", () => {
         creativeDna: {
           creativeDnaVersion: 1 as const,
           projectIntent: "Toon-shaded Blender product animation",
-          concepts: [], unknownConcepts: [], constraints: [],
+          concepts: [
+            {
+              ontologyId: "project-requirements.required-software.blender",
+              label: "Blender",
+              family: "Project Requirements",
+              category: "Required Software",
+              source: "explicit_requirement" as const,
+              status: "user_confirmed" as const,
+              confidence: 1,
+            },
+            {
+              ontologyId: "production-workflow.production-stage.rendering",
+              label: "rendering",
+              family: "Production Workflow",
+              category: "Production Stage",
+              source: "ai_inferred" as const,
+              status: "user_confirmed" as const,
+              confidence: 0.9,
+            },
+          ], unknownConcepts: [], constraints: [],
         },
         retrieval: { candidateCount: 0, backend: "local" as const, fallbackUsed: true },
         capabilityContext: { currentExperience: project.currentExperience, requiredApplications: ["blender"] },
@@ -51,10 +70,20 @@ describe("tutorial matching route", () => {
     expect(response.status).toBe(200);
     const data = await response.json() as {
       skillGaps: Array<{ label: string }>;
+      tutorialMatches: Array<{ selectedTutorialId: string | null }>;
       tutorialRankingVersion: number;
     };
     expect(data.skillGaps.some((gap: { label: string }) => gap.label === "Toon shading"))
       .toBe(true);
+    expect(data.skillGaps.some((gap) => gap.label === "Blender")).toBe(false);
+    expect(data.tutorialMatches.map((match) => match.selectedTutorialId))
+      .toEqual(expect.arrayContaining([
+        "youtube:zyk3oof-gbk",
+        "youtube:vw_iix_p5gme",
+        "youtube:jclsjg9sdni",
+        "youtube:uh-zqj2jx64",
+        "youtube:wtts7kadoyw",
+      ]));
     expect(data.tutorialRankingVersion).toBe(1);
   });
 });

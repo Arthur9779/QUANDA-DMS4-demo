@@ -355,11 +355,20 @@ function mergeDefinition(
   const priorityRank = { optional: 0, useful: 1, required: 2 } as const;
   const leftPriority = existing.priority ?? "required";
   const rightPriority = definition.priority ?? "required";
+  const sameSoftwareContext =
+    existing.softwareIds.length === 0 ||
+    definition.softwareIds.length === 0 ||
+    existing.softwareIds.some((id) => definition.softwareIds.includes(id));
   target.set(definition.id, {
     ...existing,
     triggers: [...new Set([...existing.triggers, ...definition.triggers])],
     knownAliases: [...new Set([...(existing.knownAliases ?? []), ...(definition.knownAliases ?? [])])],
-    softwareIds: [...new Set([...existing.softwareIds, ...definition.softwareIds])],
+    // A generic ontology skill such as "export" can occur in several tools.
+    // Keep the first (primary) application context instead of widening one
+    // learning need to unrelated software and ranking the wrong tutorial.
+    softwareIds: sameSoftwareContext
+      ? [...new Set([...existing.softwareIds, ...definition.softwareIds])]
+      : existing.softwareIds,
     prerequisites: [...new Set([...(existing.prerequisites ?? []), ...(definition.prerequisites ?? [])])],
     relatedTechniqueIds: [...new Set([...(existing.relatedTechniqueIds ?? []), ...(definition.relatedTechniqueIds ?? [])])],
     priority: priorityRank[rightPriority] > priorityRank[leftPriority]
@@ -399,16 +408,29 @@ function workflowDefinitions(
 function conceptDefinitions(
   project: RoadmapRequest,
   creativeDna: CreativeDNA,
+  workflowIds: ReadonlySet<string> = new Set(),
 ): SkillDefinition[] {
   return creativeDna.concepts.flatMap((concept) => {
     if (concept.status === "user_rejected" || !concept.ontologyId) return [];
     const node = getOntologyConcept(concept.ontologyId);
     if (!node) return [];
+    const normalizedCategory = normalizeOntologyLabel(node.category);
+    const isRequiredSoftware =
+      node.id.startsWith("project-requirements.required-software.") ||
+      normalizedCategory === "required software";
+    // Required software answers "where will the work be made?"; it is not a
+    // learnable technique by itself. Application-specific workflow steps below
+    // provide the actual skills (modelling, lighting, rendering, export, etc.).
+    if (isRequiredSoftware) return [];
     const family = normalizeOntologyLabel(node.family).replace(/[^a-z0-9]+/g, " ").trim();
     const explicitlyChosen = concept.source === "explicit_requirement" || concept.source === "user_added";
     if (!ACTIONABLE_FAMILIES.has(family) && !explicitlyChosen) return [];
     if (NON_PROJECT_FAMILIES.test(node.family) && !explicitlyChosen) return [];
     const canonicalId = canonicalSkillIdForTopic(node.label) ?? node.id;
+    // Prefer the contextual application workflow card when the same ontology
+    // skill has already been decomposed there. This prevents broad Creative
+    // DNA tags such as "rendering" or "export" from becoming duplicate nodes.
+    if (workflowIds.has(canonicalId)) return [];
     return [{
       id: canonicalId,
       label: node.label,
@@ -429,6 +451,8 @@ function decompositionDefinitions(
   requiredText: string,
 ) {
   const definitions = new Map<string, SkillDefinition>();
+  const workflow = workflowDefinitions(project, requiredText);
+  const workflowIds = new Set(workflow.map((definition) => definition.id));
   for (const definition of SPECIALIZED_SKILLS) {
     const matchingRequiredApplications = project.requiredApplications.filter(
       (requiredId) => definition.softwareIds.some(
@@ -445,10 +469,10 @@ function decompositionDefinitions(
           : definition.softwareIds,
     });
   }
-  for (const definition of workflowDefinitions(project, requiredText)) {
+  for (const definition of workflow) {
     mergeDefinition(definitions, definition);
   }
-  for (const definition of conceptDefinitions(project, creativeDna)) {
+  for (const definition of conceptDefinitions(project, creativeDna, workflowIds)) {
     mergeDefinition(definitions, definition);
   }
   return definitions;
@@ -572,9 +596,11 @@ export function deriveSkillGaps(
   const requiredText = inputText(project, creativeDna);
   const experience = normalizeOntologyLabel(project.currentExperience);
   const byId = decompositionDefinitions(project, creativeDna, requiredText);
+  const workflow = workflowDefinitions(project, requiredText);
+  const workflowIds = new Set(workflow.map((definition) => definition.id));
   const automaticIds = [
-    ...workflowDefinitions(project, requiredText),
-    ...conceptDefinitions(project, creativeDna),
+    ...workflow,
+    ...conceptDefinitions(project, creativeDna, workflowIds),
   ].map((definition) => definition.id);
   const triggeredIds = [...byId.values()]
     .filter(
