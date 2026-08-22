@@ -64,7 +64,7 @@ function isRateLimited(ip: string): boolean {
   return bucket.count > RATE_LIMIT;
 }
 
-type FallbackReason = "not_configured" | "unavailable";
+type FallbackReason = "not_configured" | "unavailable" | "invalid_response";
 
 function fallbackNotice(
   language: "en" | "vi",
@@ -74,6 +74,11 @@ function fallbackNotice(
     return language === "en"
       ? "AI enhancement is not configured for this deployment. QUANDA built this deterministic plan from your confirmed direction, skill gaps, and verified tutorials."
       : "Tính năng tăng cường bằng AI chưa được cấu hình cho bản triển khai này. QUANDA đã tạo kế hoạch xác định từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã kiểm chứng.";
+  }
+  if (reason === "invalid_response") {
+    return language === "en"
+      ? "AI enhancement returned a plan that did not pass QUANDA's consistency checks. QUANDA built this deterministic plan from your confirmed direction, skill gaps, and every verified tutorial you selected."
+      : "Tính năng tăng cường bằng AI trả về kế hoạch chưa vượt qua kiểm tra tính nhất quán của QUANDA. QUANDA đã tạo kế hoạch xác định từ định hướng đã xác nhận, khoảng thiếu kỹ năng và mọi tutorial đã kiểm chứng mà bạn chọn.";
   }
   return language === "en"
     ? "AI enhancement was temporarily unavailable. QUANDA built this deterministic plan from your confirmed direction, skill gaps, and verified tutorials."
@@ -245,6 +250,7 @@ export async function POST(request: NextRequest) {
               validationSummary(parsedRoadmap.error),
               roadmapInput.projectInput.interfaceLanguage,
               signal,
+              prompt,
             ),
         );
         parsedRoadmap = parseRoadmap(repairedOutput);
@@ -256,7 +262,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (!parsedRoadmap.success) {
-      const roadmap = fallbackRoadmap(roadmapInput, "fallback");
+      console.warn("[QUANDA] Roadmap response remained schema-invalid after repair.");
+      const roadmap = fallbackRoadmap(
+        roadmapInput,
+        "fallback",
+        "invalid_response",
+      );
       return response(
         roadmap,
         200,
@@ -265,10 +276,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validationErrors = validateRoadmapForInput(parsedRoadmap.data, roadmapInput);
+    let validationErrors = validateRoadmapForInput(parsedRoadmap.data, roadmapInput);
     if (validationErrors.length > 0) {
-      const roadmap = fallbackRoadmap(roadmapInput, "fallback");
-      return response(roadmap, 200, roadmap.source, "input_constraint_validation");
+      console.warn(
+        `[QUANDA] Roadmap constraint validation requested repair: ${validationErrors.slice(0, 12).join(" | ")}`,
+      );
+      try {
+        const repairedOutput = await withAbortTimeout(
+          configuredTimeoutMs(
+            process.env.GEMINI_ROADMAP_REPAIR_TIMEOUT_MS,
+            25_000,
+          ),
+          (signal) =>
+            repairGoogleAiRoadmap(
+              JSON.stringify(parsedRoadmap.data),
+              validationErrors.join("\n"),
+              roadmapInput.projectInput.interfaceLanguage,
+              signal,
+              prompt,
+            ),
+        );
+        const repairedRoadmap = parseRoadmap(repairedOutput);
+        if (repairedRoadmap.success) {
+          const repairedValidationErrors = validateRoadmapForInput(
+            repairedRoadmap.data,
+            roadmapInput,
+          );
+          if (repairedValidationErrors.length === 0) {
+            parsedRoadmap = repairedRoadmap;
+            validationErrors = [];
+          } else {
+            validationErrors = repairedValidationErrors;
+          }
+        } else {
+          validationErrors = ["The repaired roadmap did not match the response schema."];
+        }
+      } catch (error) {
+        logAiFailure("constraint repair request", error);
+        repairDiagnostic = aiDiagnosticCode(error);
+      }
+    }
+    if (validationErrors.length > 0) {
+      console.warn(
+        `[QUANDA] Roadmap constraint repair failed: ${validationErrors.slice(0, 12).join(" | ")}`,
+      );
+      const roadmap = fallbackRoadmap(
+        roadmapInput,
+        "fallback",
+        "invalid_response",
+      );
+      return response(
+        roadmap,
+        200,
+        roadmap.source,
+        repairDiagnostic || "input_constraint_validation",
+      );
     }
     const roadmap = normalizeRoadmap(parsedRoadmap.data, roadmapInput.projectInput, {
       allowedTutorialIds: new Set(roadmapInput.selectedTutorials.map((item) => item.tutorial.id)),

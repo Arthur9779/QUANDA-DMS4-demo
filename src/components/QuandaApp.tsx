@@ -23,13 +23,14 @@ import {
   clearProjectStorage,
   clearCreativeDnaReview,
   clearLearningPlan,
+  clearRoadmap,
   readCalendarTasks,
   readCompletion,
   readDraft,
   readCreativeDnaReview,
   readLearningPlan,
   readLanguage,
-  readRoadmap,
+  readRoadmapForProject,
   writeCompletion,
   writeCalendarTasks,
   writeDraft,
@@ -108,51 +109,56 @@ export function QuandaApp() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [matchingError, setMatchingError] = useState<string | null>(null);
   const t = getTranslation(locale);
+  const projectInputFingerprint = createProjectInputFingerprint(form);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
   const creativeDnaIsStale = creativeDnaReview
-    ? creativeDnaReview.inputFingerprint !== createProjectInputFingerprint(form)
+    ? creativeDnaReview.inputFingerprint !== projectInputFingerprint
     : false;
   const learningPlanIsStale = learningPlan
-    ? learningPlan.inputFingerprint !== createProjectInputFingerprint(form)
+    ? learningPlan.inputFingerprint !== projectInputFingerprint
     : false;
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       const savedLocale = readLanguage(window.localStorage);
       const savedDraft = readDraft(window.localStorage);
-      const savedRoadmap = readRoadmap(window.localStorage);
       const savedCompletion = readCompletion(window.localStorage);
       const savedCalendarTasks = readCalendarTasks(window.localStorage);
       const restoredLocale =
-        savedLocale ?? savedDraft?.interfaceLanguage ?? savedRoadmap?.language ?? "en";
+        savedLocale ?? savedDraft?.interfaceLanguage ?? "en";
       const restoredForm = savedDraft
         ? { ...savedDraft, interfaceLanguage: restoredLocale }
         : emptyForm(restoredLocale);
+      const savedRoadmap = readRoadmapForProject(
+        window.localStorage,
+        restoredForm,
+      );
       const savedCreativeDnaReview = readCreativeDnaReview(
         window.localStorage,
         restoredForm,
       );
       const savedLearningPlan = readLearningPlan(window.localStorage);
+      const restoredFingerprint = createProjectInputFingerprint(restoredForm);
+      const restoredRoadmap = savedRoadmap;
 
       setLocale(restoredLocale);
       setForm(restoredForm);
-      setRoadmap(savedRoadmap);
+      setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
       setLearningPlan(
         savedLearningPlan &&
-          savedLearningPlan.inputFingerprint ===
-            createProjectInputFingerprint(restoredForm)
+          savedLearningPlan.inputFingerprint === restoredFingerprint
           ? savedLearningPlan
           : null,
       );
       setCompletion(savedCompletion);
       setCalendarTasks(
-        savedRoadmap
+        restoredRoadmap
           ? syncRoadmapCalendarTasks(
               savedCalendarTasks,
-              savedRoadmap,
+              restoredRoadmap,
               restoredForm.deadline,
-              savedCompletion[savedRoadmap.id] ?? [],
+              savedCompletion[restoredRoadmap.id] ?? [],
             )
           : removeRoadmapCalendarTasks(savedCalendarTasks),
       );
@@ -177,9 +183,9 @@ export function QuandaApp() {
   }, [form, isHydrated]);
 
   useEffect(() => {
-    if (isHydrated && roadmap) {
-      writeRoadmap(window.localStorage, roadmap);
-    }
+    if (!isHydrated) return;
+    if (roadmap) writeRoadmap(window.localStorage, roadmap);
+    else clearRoadmap(window.localStorage);
   }, [isHydrated, roadmap]);
 
   useEffect(() => {
@@ -230,12 +236,16 @@ export function QuandaApp() {
       setRoadmap({
         ...roadmap,
         language: nextLocale,
+        projectInputFingerprint: createProjectInputFingerprint(nextForm),
         title: isProductAnimationExample
           ? nextLocale === "vi"
             ? "Lộ trình làm hoạt hình sản phẩm 20 giây"
             : "20-second product animation roadmap"
           : roadmap.title,
       });
+    } else if (roadmap) {
+      setRoadmap(null);
+      setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     }
   };
 
@@ -343,6 +353,8 @@ export function QuandaApp() {
       creativeDna: CreativeDnaReviewRecord["analysis"]["creativeDna"],
     ) => CreativeDnaReviewRecord["analysis"]["creativeDna"],
   ) => {
+    setRoadmap(null);
+    setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     setLearningPlan(null);
     clearLearningPlan(window.localStorage);
     setCreativeDnaReview((current) =>
@@ -630,7 +642,19 @@ export function QuandaApp() {
 
         <ProjectBriefForm
           isSubmitting={isLoading || isAnalyzing || isMatchingTutorials || !isHydrated}
-          onChange={setForm}
+          onChange={(nextForm) => {
+            setForm(nextForm);
+            if (
+              roadmap &&
+              roadmap.projectInputFingerprint !==
+                createProjectInputFingerprint(nextForm)
+            ) {
+              setRoadmap(null);
+              setCalendarTasks((current) =>
+                removeRoadmapCalendarTasks(current),
+              );
+            }
+          }}
           onSubmit={(request) => void analyzeProject(request)}
           t={t}
           value={form}
@@ -749,12 +773,16 @@ export function QuandaApp() {
               isBusy={isLoading}
               onContinue={() => void generateRoadmap(form)}
               onReplace={(needId, feedback) => {
+                setRoadmap(null);
+                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
                 setLearningPlan((current) =>
                   current ? replaceTutorial(current, needId, feedback) : current,
                 );
                 trackEvent("tutorial_replaced", { feedback: feedback ?? "none" });
               }}
               onSkillStatus={(skillId, status) => {
+                setRoadmap(null);
+                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
                 setLearningPlan((current) =>
                   current ? markSkillGap(current, skillId, status) : current,
                 );
@@ -765,7 +793,8 @@ export function QuandaApp() {
             />
           )}
 
-        {roadmap && (
+        {roadmap &&
+          roadmap.projectInputFingerprint === projectInputFingerprint && (
           <RoadmapResults
             completedStageIds={completedStageIds}
             onEdit={scrollToForm}

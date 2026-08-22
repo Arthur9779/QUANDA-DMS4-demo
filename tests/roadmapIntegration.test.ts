@@ -150,6 +150,60 @@ describe("project-oriented roadmap integration", () => {
     expect(RoadmapResponseSchema.safeParse(roadmap).success).toBe(true);
   });
 
+  it("carries every selected tutorial into a bounded roadmap for any application stack", () => {
+    const skills = Array.from({ length: 12 }, (_, index) => ({
+      ...missingSkill,
+      id: `gap-${index}`,
+      skillId: `skill-${index}`,
+      label: `Project skill ${index + 1}`,
+      softwareIds: ["custom:p5.js"],
+    }));
+    const needs = skills.map((skill, index) => ({
+      ...need,
+      id: `need-${index}`,
+      label: skill.label,
+      skillIds: [skill.skillId],
+      searchQueries: [`p5.js ${skill.label}`],
+    }));
+    const selected = needs.map((tutorialNeed, index) => ({
+      ...selectedTutorial,
+      needId: tutorialNeed.id,
+      tutorial: {
+        ...selectedTutorial.tutorial,
+        id: `tutorial:project-${index}`,
+        title: `Verified project tutorial ${index + 1}`,
+        skillIds: tutorialNeed.skillIds,
+      },
+    })) as SelectedTutorial[];
+    const roadmapInput = input({
+      projectInput: {
+        ...input().projectInput,
+        requiredApplications: [
+          "custom:p5.js",
+          "figma",
+          "after-effects",
+          "premiere-pro",
+          "davinci-resolve",
+        ],
+      },
+      skillGaps: [knownSkill, ...skills],
+      tutorialNeeds: needs,
+      selectedTutorials: selected,
+    });
+
+    const roadmap = createIntegratedFallback(roadmapInput);
+    const roadmapTutorialIds = roadmap.stages.flatMap(
+      (stage) => stage.tutorialIds,
+    );
+    expect(new Set(roadmapTutorialIds)).toEqual(
+      new Set(selected.map((tutorial) => tutorial.tutorial.id)),
+    );
+    expect(roadmapTutorialIds).toHaveLength(selected.length);
+    expect(roadmap.stages).toHaveLength(8);
+    expect(validateRoadmapForInput(roadmap, roadmapInput)).toEqual([]);
+    expect(RoadmapResponseSchema.safeParse(roadmap).success).toBe(true);
+  });
+
   it("preserves unknown confirmed wording and flags an infeasible deadline", () => {
     const roadmap = createIntegratedFallback(input());
     expect(roadmap.summary).toContain("neo-y2k eco-rave");
@@ -170,5 +224,16 @@ describe("project-oriented roadmap integration", () => {
       expect.stringContaining("Known skill"),
       expect.stringContaining("Rejected creative concept"),
     ]));
+  });
+
+  it("rejects a roadmap that drops a tutorial selected in the learning plan", () => {
+    const roadmap = createIntegratedFallback(input());
+    const withoutTutorial = {
+      ...roadmap,
+      stages: roadmap.stages.map((stage) => ({ ...stage, tutorialIds: [] })),
+    };
+    expect(validateRoadmapForInput(withoutTutorial, input())).toContain(
+      "Selected tutorial tutorial:p5-audio-fft is missing from the roadmap.",
+    );
   });
 });

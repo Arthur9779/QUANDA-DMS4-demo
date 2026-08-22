@@ -74,6 +74,17 @@ export function readRoadmap(storage: Storage): RoadmapResponse | null {
   return parsed.success ? parsed.data : null;
 }
 
+export function readRoadmapForProject(
+  storage: Storage,
+  currentInput: RoadmapRequest,
+): RoadmapResponse | null {
+  const roadmap = readRoadmap(storage);
+  return roadmap?.projectInputFingerprint ===
+    createProjectInputFingerprint(currentInput)
+    ? roadmap
+    : null;
+}
+
 export function writeRoadmap(
   storage: Storage,
   roadmap: RoadmapResponse,
@@ -82,6 +93,14 @@ export function writeRoadmap(
     storage.setItem(STORAGE_KEYS.roadmap, JSON.stringify(roadmap));
   } catch {
     // The generated roadmap remains usable in memory.
+  }
+}
+
+export function clearRoadmap(storage: Storage): void {
+  try {
+    storage.removeItem(STORAGE_KEYS.roadmap);
+  } catch {
+    // The in-memory roadmap reset still succeeds.
   }
 }
 

@@ -100,9 +100,15 @@ export function repairGoogleAiRoadmap(
   validationErrors: string,
   language: "en" | "vi",
   signal: AbortSignal,
+  sourceRequirements = "",
 ): Promise<string> {
   return completeJson(
-    buildRepairPrompt(originalOutput, validationErrors, language),
+    buildRepairPrompt(
+      originalOutput,
+      validationErrors,
+      language,
+      sourceRequirements,
+    ),
     signal,
   );
 }

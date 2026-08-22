@@ -95,4 +95,6 @@ export interface RoadmapResponse {
   notice?: string;
   roadmapGeneratorVersion?: number;
   inputFingerprint?: string;
+  /** Identifies the project brief this roadmap belongs to for safe restoration. */
+  projectInputFingerprint?: string;
 }

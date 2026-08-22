@@ -15,6 +15,7 @@ import {
   validateTutorialIds,
 } from "@/src/lib/tutorialMatcher";
 import type { RoadmapRequest, RoadmapResponse } from "@/src/types";
+import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
 
 const applicationIds = new Set(applications.map((application) => application.id));
 
@@ -67,8 +68,8 @@ export function normalizeRoadmap(
       productionMinutes: Math.max(1, Math.round(stage.productionMinutes)),
       dependsOnStageIds: [...new Set(validDependencies)],
       tutorialIds: options.allowedTutorialIds
-        ? stage.tutorialIds.filter((id) => options.allowedTutorialIds!.has(id)).slice(0, 3)
-        : validateTutorialIds(stage.tutorialIds).slice(0, 3),
+        ? stage.tutorialIds.filter((id) => options.allowedTutorialIds!.has(id)).slice(0, 12)
+        : validateTutorialIds(stage.tutorialIds).slice(0, 12),
       productionTasks: stage.productionTasks?.length ? stage.productionTasks : stage.tasks,
       learningTasks: stage.learningTasks ?? [],
       definitionOfDone: stage.definitionOfDone?.length
@@ -136,5 +137,6 @@ export function normalizeRoadmap(
                   : ("medium" as const),
           })),
     source: "ai",
+    projectInputFingerprint: createProjectInputFingerprint(request),
   };
 }

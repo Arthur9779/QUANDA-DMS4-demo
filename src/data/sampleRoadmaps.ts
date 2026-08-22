@@ -16,6 +16,7 @@ import {
   getApplicationName,
   isSupportedApplicationId,
 } from "@/src/data/applications";
+import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
 
 type SampleKind = "blender" | "figma" | "davinci" | "generic";
 
@@ -435,5 +436,6 @@ export function createSampleRoadmap(request: RoadmapRequest): RoadmapResponse {
       priority: index < 2 ? "high" : index < selectedStages.length - 1 ? "medium" : "low",
     })),
     source: "demo",
+    projectInputFingerprint: createProjectInputFingerprint(request),
   };
 }

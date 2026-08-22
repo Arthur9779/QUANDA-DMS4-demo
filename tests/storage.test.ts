@@ -8,11 +8,15 @@ import {
   readLanguage,
   readLearningPlan,
   readRoadmap,
+  readRoadmapForProject,
   STORAGE_KEYS,
   writeCreativeDnaAnalysis,
   writeCreativeDnaReview,
   writeLearningPlan,
+  writeRoadmap,
 } from "@/src/lib/storage";
+import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
+import type { RoadmapRequest } from "@/src/types";
 
 class MemoryStorage implements Storage {
   private values = new Map<string, string>();
@@ -191,5 +195,32 @@ describe("local storage recovery", () => {
     expect(readLearningPlan(storage)).toEqual(plan);
     storage.setItem(STORAGE_KEYS.learningPlan, JSON.stringify({ ...plan, learningPlanVersion: 9 }));
     expect(readLearningPlan(storage)).toBeNull();
+  });
+
+  it("never restores a roadmap for a different project brief", () => {
+    const storage = new MemoryStorage();
+    const project: RoadmapRequest = {
+      interfaceLanguage: "en",
+      projectBrief: "Create an interactive p5.js poster that reacts to music.",
+      deadline: "2026-09-30",
+      currentExperience: "JavaScript beginner",
+      hoursPerDay: 2,
+      daysPerWeek: 4,
+      tutorialLanguage: "en",
+      requiredApplications: ["custom:p5.js"],
+      outputType: "other",
+      targetQuality: "portfolio",
+    };
+    const roadmap = createSampleRoadmap(project);
+    writeRoadmap(storage, roadmap);
+
+    expect(readRoadmapForProject(storage, project)?.id).toBe(roadmap.id);
+    expect(
+      readRoadmapForProject(storage, {
+        ...project,
+        projectBrief: "Build a TouchDesigner flower installation controlled by movement.",
+        requiredApplications: ["custom:TouchDesigner"],
+      }),
+    ).toBeNull();
   });
 });

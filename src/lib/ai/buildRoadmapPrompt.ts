@@ -73,7 +73,7 @@ Use this exact JSON shape:
     "learningMinutes": 1,
     "productionMinutes": 1,
     "dependsOnStageIds": [],
-    "tutorialIds": ["candidate-id-only"],
+    "tutorialIds": ["selected-tutorial-id-only"],
     "productionTasks": ["concrete project work"],
     "learningTasks": ["only missing skill needed now"],
     "definitionOfDone": ["observable completion criterion"],
@@ -100,7 +100,7 @@ Validity rules:
 - When no application is required, use only an application named in PROJECT_INPUT when it is genuinely useful.
 - Explain an application's purpose in the stage goal or why text.
 - Dependencies may refer only to earlier stage IDs.
-- Choose tutorial IDs only from SELECTED_TUTORIALS_ONLY and return at most three per stage. Never invent a URL, tutorial ID, ontology ID, or software requirement.
+- Include every unique tutorial ID in SELECTED_TUTORIALS_ONLY exactly once across the roadmap. Group related skills and tutorials into the same production stage when necessary. Return at most twelve tutorial IDs per stage. Never invent a URL, tutorial ID, ontology ID, or software requirement.
 - Do not teach any item in KNOWN_SKILLS. Cover every required SKILL_GAPS item with a matching learning task, then immediately attach it to project work.
 - Every stage must include productionTasks and definitionOfDone. Keep learningTasks empty when no learning is needed.
 - Preserve the literal wording of confirmed unknown Creative DNA concepts. Never re-add rejected concepts.
@@ -113,14 +113,18 @@ export function buildRepairPrompt(
   originalOutput: string,
   validationErrors: string,
   language: "en" | "vi",
+  sourceRequirements = "",
 ): string {
   return `
 Repair the following invalid QUANDA roadmap into one valid JSON object only.
-Do not use Markdown. Do not add URLs or tutorial IDs that are absent from the original output.
+Do not use Markdown. Never add URLs. Tutorial IDs may only come from SELECTED_TUTORIALS_ONLY in SOURCE_REQUIREMENTS.
 Keep all user-visible text in ${language === "vi" ? "Vietnamese" : "English"}.
 ${language === "vi" ? "Use natural Vietnamese throughout. Keep only brand and product names, file extensions, and established technical terms in English; never switch a whole phrase or sentence to English." : ""}
 The result must contain 4 to 8 stages and satisfy these validation errors:
 ${validationErrors}
+
+SOURCE_REQUIREMENTS:
+${sourceRequirements.slice(0, 30_000)}
 
 INVALID_OUTPUT:
 ${originalOutput.slice(0, 24_000)}

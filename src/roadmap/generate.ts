@@ -8,6 +8,7 @@ import {
 import type { RoadmapResponse, RoadmapStage } from "@/src/types";
 import type { RoadmapGenerationInput } from "./contracts";
 import { ROADMAP_GENERATOR_VERSION } from "./contracts";
+import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
 
 function copy(input: RoadmapGenerationInput, en: string, vi: string) {
   return input.projectInput.interfaceLanguage === "vi" ? vi : en;
@@ -17,15 +18,6 @@ function activeGaps(input: RoadmapGenerationInput) {
   return input.skillGaps.filter((gap) =>
     ["needs_learning", "partial"].includes(gap.status),
   );
-}
-
-function selectedForSkill(input: RoadmapGenerationInput, skillId: string) {
-  const needIds = new Set(
-    input.tutorialNeeds
-      .filter((need) => need.skillIds.includes(skillId) && need.status === "active")
-      .map((need) => need.id),
-  );
-  return input.selectedTutorials.find((tutorial) => needIds.has(tutorial.needId));
 }
 
 function creativeDirection(input: RoadmapGenerationInput): string {
@@ -57,7 +49,9 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
   const locale = project.interfaceLanguage;
   const isProductAnimationExample = /20[- ]second product animation|hoạt hình sản phẩm.*20 giây/i.test(project.projectBrief);
   const stages: RoadmapStage[] = [];
-  const handoffApplicationIds = appIds.slice(1, 3);
+  // The final application is already represented by the delivery stage, so
+  // reserve explicit handoff stages only for applications in the middle.
+  const handoffApplicationIds = appIds.slice(1, -1).slice(0, 3);
   // RoadmapResponseSchema deliberately caps the user-facing plan at eight
   // stages. Reserve space for scope, core output, review, delivery, and any
   // required application handoffs before adding just-in-time learning stages.
@@ -118,30 +112,90 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     tutorialIds: [],
   });
 
-  for (const gap of activeGaps(input).slice(0, learningStageLimit)) {
-    const tutorial = selectedForSkill(input, gap.skillId);
+  const gaps = activeGaps(input);
+  const uniqueSelectedTutorials = [
+    ...new Map(
+      input.selectedTutorials.map((tutorial) => [tutorial.tutorial.id, tutorial]),
+    ).values(),
+  ];
+  const learningStageCount = Math.min(
+    learningStageLimit,
+    gaps.length > 0 ? gaps.length : uniqueSelectedTutorials.length > 0 ? 1 : 0,
+  );
+  const learningGroups = Array.from({ length: learningStageCount }, () => ({
+    gaps: [] as typeof gaps,
+    tutorials: [] as typeof uniqueSelectedTutorials,
+  }));
+
+  gaps.forEach((gap, index) => {
+    learningGroups[index % learningStageCount]?.gaps.push(gap);
+  });
+
+  const needById = new Map(input.tutorialNeeds.map((need) => [need.id, need]));
+  for (const tutorial of uniqueSelectedTutorials) {
+    const relatedSkillIds = new Set([
+      ...(needById.get(tutorial.needId)?.skillIds ?? []),
+      ...tutorial.tutorial.skillIds,
+    ]);
+    const matchingGroup = learningGroups.find((group) =>
+      group.gaps.some((gap) => relatedSkillIds.has(gap.skillId)),
+    );
+    const leastLoadedGroup = learningGroups.reduce(
+      (best, group) =>
+        group.tutorials.length < best.tutorials.length ? group : best,
+      learningGroups[0],
+    );
+    (matchingGroup ?? leastLoadedGroup)?.tutorials.push(tutorial);
+  }
+
+  learningGroups.forEach((group, groupIndex) => {
+    const labels = group.gaps.map((gap) => gap.label);
+    const compactLabel = labels.length <= 2
+      ? labels.join(" and ")
+      : `${labels.slice(0, 2).join(", ")} +${labels.length - 2} more`;
+    const tutorialTitles = group.tutorials.map((tutorial) => tutorial.tutorial.title);
+    const stageLabel = compactLabel || tutorialTitles[0] || copy(input, "selected learning", "nội dung học đã chọn");
+    const applicationId =
+      group.gaps.flatMap((gap) => gap.softwareIds).find((id) => appIds.includes(id)) ??
+      group.tutorials.flatMap((tutorial) => tutorial.tutorial.softwareIds).find((id) => appIds.includes(id)) ??
+      primaryApplication;
+    const classification = group.gaps.some((gap) => gap.priority === "required")
+      ? "required" as const
+      : group.gaps.some((gap) => gap.priority === "useful")
+        ? "useful" as const
+        : "optional" as const;
+    const learningMinutes = Math.max(
+      1,
+      group.gaps.reduce(
+        (total, gap) => total + (gap.estimatedLearningMinutes ?? 10),
+        0,
+      ) || group.tutorials.reduce(
+        (total, tutorial) => total + (tutorial.tutorial.durationMinutes ?? 0),
+        0,
+      ),
+    );
     add({
-      id: `apply-${gap.id}`.slice(0, 80),
-      title: copy(input, `Apply ${gap.label}`, `Áp dụng ${gap.label}`),
-      goal: copy(input, `Use ${gap.label} to move the required project forward.`, `Dùng ${gap.label} để đưa dự án bắt buộc tiến lên.`),
-      why: gap.reason,
-      applicationId: gap.softwareIds.find((id) => appIds.includes(id)) ?? primaryApplication,
-      skillToLearn: gap.label,
+      id: `apply-learning-${groupIndex + 1}`,
+      title: copy(input, `Apply ${stageLabel}`, `Áp dụng ${stageLabel}`),
+      goal: copy(input, `Use ${stageLabel} directly in the required project output.`, `Dùng ${stageLabel} trực tiếp trong sản phẩm bắt buộc.`),
+      why: group.gaps.map((gap) => gap.reason).join(" ").slice(0, 600) || copy(input, "These selected tutorials support the confirmed production direction.", "Các tutorial đã chọn hỗ trợ định hướng sản xuất đã xác nhận."),
+      applicationId,
+      skillToLearn: (labels.join(", ") || stageLabel).slice(0, 240),
       tasks: [
-        copy(input, `Learn only the ${gap.label} technique needed for this stage`, `Chỉ học kỹ thuật ${gap.label} cần cho giai đoạn này`),
+        copy(input, "Complete the selected just-in-time tutorials for this work block", "Hoàn thành các tutorial vừa đủ cho khối công việc này"),
         copy(input, "Apply it directly to the project output", "Áp dụng trực tiếp vào sản phẩm dự án"),
       ],
-      productionTasks: [copy(input, `Apply ${gap.label} in the project file`, `Áp dụng ${gap.label} trong tệp dự án`)],
-      learningTasks: tutorial ? [tutorial.tutorial.title] : [gap.label],
-      definitionOfDone: [copy(input, `${gap.label} is visible in the project output and checked against the brief.`, `${gap.label} xuất hiện trong sản phẩm và đã được đối chiếu với đề bài.`)],
-      classification: gap.priority,
-      creativeDnaIds: gap.relatedTechniqueIds,
-      skillIds: [gap.skillId],
-      learningMinutes: gap.estimatedLearningMinutes ?? 10,
-      productionMinutes: gap.priority === "required" ? 45 : 30,
-      tutorialIds: tutorial ? [tutorial.tutorial.id] : [],
+      productionTasks: [copy(input, `Apply ${stageLabel} in the project file`, `Áp dụng ${stageLabel} trong tệp dự án`)],
+      learningTasks: (tutorialTitles.length > 0 ? tutorialTitles : labels).slice(0, 12),
+      definitionOfDone: [copy(input, `${stageLabel} is visible in the project output and checked against the brief.`, `${stageLabel} xuất hiện trong sản phẩm và đã được đối chiếu với đề bài.`)],
+      classification,
+      creativeDnaIds: [...new Set(group.gaps.flatMap((gap) => gap.relatedTechniqueIds))].slice(0, 30),
+      skillIds: group.gaps.map((gap) => gap.skillId).slice(0, 30),
+      learningMinutes,
+      productionMinutes: classification === "required" ? 45 : 30,
+      tutorialIds: group.tutorials.map((tutorial) => tutorial.tutorial.id),
     });
-  }
+  });
 
   for (const applicationId of handoffApplicationIds) {
     add({
@@ -238,12 +292,14 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     notice: copy(input, "QUANDA created this project-aware plan from your confirmed direction, skill gaps, and selected tutorials.", "QUANDA đã tạo kế hoạch theo dự án từ định hướng đã xác nhận, khoảng thiếu kỹ năng và tutorial đã chọn."),
     roadmapGeneratorVersion: ROADMAP_GENERATOR_VERSION,
     inputFingerprint: input.inputFingerprint,
+    projectInputFingerprint: createProjectInputFingerprint(project),
   };
 }
 
 export function validateRoadmapForInput(roadmap: RoadmapResponse, input: RoadmapGenerationInput): string[] {
   const errors: string[] = [];
   const selectedTutorialIds = new Set(input.selectedTutorials.map((item) => item.tutorial.id));
+  const tutorialOccurrences = new Map<string, number>();
   const knownSkillIds = new Set(input.skillGaps.filter((gap) => gap.status === "known").map((gap) => gap.skillId));
   const rejectedConceptIds = new Set(input.creativeDna.concepts.filter((concept) => concept.status === "user_rejected").map((concept) => concept.ontologyId).filter((id): id is string => Boolean(id)));
   const allowedApplications = new Set(input.projectInput.requiredApplications);
@@ -251,11 +307,28 @@ export function validateRoadmapForInput(roadmap: RoadmapResponse, input: Roadmap
   const coveredSkills = new Set(roadmap.stages.flatMap((stage) => stage.skillIds ?? []));
 
   for (const stage of roadmap.stages) {
-    for (const tutorialId of stage.tutorialIds) if (!selectedTutorialIds.has(tutorialId)) errors.push(`Tutorial ${tutorialId} was not selected by the tutorial matcher.`);
+    for (const tutorialId of stage.tutorialIds) {
+      if (!selectedTutorialIds.has(tutorialId)) {
+        errors.push(`Tutorial ${tutorialId} was not selected by the tutorial matcher.`);
+      } else {
+        tutorialOccurrences.set(
+          tutorialId,
+          (tutorialOccurrences.get(tutorialId) ?? 0) + 1,
+        );
+      }
+    }
     for (const skillId of stage.skillIds ?? []) if (knownSkillIds.has(skillId)) errors.push(`Known skill ${skillId} was unnecessarily added.`);
     for (const conceptId of stage.creativeDnaIds ?? []) if (rejectedConceptIds.has(conceptId)) errors.push(`Rejected creative concept ${conceptId} was restored.`);
     if (allowedApplications.size > 0 && stage.applicationId && !allowedApplications.has(stage.applicationId)) errors.push(`Application ${stage.applicationId} is not an explicit requirement.`);
     if ((stage.productionTasks?.length ?? 0) === 0 || (stage.definitionOfDone?.length ?? 0) === 0) errors.push(`Stage ${stage.id} is missing production work or a definition of done.`);
+  }
+  for (const tutorialId of selectedTutorialIds) {
+    const occurrences = tutorialOccurrences.get(tutorialId) ?? 0;
+    if (occurrences === 0) {
+      errors.push(`Selected tutorial ${tutorialId} is missing from the roadmap.`);
+    } else if (occurrences > 1) {
+      errors.push(`Selected tutorial ${tutorialId} appears more than once in the roadmap.`);
+    }
   }
   for (const gap of requiredGaps) if (!coveredSkills.has(gap.skillId)) errors.push(`Required skill gap ${gap.skillId} has no learning support.`);
   for (const applicationId of allowedApplications) if (!roadmap.stages.some((stage) => stage.applicationId === applicationId)) errors.push(`Required application ${applicationId} is missing from the roadmap.`);

@@ -53,3 +53,44 @@ test("corrects and persists the focused learning path", async ({ page }) => {
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await expect(page.getByText(firstLabel ?? "", { exact: true })).toBeVisible();
 });
+
+test("carries every selected Figma tutorial into the roadmap and clears it after the brief changes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Project brief").fill(
+    "Design a mobile museum guide in Figma with a reusable component system, responsive auto layout, and an interactive prototype for usability testing.",
+  );
+  await page.getByLabel("Current experience").fill(
+    "I understand basic frames but need help with components, auto layout, and prototyping.",
+  );
+  await page.getByLabel("Figma", { exact: true }).check();
+  await page.getByRole("button", { name: "Understand my project" }).click();
+  await page.getByRole("button", { name: "Looks right — continue" }).click();
+
+  const learning = page.locator("#learning-path-review");
+  await expect(learning).toBeVisible();
+  const selectedTitles = await learning
+    .locator(".matched-tutorial-card h5")
+    .allTextContents();
+  expect(selectedTitles.length).toBeGreaterThan(1);
+
+  await learning
+    .getByRole("button", { name: "Continue to my roadmap" })
+    .click();
+  const roadmap = page.locator("#roadmap-results");
+  await expect(roadmap).toBeVisible();
+  for (const title of [...new Set(selectedTitles)]) {
+    await expect(
+      roadmap.getByRole("heading", { name: title, exact: true }),
+    ).toBeVisible();
+  }
+
+  await roadmap.getByRole("button", { name: "Edit input" }).click();
+  await page.getByLabel("Project brief").fill(
+    "Create a projection-mapped TouchDesigner installation controlled by body movement.",
+  );
+  await expect(roadmap).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator("#roadmap-results")).toHaveCount(0);
+});
