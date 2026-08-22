@@ -77,7 +77,7 @@ The browser sends only the validated roadmap request to `/api/roadmap`. The serv
 
 ## 7. Demo mode
 
-When `GEMINI_API_KEY` is absent, `/api/roadmap` returns a deterministic roadmap based on the project type. The UI labels this as demo mode. If a configured AI request times out, fails, or returns invalid JSON after one repair attempt, QUANDA returns the same safe fallback shape with a bilingual notice.
+When `GEMINI_API_KEY` is absent, `/api/roadmap` returns a deterministic roadmap based on the confirmed Creative DNA and learning plan. AI roadmaps must carry every selected tutorial into the production path exactly once; invalid responses receive one constrained repair. If that repair fails, the fallback groups the complete skill-gap set into at most eight stages while preserving every selected verified tutorial, with a bilingual explanation.
 
 ## 8. Add tutorials
 
@@ -139,6 +139,8 @@ The compiled runtime ontology and update workflow are documented in [`docs/ontol
 5. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
 6. Deploy and test the public URL in English and Vietnamese.
 7. Temporarily test without the API key, with a stale index hash, or with the upstream service unavailable, to confirm demo and retrieval fallback behaviour.
+
+On a Vercel Hobby project, merge production changes through the GitHub account that owns the Vercel project. Hobby deployments can block a production commit whose Git author is not a project member, even when that commit is already on the production branch.
 
 The server endpoint uses bounded request sizes, a short in-memory rate limit, and request timeouts; it does not start background jobs.
 
