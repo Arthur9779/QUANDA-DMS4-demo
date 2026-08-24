@@ -11,7 +11,8 @@ test("uses quanda.skills to build a tutorial-backed Figma workflow", async ({
     "I know Figma basics but not Auto Layout, components, user flows, or prototyping.",
   );
   await page.getByLabel("Desired output type").selectOption("uiux");
-  await page.getByLabel("Figma", { exact: true }).check();
+  await page.getByLabel("Search applications").fill("Figma");
+  await page.getByRole("button", { name: "Add application: Figma" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
 
   const creativeDna = page.locator("#creative-dna-review");
