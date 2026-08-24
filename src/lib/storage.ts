@@ -19,6 +19,16 @@ import type {
   RoadmapResponse,
 } from "@/src/types";
 import type { ProjectAnalysisResponse } from "@/src/project-analysis/contracts";
+import {
+  EngineeringInterpretationSchema,
+  EngineeringProjectSchema,
+  EngineeringRoadmapSchema,
+  ProjectPathSchema,
+  type EngineeringInterpretation,
+  type EngineeringProject,
+  type EngineeringRoadmap,
+  type ProjectPath,
+} from "@/src/project-path/contracts";
 
 export const STORAGE_KEYS = {
   language: "quanda:v1:language",
@@ -28,6 +38,11 @@ export const STORAGE_KEYS = {
   calendar: "quanda:v1:calendar-tasks",
   creativeDnaAnalysis: "quanda:v1:creative-dna-analysis",
   learningPlan: "quanda:v1:learning-plan",
+  projectPath: "quanda:v2:project-path",
+  engineeringDraft: "quanda:v2:engineering-draft",
+  engineeringInterpretation: "quanda:v2:engineering-interpretation",
+  engineeringRoadmap: "quanda:v2:engineering-roadmap",
+  engineeringCompletion: "quanda:v2:engineering-completion",
 } as const;
 
 function safeParse(value: string | null): unknown {
@@ -50,6 +65,80 @@ export function writeLanguage(storage: Storage, locale: Locale): void {
   } catch {
     // Private browsing and storage quotas must not break the app.
   }
+}
+
+export function readProjectPath(storage: Storage): ProjectPath | null {
+  const parsed = ProjectPathSchema.safeParse(storage.getItem(STORAGE_KEYS.projectPath));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeProjectPath(storage: Storage, path: ProjectPath): void {
+  try { storage.setItem(STORAGE_KEYS.projectPath, path); } catch { /* progressive enhancement */ }
+}
+
+export function clearProjectPath(storage: Storage): void {
+  try { storage.removeItem(STORAGE_KEYS.projectPath); } catch { /* in-memory state still resets */ }
+}
+
+export function readEngineeringDraft(storage: Storage): EngineeringProject | null {
+  const parsed = EngineeringProjectSchema.safeParse(safeParse(storage.getItem(STORAGE_KEYS.engineeringDraft)));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeEngineeringDraft(storage: Storage, draft: EngineeringProject): void {
+  const parsed = EngineeringProjectSchema.safeParse(draft);
+  if (!parsed.success) return;
+  try { storage.setItem(STORAGE_KEYS.engineeringDraft, JSON.stringify(parsed.data)); } catch { /* progressive enhancement */ }
+}
+
+export function clearEngineeringDraft(storage: Storage): void {
+  try { storage.removeItem(STORAGE_KEYS.engineeringDraft); } catch { /* in-memory state still resets */ }
+}
+
+export function readEngineeringInterpretation(storage: Storage): EngineeringInterpretation | null {
+  const parsed = EngineeringInterpretationSchema.safeParse(safeParse(storage.getItem(STORAGE_KEYS.engineeringInterpretation)));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeEngineeringInterpretation(storage: Storage, interpretation: EngineeringInterpretation): void {
+  const parsed = EngineeringInterpretationSchema.safeParse(interpretation);
+  if (!parsed.success) return;
+  try { storage.setItem(STORAGE_KEYS.engineeringInterpretation, JSON.stringify(parsed.data)); } catch { /* progressive enhancement */ }
+}
+
+export function clearEngineeringInterpretation(storage: Storage): void {
+  try { storage.removeItem(STORAGE_KEYS.engineeringInterpretation); } catch { /* in-memory state still resets */ }
+}
+
+export function readEngineeringRoadmap(storage: Storage): EngineeringRoadmap | null {
+  const parsed = EngineeringRoadmapSchema.safeParse(safeParse(storage.getItem(STORAGE_KEYS.engineeringRoadmap)));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeEngineeringRoadmap(storage: Storage, roadmap: EngineeringRoadmap): void {
+  const parsed = EngineeringRoadmapSchema.safeParse(roadmap);
+  if (!parsed.success) return;
+  try { storage.setItem(STORAGE_KEYS.engineeringRoadmap, JSON.stringify(parsed.data)); } catch { /* progressive enhancement */ }
+}
+
+export function clearEngineeringRoadmap(storage: Storage): void {
+  try { storage.removeItem(STORAGE_KEYS.engineeringRoadmap); } catch { /* in-memory state still resets */ }
+}
+
+export function readEngineeringCompletion(storage: Storage): string[] {
+  const value = safeParse(storage.getItem(STORAGE_KEYS.engineeringCompletion));
+  return Array.isArray(value) && value.every((item) => typeof item === "string") ? [...new Set(value)] : [];
+}
+
+export function writeEngineeringCompletion(storage: Storage, completed: string[]): void {
+  try { storage.setItem(STORAGE_KEYS.engineeringCompletion, JSON.stringify([...new Set(completed)])); } catch { /* progressive enhancement */ }
+}
+
+export function clearEngineeringState(storage: Storage): void {
+  clearEngineeringDraft(storage);
+  clearEngineeringInterpretation(storage);
+  clearEngineeringRoadmap(storage);
+  try { storage.removeItem(STORAGE_KEYS.engineeringCompletion); } catch { /* in-memory state still resets */ }
 }
 
 export function readDraft(storage: Storage): RoadmapRequest | null {
@@ -247,7 +336,9 @@ export function clearProjectStorage(storage: Storage): void {
     storage.removeItem(STORAGE_KEYS.completion);
     storage.removeItem(STORAGE_KEYS.creativeDnaAnalysis);
     storage.removeItem(STORAGE_KEYS.learningPlan);
+    storage.removeItem(STORAGE_KEYS.projectPath);
   } catch {
     // The in-memory reset still succeeds.
   }
+  clearEngineeringState(storage);
 }
