@@ -68,7 +68,7 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   await expect(page.getByTestId("project-calendar")).toBeVisible();
 });
 
-test("preserves a custom coding environment and supplies guides without unrelated videos", async ({
+test("routes software briefs into the separate agentic engineering workflow", async ({
   page,
 }) => {
   const consoleErrors: string[] = [];
@@ -78,53 +78,35 @@ test("preserves a custom coding environment and supplies guides without unrelate
   page.on("pageerror", (error) => consoleErrors.push(error.message));
 
   await page.goto("/");
-  await expect(page.getByText(
-    "Search QUANDA’s application knowledge base, then add every tool the assignment requires.",
-  )).toBeVisible();
-
   await page.getByLabel("Project brief").fill(
-    "Build a small TypeScript sign-in page with validation, tests, and a verified production build for a class project.",
+    "Build a small TypeScript sign-in website with validation, tests, and a verified production build for a class project.",
   );
-  await page.getByLabel("Current experience").fill(
+  await page.getByRole("button", { name: "Choose my path" }).click();
+  await expect(page.getByRole("heading", { name: "Describe the build QUANDA should help you execute" })).toBeVisible();
+  await page.getByLabel("Definition of done").fill(
+    "The sign-in form validates input, shows useful errors, has focused tests, and the production build passes.",
+  );
+  await page.getByLabel("Current technical experience").fill(
     "Complete beginner with TypeScript and Visual Studio Code",
   );
-  await page.getByLabel("Search applications").fill("Visual Studio Code");
-  await page.getByRole("button", {
-    name: "Add application: Visual Studio Code",
-  }).click();
-  await page.getByLabel("Desired output type").selectOption("other");
-  await page.getByRole("button", { name: "Understand my project" }).click();
-  await expect(page.getByRole("heading", { name: "QUANDA understood your project" })).toBeVisible();
-  await page.getByRole("button", { name: "Looks right — continue" }).click();
-  await expect(page.locator("#learning-path-review")).toBeVisible();
-  await page.getByRole("button", { name: "Continue to my roadmap" }).click();
-
-  await expect(page.locator("#roadmap-results")).toBeVisible();
-  await expect(page.getByTestId("quanda-guide").first()).toBeVisible();
-  await expect(page.locator('[data-guide-kind="coding"]').first()).toBeVisible();
-  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
-    .toBeVisible();
-  await expect(page.locator(".tutorial-card")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Watch on YouTube" })).toHaveCount(0);
-
-  const proceduralGuide = page.locator('[data-guide-kind="procedural"]').first();
-  await expect(proceduralGuide).toBeVisible();
-  await expect(proceduralGuide.getByTestId("tutorial-status")).toContainText(
-    "no video is required",
-  );
+  await page.getByLabel("Required or preferred technologies").fill("TypeScript, Next.js");
+  await page.getByRole("button", { name: "Review my build plan" }).click();
+  await expect(page.getByRole("heading", { name: "QUANDA understood your build" })).toBeVisible();
+  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
+  await expect(page.locator("#learning-path-review")).toHaveCount(0);
+  await page.getByRole("button", { name: "Generate the engineering roadmap" }).click();
+  await expect(page.locator("#engineering-roadmap-results")).toBeVisible();
+  await expect(page.locator(".engineering-task-card")).toHaveCount(9);
+  await expect(page.getByText("Agent-ready implementation prompt")).toBeVisible();
+  await expect(page.getByText("Acceptance criteria")).toBeVisible();
+  await expect(page.getByText("Verification checks")).toBeVisible();
 
   await page.getByRole("button", { name: "VI", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Hướng dẫn QUANDA" }).first())
-    .toBeVisible();
-  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
-    .toBeVisible();
-  await expect(page.locator(".tutorial-card")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Thực thi pipeline sản xuất" })).toBeVisible();
+  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
 
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Hướng dẫn QUANDA" }).first())
-    .toBeVisible();
-  await expect(page.getByText("Visual Studio Code", { exact: true }).first())
-    .toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thực thi pipeline sản xuất" })).toBeVisible();
 
   const layout = await page.evaluate(() => ({
     width: window.innerWidth,

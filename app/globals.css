@@ -36,11 +36,13 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 104px;
+  overflow-x: clip;
 }
 
 body {
   position: relative;
   margin: 0;
+  overflow-x: hidden;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-manrope), Arial, sans-serif;
@@ -3176,4 +3178,54 @@ footer {
   .learning-need-number { height: 34px; justify-content: flex-start; padding-left: 18px; }
   .skill-state-controls button, .tutorial-match-actions button, .tutorial-match-actions a { justify-content: center; width: 100%; }
   .matched-tutorial-card dl { grid-template-columns: 1fr; }
+}
+
+.path-entry-section, .engineering-form-section, .engineering-interpretation, .engineering-roadmap-results, .path-clarification { margin: 64px auto 0; max-width: 980px; }
+.path-status { align-items: center; background: var(--green-soft); border: 1px solid #b7cda2; border-radius: 999px; display: flex; gap: 16px; justify-content: space-between; margin: 34px auto -34px; max-width: 980px; padding: 8px 10px 8px 16px; }
+.path-status .button-text { color: var(--ink); font-size: 0.82rem; }
+.path-clarification { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: clamp(26px, 5vw, 54px); }
+.path-clarification h2, .engineering-interpretation h2, .engineering-roadmap-results h2 { font-family: var(--font-newsreader), Georgia, serif; font-size: clamp(2rem, 5vw, 3.7rem); letter-spacing: -0.045em; line-height: 0.98; margin: 8px 0 14px; }
+.path-clarification > p:not(.eyebrow) { color: var(--muted); max-width: 700px; }
+.path-choice-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
+.path-choice-card { align-items: flex-start; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; color: var(--ink); cursor: pointer; display: grid; gap: 10px; padding: 22px; text-align: left; transition: border-color 160ms ease, transform 160ms ease; }
+.path-choice-card:hover, .path-choice-card:focus-visible { border-color: var(--palm); transform: translateY(-2px); }
+.path-choice-card span { font-size: 1.1rem; font-weight: 850; }
+.path-choice-card small { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+.path-choice-card svg:last-child { justify-self: end; }
+.engineering-interpretation, .engineering-roadmap-results { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: clamp(26px, 5vw, 54px); }
+.engineering-interpretation-grid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.engineering-interpretation-grid .field-wide { grid-column: 1 / -1; }
+.engineering-review-actions { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 24px; }
+.engineering-roadmap-summary { align-items: start; background: var(--green-soft); border: 1px solid #b7cda2; border-radius: 17px; display: grid; gap: 20px; grid-template-columns: 1fr auto; margin: 26px 0; padding: 20px; }
+.engineering-roadmap-summary strong { font-size: 1.05rem; }
+.engineering-roadmap-summary p { color: var(--muted); margin: 5px 0 0; }
+.engineering-notice { background: var(--amber-soft); border-left: 4px solid var(--amber); border-radius: 10px; margin: 18px 0; padding: 12px 16px; }
+.engineering-task-list { display: grid; gap: 14px; margin: 26px 0; }
+.engineering-task-card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.engineering-task-card.is-complete { border-color: #92ad72; }
+.engineering-task-card.is-complete h3 { text-decoration: line-through; }
+.engineering-task-header { align-items: center; display: grid; gap: 14px; grid-template-columns: auto auto 1fr auto; padding: 18px 20px; }
+.engineering-task-check input { accent-color: var(--green); height: 18px; width: 18px; }
+.engineering-task-number { color: var(--palm); font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; }
+.engineering-task-header h3 { font-family: var(--font-newsreader), Georgia, serif; font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.05; margin: 2px 0 0; }
+.engineering-task-header .eyebrow { margin: 0; }
+.icon-button { align-items: center; background: transparent; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); cursor: pointer; display: grid; height: 36px; justify-content: center; width: 36px; }
+.engineering-task-content { border-top: 1px solid var(--line); padding: 20px; }
+.engineering-task-summary { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.engineering-task-summary p, .engineering-task-columns p { color: var(--muted); margin: 5px 0 0; }
+.engineering-task-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+.engineering-task-meta span { align-items: center; background: var(--white); border: 1px solid var(--line); border-radius: 999px; display: inline-flex; font-size: 0.78rem; gap: 6px; padding: 7px 10px; }
+.engineering-task-columns { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.engineering-task-columns > div { background: rgba(255, 255, 255, 0.66); border-radius: 12px; padding: 14px; }
+.engineering-task-columns strong { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.engineering-task-columns ul, .engineering-warnings ul { color: var(--muted); margin: 7px 0 0; padding-left: 20px; }
+.engineering-task-columns pre { background: var(--dark); border-radius: 10px; color: #fffdf6; font: 0.84rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; margin: 8px 0 0; overflow-x: auto; padding: 12px; white-space: pre-wrap; }
+.engineering-warnings { background: var(--amber-soft); border-left: 4px solid var(--amber); border-radius: 12px; margin: 22px 0; padding: 15px 18px; }
+
+@media (max-width: 760px) {
+  .path-choice-grid, .engineering-interpretation-grid, .engineering-task-summary, .engineering-task-columns { grid-template-columns: 1fr; }
+  .engineering-interpretation-grid .field-wide { grid-column: auto; }
+  .engineering-roadmap-summary { grid-template-columns: 1fr; }
+  .engineering-task-header { grid-template-columns: auto auto 1fr; }
+  .engineering-task-header .icon-button { grid-column: 3; grid-row: 1; justify-self: end; }
 }

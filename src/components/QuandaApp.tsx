@@ -11,6 +11,11 @@ import type {
   RoadmapResponse,
 } from "@/src/types";
 import { ProjectBriefForm } from "./ProjectBriefForm";
+import { InitialBriefForm } from "./InitialBriefForm";
+import { PathClarification } from "./PathClarification";
+import { EngineeringProjectForm } from "./EngineeringProjectForm";
+import { EngineeringInterpretation } from "./EngineeringInterpretation";
+import { EngineeringRoadmapResults } from "./EngineeringRoadmapResults";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
 import { CreativeDnaReview } from "./CreativeDnaReview";
@@ -38,6 +43,18 @@ import {
   writeLearningPlan,
   writeLanguage,
   writeRoadmap,
+  clearEngineeringState,
+  clearProjectPath,
+  readEngineeringCompletion,
+  readEngineeringDraft,
+  readEngineeringInterpretation,
+  readEngineeringRoadmap,
+  readProjectPath,
+  writeEngineeringCompletion,
+  writeEngineeringDraft,
+  writeEngineeringInterpretation,
+  writeEngineeringRoadmap,
+  writeProjectPath,
 } from "@/src/lib/storage";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { trackEvent } from "@/src/lib/analytics";
@@ -70,6 +87,8 @@ import {
   restorePreviousTutorial,
   type LearningPlan,
 } from "@/src/tutorial-matching";
+import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, type EngineeringInterpretation as EngineeringInterpretationValue, type EngineeringProject, type EngineeringRoadmap, type PathClassification, type ProjectPath } from "@/src/project-path";
+import { generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -93,9 +112,37 @@ function emptyForm(locale: Locale): RoadmapRequest {
   };
 }
 
+function emptyEngineeringForm(locale: Locale, brief = ""): EngineeringProject {
+  const hints = inferEngineeringHints(brief);
+  return {
+    path: "agentic_engineering",
+    interfaceLanguage: locale,
+    technicalBrief: brief,
+    startingPoint: hints.startingPoint,
+    repositoryUrl: hints.repositoryUrl,
+    projectLocation: "",
+    definitionOfDone: "",
+    targetPlatform: hints.targetPlatform,
+    technologies: hints.technologies,
+    currentExperience: "",
+    deploymentTarget: "",
+    deadline: dateFromToday(7),
+    hoursPerDay: 2,
+    daysPerWeek: 6,
+    constraints: "",
+    existingErrors: "",
+  };
+}
+
 export function QuandaApp() {
   const [locale, setLocale] = useState<Locale>("en");
+  const [projectPath, setProjectPath] = useState<ProjectPath | null>(null);
+  const [pathClassification, setPathClassification] = useState<PathClassification | null>(null);
   const [form, setForm] = useState<RoadmapRequest>(() => emptyForm("en"));
+  const [engineeringForm, setEngineeringForm] = useState<EngineeringProject>(() => emptyEngineeringForm("en"));
+  const [engineeringInterpretation, setEngineeringInterpretation] = useState<EngineeringInterpretationValue | null>(null);
+  const [engineeringRoadmap, setEngineeringRoadmap] = useState<EngineeringRoadmap | null>(null);
+  const [engineeringCompletion, setEngineeringCompletion] = useState<string[]>([]);
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
   const [creativeDnaReview, setCreativeDnaReview] =
     useState<CreativeDnaReviewRecord | null>(null);
@@ -109,6 +156,7 @@ export function QuandaApp() {
   const [error, setError] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [matchingError, setMatchingError] = useState<string | null>(null);
+  const [engineeringError, setEngineeringError] = useState<string | null>(null);
   const t = getTranslation(locale);
   const projectInputFingerprint = createProjectInputFingerprint(form);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
@@ -125,6 +173,11 @@ export function QuandaApp() {
       const savedDraft = readDraft(window.localStorage);
       const savedCompletion = readCompletion(window.localStorage);
       const savedCalendarTasks = readCalendarTasks(window.localStorage);
+      const savedPath = readProjectPath(window.localStorage);
+      const savedEngineeringDraft = readEngineeringDraft(window.localStorage);
+      const savedEngineeringInterpretation = readEngineeringInterpretation(window.localStorage);
+      const savedEngineeringRoadmap = readEngineeringRoadmap(window.localStorage);
+      const savedEngineeringCompletion = readEngineeringCompletion(window.localStorage);
       const restoredLocale =
         savedLocale ?? savedDraft?.interfaceLanguage ?? "en";
       const restoredForm = savedDraft
@@ -141,9 +194,17 @@ export function QuandaApp() {
       const savedLearningPlan = readLearningPlan(window.localStorage);
       const restoredFingerprint = createProjectInputFingerprint(restoredForm);
       const restoredRoadmap = savedRoadmap;
+      const restoredPath: ProjectPath | null = savedPath ??
+        (savedEngineeringDraft || savedEngineeringRoadmap ? "agentic_engineering" :
+          (savedRoadmap || savedCreativeDnaReview ? "design" : null));
 
       setLocale(restoredLocale);
+      setProjectPath(restoredPath);
       setForm(restoredForm);
+      setEngineeringForm(savedEngineeringDraft ?? emptyEngineeringForm(restoredLocale, restoredForm.projectBrief));
+      setEngineeringInterpretation(savedEngineeringInterpretation);
+      setEngineeringRoadmap(savedEngineeringRoadmap);
+      setEngineeringCompletion(savedEngineeringCompletion);
       setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
       setLearningPlan(
@@ -184,6 +245,21 @@ export function QuandaApp() {
   }, [form, isHydrated]);
 
   useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
+    const timeout = window.setTimeout(
+      () => writeEngineeringDraft(window.localStorage, engineeringForm),
+      350,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [engineeringForm, isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    if (projectPath) writeProjectPath(window.localStorage, projectPath);
+    else clearProjectPath(window.localStorage);
+  }, [isHydrated, projectPath]);
+
+  useEffect(() => {
     if (!isHydrated) return;
     if (roadmap) writeRoadmap(window.localStorage, roadmap);
     else clearRoadmap(window.localStorage);
@@ -202,6 +278,21 @@ export function QuandaApp() {
   }, [isHydrated, learningPlan]);
 
   useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
+    if (engineeringInterpretation) writeEngineeringInterpretation(window.localStorage, engineeringInterpretation);
+  }, [engineeringInterpretation, isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
+    if (engineeringRoadmap) writeEngineeringRoadmap(window.localStorage, engineeringRoadmap);
+  }, [engineeringRoadmap, isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
+    writeEngineeringCompletion(window.localStorage, engineeringCompletion);
+  }, [engineeringCompletion, isHydrated, projectPath]);
+
+  useEffect(() => {
     if (isHydrated) {
       writeCompletion(window.localStorage, completion);
     }
@@ -218,6 +309,11 @@ export function QuandaApp() {
     trackEvent("language_changed", { language: nextLocale });
     const nextForm = { ...form, interfaceLanguage: nextLocale };
     setForm(nextForm);
+    setEngineeringForm((current) => ({ ...current, interfaceLanguage: nextLocale }));
+    if (projectPath === "agentic_engineering" && engineeringRoadmap) {
+      setEngineeringRoadmap((current) => current ? { ...current, language: nextLocale } : current);
+    }
+    if (projectPath === "agentic_engineering") return;
     if (roadmap?.source === "demo") {
       const nextRoadmap = createSampleRoadmap(nextForm);
       setRoadmap(nextRoadmap);
@@ -254,6 +350,101 @@ export function QuandaApp() {
     document.querySelector("#project-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const selectPath = (nextPath: ProjectPath, brief = form.projectBrief) => {
+    setProjectPath(nextPath);
+    setPathClassification(null);
+    setRoadmap(null);
+    setCreativeDnaReview(null);
+    setLearningPlan(null);
+    setEngineeringRoadmap(null);
+    setEngineeringInterpretation(null);
+    setEngineeringCompletion([]);
+    setEngineeringError(null);
+    setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+    clearCreativeDnaReview(window.localStorage);
+    clearLearningPlan(window.localStorage);
+    if (nextPath === "design") {
+      setForm((current) => ({ ...current, projectBrief: brief, interfaceLanguage: locale }));
+      clearEngineeringState(window.localStorage);
+    } else {
+      setEngineeringForm(emptyEngineeringForm(locale, brief));
+      setForm((current) => ({ ...current, projectBrief: brief, interfaceLanguage: locale }));
+    }
+    requestAnimationFrame(() => {
+      document.querySelector(nextPath === "design" ? "#project-form" : "#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const submitInitialBrief = (brief: string) => {
+    const classification = classifyProjectPath(brief);
+    setPathClassification(classification);
+    if (classification.path !== "clarification") selectPath(classification.path, brief);
+    else setForm((current) => ({ ...current, projectBrief: brief }));
+  };
+
+  const returnToBeginning = () => {
+    clearProjectStorage(window.localStorage);
+    setProjectPath(null);
+    setPathClassification(null);
+    setForm(emptyForm(locale));
+    setEngineeringForm(emptyEngineeringForm(locale));
+    setEngineeringInterpretation(null);
+    setEngineeringRoadmap(null);
+    setEngineeringCompletion([]);
+    setRoadmap(null);
+    setCreativeDnaReview(null);
+    setLearningPlan(null);
+    setCompletion({});
+    setCalendarTasks([]);
+    setError(null);
+    setAnalysisError(null);
+    setMatchingError(null);
+    setEngineeringError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const interpretEngineering = async (request: EngineeringProject) => {
+    setEngineeringForm(request);
+    setEngineeringError(null);
+    setEngineeringInterpretation(null);
+    setEngineeringRoadmap(null);
+    const local = interpretEngineeringProject(request);
+    try {
+      const response = await fetch("/api/engineering/interpret", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+      });
+      if (!response.ok) throw new Error("engineering_interpretation_failed");
+      setEngineeringInterpretation(local);
+    } catch {
+      setEngineeringInterpretation({ ...local, source: "fallback" });
+      setEngineeringError(t.errors.networkFallback);
+    }
+    requestAnimationFrame(() => document.querySelector("#engineering-interpretation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const generateEngineering = async () => {
+    if (!engineeringInterpretation) return;
+    setEngineeringError(null);
+    try {
+      const response = await fetch("/api/engineering/roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: engineeringForm, interpretation: engineeringInterpretation }),
+      });
+      if (!response.ok) throw new Error("engineering_roadmap_failed");
+      const parsed = EngineeringRoadmapSchema.parse(await response.json());
+      setEngineeringRoadmap(parsed);
+    } catch {
+      setEngineeringRoadmap(generateEngineeringRoadmap(engineeringForm, engineeringInterpretation, {
+        source: "fallback",
+        notice: t.engineering.notice,
+      }));
+    }
+    requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
   const loadExample = () => {
     const nextForm: RoadmapRequest = {
       ...emptyForm(locale),
@@ -270,6 +461,14 @@ export function QuandaApp() {
       targetQuality: "basic",
     };
     setForm(nextForm);
+    setProjectPath("design");
+    setPathClassification({ path: "design", confidence: 0.99, reason: "The loaded example explicitly asks for a product animation.", signals: ["creative deliverable"] });
+    clearProjectPath(window.localStorage);
+    writeProjectPath(window.localStorage, "design");
+    clearEngineeringState(window.localStorage);
+    setEngineeringRoadmap(null);
+    setEngineeringInterpretation(null);
+    setEngineeringCompletion([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
     clearCreativeDnaReview(window.localStorage);
@@ -641,30 +840,60 @@ export function QuandaApp() {
           </ol>
         </section>
 
-        <ProjectBriefForm
-          isSubmitting={isLoading || isAnalyzing || isMatchingTutorials || !isHydrated}
-          onChange={(nextForm) => {
-            setForm(nextForm);
-            if (
-              roadmap &&
-              roadmap.projectInputFingerprint !==
-                createProjectInputFingerprint(nextForm)
-            ) {
-              setRoadmap(null);
-              setCalendarTasks((current) =>
-                removeRoadmapCalendarTasks(current),
-              );
-            }
-          }}
-          onSubmit={(request) => void analyzeProject(request)}
-          t={t}
-          value={form}
-        />
+        {!projectPath && !pathClassification && (
+          <InitialBriefForm
+            brief={form.projectBrief}
+            isSubmitting={!isHydrated}
+            onChange={(brief) => setForm((current) => ({ ...current, projectBrief: brief }))}
+            onSubmit={submitInitialBrief}
+            t={t}
+          />
+        )}
+
+        {!projectPath && pathClassification?.path === "clarification" && (
+          <PathClarification t={t} onChoose={(nextPath) => selectPath(nextPath, form.projectBrief)} />
+        )}
+
+        {projectPath && !engineeringRoadmap && (
+          <div className="path-status" role="status"><span>{t.path.detectedAs} <strong>{projectPath === "design" ? t.path.designLabel : t.path.engineeringLabel}</strong>.</span><button className="button button-text" onClick={returnToBeginning} type="button">{t.path.returnToStart}</button></div>
+        )}
+
+        {projectPath === "design" && (
+          <ProjectBriefForm
+            isSubmitting={isLoading || isAnalyzing || isMatchingTutorials || !isHydrated}
+            onChange={(nextForm) => {
+              setForm(nextForm);
+              if (roadmap && roadmap.projectInputFingerprint !== createProjectInputFingerprint(nextForm)) {
+                setRoadmap(null);
+                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+              }
+            }}
+            onSubmit={(request) => void analyzeProject(request)}
+            t={t}
+            value={form}
+          />
+        )}
+
+        {projectPath === "agentic_engineering" && (
+          <EngineeringProjectForm
+            isSubmitting={!isHydrated || Boolean(engineeringInterpretation) || Boolean(engineeringRoadmap)}
+            onChange={(next) => {
+              setEngineeringForm(next);
+              setEngineeringInterpretation(null);
+              setEngineeringRoadmap(null);
+              setEngineeringCompletion([]);
+            }}
+            onSubmit={(request) => void interpretEngineering(request)}
+            t={t}
+            value={engineeringForm}
+          />
+        )}
 
         <div aria-live="polite">
-          {isAnalyzing && <LoadingAnalysis t={t} />}
-          {isMatchingTutorials && <LoadingLearningPath t={t} />}
-          {analysisError && (
+          {projectPath === "agentic_engineering" && engineeringError && <div className="api-error" role="status"><strong>{t.engineering.notice}</strong><p>{engineeringError}</p></div>}
+          {projectPath === "design" && isAnalyzing && <LoadingAnalysis t={t} />}
+          {projectPath === "design" && isMatchingTutorials && <LoadingLearningPath t={t} />}
+          {projectPath === "design" && analysisError && (
             <div className="api-error analysis-error" role="alert">
               <strong>{t.review.errorTitle}</strong>
               <p>{analysisError}</p>
@@ -683,7 +912,7 @@ export function QuandaApp() {
               </div>
             </div>
           )}
-          {matchingError && (
+          {projectPath === "design" && matchingError && (
             <div className="api-error analysis-error" role="alert">
               <strong>{t.learning.errorTitle}</strong>
               <p>{matchingError}</p>
@@ -699,8 +928,8 @@ export function QuandaApp() {
               </button>
             </div>
           )}
-          {isLoading && <LoadingRoadmap t={t} />}
-          {error && (
+          {projectPath === "design" && isLoading && <LoadingRoadmap t={t} />}
+          {projectPath === "design" && error && (
             <div className="api-error" role="alert">
               <strong>{t.form.errorsTitle}</strong>
               <p>{error}</p>
@@ -708,7 +937,7 @@ export function QuandaApp() {
           )}
         </div>
 
-        {creativeDnaReview && !isAnalyzing && !isMatchingTutorials && (
+        {projectPath === "design" && creativeDnaReview && !isAnalyzing && !isMatchingTutorials && (
           <CreativeDnaReview
             creativeDna={creativeDnaReview.analysis.creativeDna}
             isBusy={isLoading || isAnalyzing || isMatchingTutorials}
@@ -766,7 +995,7 @@ export function QuandaApp() {
           />
         )}
 
-        {learningPlan &&
+        {projectPath === "design" && learningPlan &&
           creativeDnaReview?.confirmed &&
           !learningPlanIsStale &&
           !isMatchingTutorials && (
@@ -802,7 +1031,7 @@ export function QuandaApp() {
             />
           )}
 
-        {roadmap &&
+        {projectPath === "design" && roadmap &&
           roadmap.projectInputFingerprint === projectInputFingerprint && (
           <RoadmapResults
             completedStageIds={completedStageIds}
@@ -824,18 +1053,7 @@ export function QuandaApp() {
             }}
             onStartOver={() => {
               if (!window.confirm(t.results.startOverConfirm)) return;
-              clearProjectStorage(window.localStorage);
-              setForm(emptyForm(locale));
-              setRoadmap(null);
-              setCreativeDnaReview(null);
-              setLearningPlan(null);
-              setCompletion({});
-              setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
-              setError(null);
-              setAnalysisError(null);
-              setMatchingError(null);
-              writeLanguage(window.localStorage, locale);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              returnToBeginning();
             }}
             onToggleStage={toggleStage}
             roadmap={roadmap}
@@ -845,7 +1063,7 @@ export function QuandaApp() {
           />
         )}
 
-        <ProjectCalendar
+        {projectPath === "design" && <ProjectCalendar
           locale={locale}
           onAddTask={(task) => setCalendarTasks((current) => [...current, task])}
           onDeleteTask={(taskId) =>
@@ -856,7 +1074,34 @@ export function QuandaApp() {
           onToggleTask={toggleCalendarTask}
           t={t}
           tasks={calendarTasks}
-        />
+        />}
+
+        {projectPath === "agentic_engineering" && engineeringInterpretation && !engineeringRoadmap && (
+          <EngineeringInterpretation
+            isBusy={Boolean(engineeringRoadmap)}
+            onChange={(next) => setEngineeringInterpretation(next)}
+            onConfirm={() => void generateEngineering()}
+            onEdit={() => {
+              setEngineeringInterpretation(null);
+              requestAnimationFrame(() => document.querySelector("#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            }}
+            t={t}
+            value={engineeringInterpretation}
+          />
+        )}
+
+        {projectPath === "agentic_engineering" && engineeringRoadmap && (
+          <EngineeringRoadmapResults
+            completedTaskIds={engineeringCompletion}
+            onStartOver={() => {
+              if (!window.confirm(t.results.startOverConfirm)) return;
+              returnToBeginning();
+            }}
+            onToggleTask={(taskId) => setEngineeringCompletion((current) => current.includes(taskId) ? current.filter((id) => id !== taskId) : [...current, taskId])}
+            roadmap={engineeringRoadmap}
+            t={t}
+          />
+        )}
 
         <footer>
           <a className="brand footer-brand" href="#top">QUANDA</a>

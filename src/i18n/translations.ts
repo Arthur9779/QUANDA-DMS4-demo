@@ -22,6 +22,88 @@ export interface Translation {
     start: string;
     note: string;
   };
+  path: {
+    initialEyebrow: string;
+    initialTitle: string;
+    initialIntro: string;
+    initialSubmit: string;
+    clarificationTitle: string;
+    clarificationIntro: string;
+    creativeChoice: string;
+    engineeringChoice: string;
+    designLabel: string;
+    engineeringLabel: string;
+    designDescription: string;
+    engineeringDescription: string;
+    detectedAs: string;
+    returnToStart: string;
+  };
+  engineering: {
+    eyebrow: string;
+    formTitle: string;
+    formIntro: string;
+    brief: string;
+    briefPlaceholder: string;
+    startingPoint: string;
+    startingOptions: LabelOption[];
+    repository: string;
+    repositoryPlaceholder: string;
+    location: string;
+    locationPlaceholder: string;
+    definitionOfDone: string;
+    definitionPlaceholder: string;
+    platform: string;
+    platformOptions: LabelOption[];
+    technologies: string;
+    technologiesPlaceholder: string;
+    experience: string;
+    experiencePlaceholder: string;
+    deployment: string;
+    deploymentPlaceholder: string;
+    deadline: string;
+    hoursPerDay: string;
+    daysPerWeek: string;
+    constraints: string;
+    constraintsPlaceholder: string;
+    blockers: string;
+    blockersPlaceholder: string;
+    submit: string;
+    interpretTitle: string;
+    interpretIntro: string;
+    productType: string;
+    coreFeatures: string;
+    suggestedStack: string;
+    repositoryContext: string;
+    dataApi: string;
+    deploymentTarget: string;
+    risks: string;
+    importantConstraints: string;
+    confirm: string;
+    edit: string;
+    loading: string;
+    roadmapEyebrow: string;
+    roadmapTitle: string;
+    roadmapIntro: string;
+    outcome: string;
+    whyItMatters: string;
+    executor: string;
+    dependencies: string;
+    agentPrompt: string;
+    acceptance: string;
+    verification: string;
+    expectedArtifact: string;
+    humanCheckpoint: string;
+    estimates: string;
+    failureFallback: string;
+    agent: string;
+    human: string;
+    hybrid: string;
+    minutes: string;
+    notice: string;
+    warnings: string;
+    noValue: string;
+    validationError: string;
+  };
   how: {
     eyebrow: string;
     title: string;
@@ -277,6 +359,103 @@ const en: Translation = {
       "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
     start: "Plan my project",
     note: "No account needed · Your work stays on this device",
+  },
+  path: {
+    initialEyebrow: "Start with the deliverable",
+    initialTitle: "What are you primarily delivering?",
+    initialIntro: "QUANDA will send you into one focused workflow. Start with the project brief; we will infer the rest where it is safe to do so.",
+    initialSubmit: "Choose my path",
+    clarificationTitle: "One quick clarification",
+    clarificationIntro: "Your brief could fit both workflows. Choose the primary deliverable so QUANDA keeps the rest of the experience focused.",
+    creativeChoice: "A creative or visual artifact",
+    engineeringChoice: "Working software or a technical system",
+    designLabel: "Design Production",
+    engineeringLabel: "Agentic Engineering",
+    designDescription: "Creative DNA, skill gaps, verified tutorials, and a production roadmap.",
+    engineeringDescription: "A build contract, agent-ready tasks, verification, and human review checkpoints.",
+    detectedAs: "QUANDA routed this brief to",
+    returnToStart: "Return to the beginning",
+  },
+  engineering: {
+    eyebrow: "Agentic Engineering",
+    formTitle: "Describe the build QUANDA should help you execute",
+    formIntro: "This is a project brief for a coding agent, not a programming course. QUANDA will turn it into concrete tasks you can supervise and verify.",
+    brief: "Technical project brief",
+    briefPlaceholder: "For example: Build a Next.js portfolio website with a searchable project gallery, accessible navigation, and a Vercel preview.",
+    startingPoint: "Starting point",
+    startingOptions: [
+      { value: "new_project", label: "New project" },
+      { value: "existing_repository", label: "Existing repository" },
+      { value: "existing_bug", label: "Existing project with a bug" },
+      { value: "existing_feature", label: "Existing project requiring a feature" },
+    ],
+    repository: "Repository URL",
+    repositoryPlaceholder: "https://github.com/you/project",
+    location: "Project location",
+    locationPlaceholder: "Local folder or workspace name",
+    definitionOfDone: "Definition of done",
+    definitionPlaceholder: "What must be true for you to accept the delivery?",
+    platform: "Target platform",
+    platformOptions: [
+      { value: "web_application", label: "Web application" },
+      { value: "mobile_application", label: "Mobile application" },
+      { value: "desktop_application", label: "Desktop application" },
+      { value: "api_backend", label: "API / backend" },
+      { value: "automation", label: "Automation" },
+      { value: "game", label: "Game" },
+      { value: "data_project", label: "Data project" },
+      { value: "plugin_extension", label: "Plugin / extension" },
+      { value: "other", label: "Other technical system" },
+    ],
+    technologies: "Required or preferred technologies",
+    technologiesPlaceholder: "For example: Next.js, TypeScript, PostgreSQL",
+    experience: "Current technical experience",
+    experiencePlaceholder: "For example: comfortable editing React, new to deployment",
+    deployment: "Deployment target",
+    deploymentPlaceholder: "For example: Vercel preview, local-only, or App Store build",
+    deadline: "Deadline",
+    hoursPerDay: "Available hours per day",
+    daysPerWeek: "Available days per week",
+    constraints: "Known constraints",
+    constraintsPlaceholder: "Access, package, device, privacy, or scope constraints",
+    blockers: "Existing errors or blockers",
+    blockersPlaceholder: "Required for an existing bug; otherwise optional",
+    submit: "Review my build plan",
+    interpretTitle: "QUANDA understood your build",
+    interpretIntro: "Check the technical interpretation before QUANDA generates agent-ready work. These fields remain separate from the design workflow.",
+    productType: "Product type",
+    coreFeatures: "Core features",
+    suggestedStack: "Suggested technology stack",
+    repositoryContext: "Repository context",
+    dataApi: "Data or API requirements",
+    deploymentTarget: "Deployment target",
+    risks: "Main technical risks",
+    importantConstraints: "Important constraints",
+    confirm: "Generate the engineering roadmap",
+    edit: "Edit build details",
+    loading: "Building your agent-ready plan…",
+    roadmapEyebrow: "Agentic Engineering roadmap",
+    roadmapTitle: "Execute the production pipeline",
+    roadmapIntro: "Each task has an owner, an implementation prompt, acceptance criteria, verification, and a human checkpoint. QUANDA does not claim the agent can do the human-only work.",
+    outcome: "Outcome",
+    whyItMatters: "Why it matters",
+    executor: "Executor",
+    dependencies: "Dependencies",
+    agentPrompt: "Agent-ready implementation prompt",
+    acceptance: "Acceptance criteria",
+    verification: "Verification checks",
+    expectedArtifact: "Expected artifact",
+    humanCheckpoint: "Human review checkpoint",
+    estimates: "Estimated effort",
+    failureFallback: "If this fails",
+    agent: "Agent-executable",
+    human: "Human-only",
+    hybrid: "Hybrid",
+    minutes: "min",
+    notice: "Deterministic fallback used",
+    warnings: "Important limits",
+    noValue: "Not provided",
+    validationError: "Please complete the required build details.",
   },
   how: {
     eyebrow: "How it works",
@@ -605,6 +784,103 @@ const vi: Translation = {
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
     start: "Lập kế hoạch dự án",
     note: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
+  },
+  path: {
+    initialEyebrow: "Bắt đầu từ sản phẩm cần giao",
+    initialTitle: "Bạn chủ yếu đang giao sản phẩm nào?",
+    initialIntro: "QUANDA sẽ đưa bạn vào một quy trình tập trung. Hãy bắt đầu bằng đề bài; hệ thống sẽ tự suy ra phần còn lại khi đủ an toàn.",
+    initialSubmit: "Chọn lộ trình",
+    clarificationTitle: "Một câu hỏi làm rõ",
+    clarificationIntro: "Đề bài của bạn có thể thuộc cả hai quy trình. Hãy chọn sản phẩm chính để QUANDA giữ phần còn lại tập trung.",
+    creativeChoice: "Một sản phẩm sáng tạo hoặc hình ảnh",
+    engineeringChoice: "Phần mềm hoạt động hoặc hệ thống kỹ thuật",
+    designLabel: "Sản xuất thiết kế",
+    engineeringLabel: "Kỹ thuật tác nhân",
+    designDescription: "DNA sáng tạo, khoảng thiếu kỹ năng, tutorial đã xác minh và lộ trình sản xuất.",
+    engineeringDescription: "Hợp đồng xây dựng, nhiệm vụ cho agent, kiểm chứng và điểm review của con người.",
+    detectedAs: "QUANDA đã đưa đề bài vào",
+    returnToStart: "Quay lại từ đầu",
+  },
+  engineering: {
+    eyebrow: "Kỹ thuật tác nhân",
+    formTitle: "Mô tả phần mềm QUANDA sẽ giúp bạn thực thi",
+    formIntro: "Đây là đề bài cho coding agent, không phải khóa học lập trình. QUANDA sẽ chuyển nó thành nhiệm vụ cụ thể để bạn giám sát và kiểm chứng.",
+    brief: "Đề bài kỹ thuật",
+    briefPlaceholder: "Ví dụ: Xây website portfolio Next.js có gallery dự án, điều hướng truy cập được và preview trên Vercel.",
+    startingPoint: "Điểm bắt đầu",
+    startingOptions: [
+      { value: "new_project", label: "Dự án mới" },
+      { value: "existing_repository", label: "Repository có sẵn" },
+      { value: "existing_bug", label: "Dự án có lỗi" },
+      { value: "existing_feature", label: "Dự án cần thêm tính năng" },
+    ],
+    repository: "URL repository",
+    repositoryPlaceholder: "https://github.com/ban/du-an",
+    location: "Vị trí dự án",
+    locationPlaceholder: "Thư mục local hoặc tên workspace",
+    definitionOfDone: "Định nghĩa hoàn thành",
+    definitionPlaceholder: "Điều gì phải đúng để bạn chấp nhận bàn giao?",
+    platform: "Nền tảng mục tiêu",
+    platformOptions: [
+      { value: "web_application", label: "Ứng dụng web" },
+      { value: "mobile_application", label: "Ứng dụng di động" },
+      { value: "desktop_application", label: "Ứng dụng desktop" },
+      { value: "api_backend", label: "API / backend" },
+      { value: "automation", label: "Tự động hóa" },
+      { value: "game", label: "Game" },
+      { value: "data_project", label: "Dự án dữ liệu" },
+      { value: "plugin_extension", label: "Plugin / extension" },
+      { value: "other", label: "Hệ thống kỹ thuật khác" },
+    ],
+    technologies: "Công nghệ bắt buộc hoặc ưu tiên",
+    technologiesPlaceholder: "Ví dụ: Next.js, TypeScript, PostgreSQL",
+    experience: "Kinh nghiệm kỹ thuật hiện tại",
+    experiencePlaceholder: "Ví dụ: biết sửa React, mới làm deployment",
+    deployment: "Mục tiêu triển khai",
+    deploymentPlaceholder: "Ví dụ: preview Vercel, chỉ chạy local hoặc bản build App Store",
+    deadline: "Hạn chót",
+    hoursPerDay: "Số giờ có thể làm mỗi ngày",
+    daysPerWeek: "Số ngày có thể làm mỗi tuần",
+    constraints: "Ràng buộc đã biết",
+    constraintsPlaceholder: "Quyền truy cập, package, thiết bị, riêng tư hoặc phạm vi",
+    blockers: "Lỗi hoặc blocker hiện tại",
+    blockersPlaceholder: "Bắt buộc với dự án có lỗi; các trường hợp khác không bắt buộc",
+    submit: "Xem kế hoạch xây dựng",
+    interpretTitle: "QUANDA đã hiểu phần xây dựng",
+    interpretIntro: "Kiểm tra diễn giải kỹ thuật trước khi QUANDA tạo nhiệm vụ cho agent. Các trường này tách biệt với quy trình thiết kế.",
+    productType: "Loại sản phẩm",
+    coreFeatures: "Tính năng cốt lõi",
+    suggestedStack: "Stack công nghệ đề xuất",
+    repositoryContext: "Bối cảnh repository",
+    dataApi: "Yêu cầu dữ liệu hoặc API",
+    deploymentTarget: "Mục tiêu triển khai",
+    risks: "Rủi ro kỹ thuật chính",
+    importantConstraints: "Ràng buộc quan trọng",
+    confirm: "Tạo lộ trình kỹ thuật",
+    edit: "Sửa thông tin xây dựng",
+    loading: "Đang tạo kế hoạch cho agent…",
+    roadmapEyebrow: "Lộ trình kỹ thuật tác nhân",
+    roadmapTitle: "Thực thi pipeline sản xuất",
+    roadmapIntro: "Mỗi nhiệm vụ có người thực hiện, prompt triển khai, tiêu chí chấp nhận, kiểm tra và điểm review của con người. QUANDA không tuyên bố agent có thể làm phần chỉ dành cho con người.",
+    outcome: "Đầu ra",
+    whyItMatters: "Vì sao quan trọng",
+    executor: "Người thực hiện",
+    dependencies: "Phụ thuộc",
+    agentPrompt: "Prompt triển khai cho agent",
+    acceptance: "Tiêu chí chấp nhận",
+    verification: "Kiểm tra xác minh",
+    expectedArtifact: "Artifact mong đợi",
+    humanCheckpoint: "Điểm review của con người",
+    estimates: "Thời gian ước tính",
+    failureFallback: "Nếu bước này thất bại",
+    agent: "Agent có thể thực thi",
+    human: "Chỉ con người",
+    hybrid: "Kết hợp",
+    minutes: "phút",
+    notice: "Đã dùng phương án xác định",
+    warnings: "Giới hạn quan trọng",
+    noValue: "Chưa cung cấp",
+    validationError: "Vui lòng hoàn thành các thông tin xây dựng bắt buộc.",
   },
   how: {
     eyebrow: "Cách hoạt động",

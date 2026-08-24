@@ -14,7 +14,14 @@ import {
   writeCreativeDnaReview,
   writeLearningPlan,
   writeRoadmap,
+  readEngineeringDraft,
+  readEngineeringRoadmap,
+  readProjectPath,
+  writeEngineeringDraft,
+  writeEngineeringRoadmap,
+  writeProjectPath,
 } from "@/src/lib/storage";
+import { generateEngineeringRoadmap } from "@/src/agentic-engineering";
 import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import type { RoadmapRequest } from "@/src/types";
 
@@ -222,5 +229,36 @@ describe("local storage recovery", () => {
         requiredApplications: ["custom:TouchDesigner"],
       }),
     ).toBeNull();
+  });
+
+  it("keeps engineering state in separate versioned storage keys", () => {
+    const storage = new MemoryStorage();
+    const engineering = {
+      path: "agentic_engineering" as const,
+      interfaceLanguage: "en" as const,
+      technicalBrief: "Build a REST API for a class project with tests and deployment.",
+      startingPoint: "new_project" as const,
+      repositoryUrl: "",
+      projectLocation: "",
+      definitionOfDone: "The endpoint returns the documented response and tests pass.",
+      targetPlatform: "api_backend" as const,
+      technologies: "Python, FastAPI",
+      currentExperience: "Beginner with Python.",
+      deploymentTarget: "Local preview",
+      deadline: "2026-09-30",
+      hoursPerDay: 2,
+      daysPerWeek: 5,
+      constraints: "",
+      existingErrors: "",
+    };
+    const roadmap = generateEngineeringRoadmap(engineering);
+    writeProjectPath(storage, "agentic_engineering");
+    writeEngineeringDraft(storage, engineering);
+    writeEngineeringRoadmap(storage, roadmap);
+    expect(readProjectPath(storage)).toBe("agentic_engineering");
+    expect(readEngineeringDraft(storage)?.path).toBe("agentic_engineering");
+    expect(readEngineeringRoadmap(storage)?.tasks).toHaveLength(9);
+    expect(readRoadmap(storage)).toBeNull();
+    expect(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis)).toBeNull();
   });
 });
