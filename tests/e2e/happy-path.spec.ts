@@ -79,7 +79,7 @@ test("preserves a custom coding environment and supplies guides without unrelate
 
   await page.goto("/");
   await expect(page.getByText(
-    "Can’t find your tool? Choose ‘Other’ and enter any application, platform, coding environment, or software you need.",
+    "Search QUANDA’s application knowledge base, then add every tool the assignment requires.",
   )).toBeVisible();
 
   await page.getByLabel("Project brief").fill(
@@ -88,13 +88,10 @@ test("preserves a custom coding environment and supplies guides without unrelate
   await page.getByLabel("Current experience").fill(
     "Complete beginner with TypeScript and Visual Studio Code",
   );
-  const applicationsFieldset = page.getByRole("group", {
-    name: /Required application\(s\)/,
-  });
-  await applicationsFieldset.getByLabel("Other", { exact: true }).check();
-  await page.getByLabel("Other application, tool, or platform").fill(
-    "Visual Studio Code",
-  );
+  await page.getByLabel("Search applications").fill("Visual Studio Code");
+  await page.getByRole("button", {
+    name: "Add application: Visual Studio Code",
+  }).click();
   await page.getByLabel("Desired output type").selectOption("other");
   await page.getByRole("button", { name: "Understand my project" }).click();
   await expect(page.getByRole("heading", { name: "QUANDA understood your project" })).toBeVisible();

@@ -5,13 +5,8 @@ import { useState } from "react";
 import type { Translation } from "@/src/i18n/translations";
 import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import type { RoadmapRequest } from "@/src/types";
-import {
-  applications,
-  createCustomApplicationId,
-  getApplicationName,
-  isCustomApplicationId,
-} from "@/src/data/applications";
 import { toLocalDateKey } from "@/src/lib/date";
+import { ApplicationPicker } from "./ApplicationPicker";
 
 interface ProjectBriefFormProps {
   value: RoadmapRequest;
@@ -29,40 +24,14 @@ export function ProjectBriefForm({
   isSubmitting,
 }: ProjectBriefFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const customApplicationId = value.requiredApplications.find(isCustomApplicationId);
-  const [otherApplicationSelected, setOtherApplicationSelected] = useState(
-    Boolean(customApplicationId),
-  );
-  const otherApplicationActive =
-    otherApplicationSelected || Boolean(customApplicationId);
 
   const update = <Key extends keyof RoadmapRequest>(
     key: Key,
     nextValue: RoadmapRequest[Key],
   ) => onChange({ ...value, [key]: nextValue });
 
-  const toggleApplication = (applicationId: string) => {
-    const hasApplication = value.requiredApplications.includes(applicationId);
-    update(
-      "requiredApplications",
-      hasApplication
-        ? value.requiredApplications.filter((item) => item !== applicationId)
-        : [...value.requiredApplications, applicationId],
-    );
-  };
-
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (otherApplicationActive && !customApplicationId) {
-      setErrors({ requiredApplications: t.form.errors.requiredApplications });
-      requestAnimationFrame(() => {
-        document.querySelector("#other-application")?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      });
-      return;
-    }
     const parsed = RoadmapRequestSchema.safeParse(value);
     if (!parsed.success) {
       const nextErrors: Record<string, string> = {};
@@ -249,86 +218,19 @@ export function ProjectBriefForm({
           <p className="application-support-copy" id="application-support-copy">
             {t.form.applicationSupportCopy}
           </p>
-          <label className="check-pill">
-            <input
-              checked={value.requiredApplications.length === 0 && !otherApplicationActive}
-              onChange={() => {
-                setOtherApplicationSelected(false);
-                update("requiredApplications", []);
-              }}
-              type="checkbox"
-            />
-            <span>{t.form.noApplication}</span>
-          </label>
-          <div className="application-grid">
-            {applications.map((application) => (
-              <label className="check-pill" key={application.id}>
-                <input
-                  checked={value.requiredApplications.includes(application.id)}
-                  onChange={() => toggleApplication(application.id)}
-                  type="checkbox"
-                />
-                <span>{application.name}</span>
-              </label>
-            ))}
-            <label className="check-pill">
-              <input
-                checked={otherApplicationActive}
-                onChange={() => {
-                  const nextSelected = !otherApplicationActive;
-                  setOtherApplicationSelected(nextSelected);
-                  if (!nextSelected && customApplicationId) {
-                    update(
-                      "requiredApplications",
-                      value.requiredApplications.filter((id) => id !== customApplicationId),
-                    );
-                  }
-                }}
-                type="checkbox"
-              />
-              <span>{t.form.otherApplication}</span>
-            </label>
-          </div>
-          {otherApplicationActive && (
-            <div className="field other-application-field">
-              <label htmlFor="other-application">{t.form.otherApplicationLabel}</label>
-              <input
-                aria-describedby="other-application-error"
-                aria-invalid={Boolean(errors.requiredApplications)}
-                autoComplete="off"
-                id="other-application"
-                maxLength={64}
-                onChange={(event) => {
-                  setOtherApplicationSelected(true);
-                  const name = event.target.value;
-                  const withoutCustom = value.requiredApplications.filter(
-                    (id) => !isCustomApplicationId(id),
-                  );
-                  update(
-                    "requiredApplications",
-                    name.trim()
-                      ? [...withoutCustom, createCustomApplicationId(name)]
-                      : withoutCustom,
-                  );
-                  if (errors.requiredApplications && name.trim()) {
-                    setErrors((current) => {
-                      const next = { ...current };
-                      delete next.requiredApplications;
-                      return next;
-                    });
-                  }
-                }}
-                placeholder={t.form.otherApplicationPlaceholder}
-                type="text"
-                value={customApplicationId ? getApplicationName(customApplicationId) : ""}
-              />
-              {errors.requiredApplications && (
-                <p className="field-error" id="other-application-error">
-                  {errors.requiredApplications}
-                </p>
-              )}
-            </div>
-          )}
+          <ApplicationPicker
+            onChange={(ids) => update("requiredApplications", ids)}
+            onValidSelection={() => {
+              if (!errors.requiredApplications) return;
+              setErrors((current) => {
+                const next = { ...current };
+                delete next.requiredApplications;
+                return next;
+              });
+            }}
+            selectedIds={value.requiredApplications}
+            t={t}
+          />
         </fieldset>
 
         <fieldset>

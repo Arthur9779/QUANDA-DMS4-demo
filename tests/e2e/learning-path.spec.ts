@@ -6,7 +6,8 @@ test("corrects and persists the focused learning path", async ({ page }) => {
     "I am new to Blender and need to make a toon-shaded product animation with a simple camera move.",
   );
   await page.getByLabel("Current experience").fill("Blender: complete beginner");
-  await page.getByLabel("Blender", { exact: true }).check();
+  await page.getByLabel("Search applications").fill("Blender");
+  await page.getByRole("button", { name: "Add application: Blender" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
   await page.getByRole("button", { name: "Looks right — continue" }).click();
 
@@ -64,7 +65,8 @@ test("carries every selected Figma tutorial into the roadmap and clears it after
   await page.getByLabel("Current experience").fill(
     "I understand basic frames but need help with components, auto layout, and prototyping.",
   );
-  await page.getByLabel("Figma", { exact: true }).check();
+  await page.getByLabel("Search applications").fill("Figma");
+  await page.getByRole("button", { name: "Add application: Figma" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
   await page.getByRole("button", { name: "Looks right — continue" }).click();
 

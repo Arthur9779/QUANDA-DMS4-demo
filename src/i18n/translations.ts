@@ -45,9 +45,16 @@ export interface Translation {
     applications: string;
     applicationSupportCopy: string;
     noApplication: string;
-    otherApplication: string;
-    otherApplicationLabel: string;
-    otherApplicationPlaceholder: string;
+    applicationSearchLabel: string;
+    applicationSearchPlaceholder: string;
+    applicationSearchHint: string;
+    applicationSearching: string;
+    applicationNoResults: string;
+    selectedApplications: string;
+    addApplication: string;
+    removeApplication: string;
+    addCustomApplication: string;
+    customApplicationHint: string;
     outputType: string;
     targetQuality: string;
     submit: string;
@@ -308,11 +315,18 @@ const en: Translation = {
     tutorialLanguage: "Preferred tutorial language",
     applications: "Required application(s)",
     applicationSupportCopy:
-      "Can’t find your tool? Choose ‘Other’ and enter any application, platform, coding environment, or software you need.",
+      "Search QUANDA’s application knowledge base, then add every tool the assignment requires.",
     noApplication: "No required application",
-    otherApplication: "Other",
-    otherApplicationLabel: "Other application, tool, or platform",
-    otherApplicationPlaceholder: "For example: Cinema 4D, Canva, Unity, or CapCut",
+    applicationSearchLabel: "Search applications",
+    applicationSearchPlaceholder: "Try TouchDesigner, Cinema 4D, CapCut, Unity…",
+    applicationSearchHint: "Suggestions are restricted to applications and production software.",
+    applicationSearching: "Searching applications…",
+    applicationNoResults: "No indexed application matches yet.",
+    selectedApplications: "Selected applications",
+    addApplication: "Add application",
+    removeApplication: "Remove application",
+    addCustomApplication: "Add “{name}” as an application",
+    customApplicationHint: "Use the exact application name required by your assignment.",
     outputType: "Desired output type",
     targetQuality: "Target quality",
     submit: "Understand my project",
@@ -629,11 +643,18 @@ const vi: Translation = {
     tutorialLanguage: "Ngôn ngữ video hướng dẫn ưu tiên",
     applications: "Ứng dụng bắt buộc",
     applicationSupportCopy:
-      "Không thấy công cụ bạn cần? Chọn ‘Khác’ và nhập bất kỳ ứng dụng, nền tảng, môi trường lập trình hoặc phần mềm nào.",
+      "Tìm trong kho ứng dụng của QUANDA rồi thêm mọi công cụ mà bài tập yêu cầu.",
     noApplication: "Không yêu cầu ứng dụng",
-    otherApplication: "Khác",
-    otherApplicationLabel: "Ứng dụng, công cụ hoặc nền tảng khác",
-    otherApplicationPlaceholder: "Ví dụ: Cinema 4D, Canva, Unity hoặc CapCut",
+    applicationSearchLabel: "Tìm ứng dụng",
+    applicationSearchPlaceholder: "Thử TouchDesigner, Cinema 4D, CapCut, Unity…",
+    applicationSearchHint: "Gợi ý chỉ bao gồm ứng dụng và phần mềm sản xuất.",
+    applicationSearching: "Đang tìm ứng dụng…",
+    applicationNoResults: "Chưa có ứng dụng nào trong danh mục phù hợp.",
+    selectedApplications: "Ứng dụng đã chọn",
+    addApplication: "Thêm ứng dụng",
+    removeApplication: "Xóa ứng dụng",
+    addCustomApplication: "Thêm “{name}” làm ứng dụng",
+    customApplicationHint: "Dùng đúng tên ứng dụng mà bài tập yêu cầu.",
     outputType: "Loại sản phẩm mong muốn",
     targetQuality: "Mức chất lượng",
     submit: "Phân tích dự án của tôi",
