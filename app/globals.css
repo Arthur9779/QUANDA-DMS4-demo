@@ -123,6 +123,7 @@ a:focus-visible {
 
 #how-it-works,
 #project-form,
+#engineering-form,
 #roadmap-results,
 #calendar {
   scroll-margin-top: 104px;
@@ -3199,7 +3200,8 @@ footer {
   .matched-tutorial-card dl { grid-template-columns: 1fr; }
 }
 
-.path-entry-section, .engineering-form-section, .engineering-interpretation, .engineering-roadmap-results, .path-clarification { margin: 64px auto 0; max-width: 1180px; }
+.path-entry-section, .engineering-interpretation, .engineering-roadmap-results, .path-clarification { margin: 64px auto 0; max-width: 1180px; }
+.engineering-form-section { margin: 0 calc(50% - 50vw); max-width: none; }
 .path-status { align-items: center; background: var(--green-soft); border: 1px solid #b7cda2; border-radius: 999px; box-sizing: border-box; display: flex; gap: 16px; justify-content: space-between; margin: 34px auto 24px; max-width: 1180px; padding: 11px 14px 11px 20px; }
 .path-status .button-text { color: var(--ink); font-size: 0.82rem; }
 .path-clarification { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: clamp(26px, 5vw, 54px); }

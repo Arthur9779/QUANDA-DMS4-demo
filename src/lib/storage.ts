@@ -40,6 +40,7 @@ export const STORAGE_KEYS = {
   roadmap: "quanda:v1:last-roadmap",
   completion: "quanda:v1:completion",
   calendar: "quanda:v1:calendar-tasks",
+  engineeringCalendar: "quanda:v4:engineering-calendar-tasks",
   creativeDnaAnalysis: "quanda:v1:creative-dna-analysis",
   learningPlan: "quanda:v1:learning-plan",
   projectPath: "quanda:v2:project-path",
@@ -145,6 +146,7 @@ export function clearEngineeringState(storage: Storage): void {
   clearEngineeringInterpretation(storage);
   clearEngineeringRoadmap(storage);
   try { storage.removeItem(STORAGE_KEYS.engineeringCompletion); } catch { /* in-memory state still resets */ }
+  clearEngineeringCalendarTasks(storage);
   clearPreparationState(storage);
 }
 
@@ -379,4 +381,29 @@ export function clearProjectStorage(storage: Storage): void {
     // The in-memory reset still succeeds.
   }
   clearEngineeringState(storage);
+}
+
+export function readEngineeringCalendarTasks(storage: Storage): CalendarTask[] {
+  const value = safeParse(storage.getItem(STORAGE_KEYS.engineeringCalendar));
+  if (!Array.isArray(value)) return [];
+  return value.filter(isCalendarTask);
+}
+
+export function writeEngineeringCalendarTasks(
+  storage: Storage,
+  tasks: CalendarTask[],
+): void {
+  try {
+    storage.setItem(STORAGE_KEYS.engineeringCalendar, JSON.stringify(tasks));
+  } catch {
+    // Engineering calendar tasks remain usable in memory when storage is unavailable.
+  }
+}
+
+export function clearEngineeringCalendarTasks(storage: Storage): void {
+  try {
+    storage.removeItem(STORAGE_KEYS.engineeringCalendar);
+  } catch {
+    // In-memory reset still succeeds.
+  }
 }
