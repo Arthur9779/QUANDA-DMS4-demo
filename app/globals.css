@@ -3268,6 +3268,64 @@ footer {
 .engineering-guided-footer { align-items: center; border-top: 1px solid var(--line); display: flex; gap: 18px; justify-content: space-between; padding-top: 20px; }
 .engineering-guided-footer p { color: var(--muted); margin: 0; }
 
+/* The first brief is the landing page's only required decision. Keep it compact,
+   readable, and independent from the longer design form that follows it. */
+.path-entry-section {
+  align-items: start;
+  background: #e8ebd6;
+  border: 1px solid #c5ccb0;
+  border-radius: 28px;
+  box-sizing: border-box;
+  display: grid;
+  gap: clamp(28px, 6vw, 76px);
+  grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1.18fr);
+  margin: 64px auto 0;
+  max-width: 980px;
+  padding: clamp(30px, 5vw, 58px);
+}
+.path-entry-section .form-intro {
+  position: static;
+}
+.path-entry-section .form-intro h2 {
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 0.98;
+  max-width: 9ch;
+}
+.path-entry-section .form-intro > p:not(.eyebrow) {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  max-width: 34rem;
+}
+.path-entry-section .project-form {
+  align-self: start;
+  padding: clamp(22px, 3vw, 32px);
+}
+.path-entry-section .project-form textarea {
+  min-height: 170px;
+}
+
+@media (max-width: 800px) {
+  .path-entry-section {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 48px;
+  }
+  .path-entry-section .form-intro h2 {
+    max-width: 14ch;
+  }
+}
+
+@media (max-width: 520px) {
+  .path-entry-section {
+    border-radius: 24px;
+    padding: 24px 16px;
+  }
+  .path-entry-section .form-intro h2 {
+    font-size: clamp(2.2rem, 12vw, 3.2rem);
+    max-width: none;
+  }
+}
+
 @media (max-width: 760px) {
   .path-choice-grid, .preparation-choice-grid, .engineering-interpretation-grid, .engineering-task-summary, .engineering-task-columns { grid-template-columns: 1fr; }
   .engineering-interpretation-grid .field-wide { grid-column: auto; }

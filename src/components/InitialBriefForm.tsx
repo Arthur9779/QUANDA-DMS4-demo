@@ -33,8 +33,8 @@ export function InitialBriefForm({ brief, t, isSubmitting, onChange, onSubmit }:
         {error && <div className="error-summary" role="alert"><strong>{t.form.errorsTitle}</strong><p>{t.form.errors.projectBrief}</p></div>}
         <div className="field field-wide">
           <div className="label-row"><label htmlFor="initialProjectBrief">{t.form.brief}</label><span>{t.form.required}</span></div>
-          <textarea aria-describedby="initial-brief-hint" aria-invalid={error} id="initialProjectBrief" maxLength={3_000} onChange={(event) => onChange(event.target.value)} placeholder={t.form.briefPlaceholder} rows={8} value={brief} />
-          <div className="field-meta" id="initial-brief-hint"><span>30–3,000 characters</span><span>{brief.length}/3,000</span></div>
+          <textarea aria-describedby="initial-brief-hint" aria-invalid={error} id="initialProjectBrief" maxLength={3_000} onChange={(event) => onChange(event.target.value)} placeholder={t.path.initialBriefPlaceholder} rows={8} value={brief} />
+          <div className="field-meta" id="initial-brief-hint"><span>{t.path.initialBriefHint}</span><span>{brief.length}/3,000</span></div>
         </div>
         <div className="form-submit">
           <button className="button button-primary" disabled={isSubmitting} type="submit"><Sparkles aria-hidden="true" size={17} />{t.path.initialSubmit}<ArrowRight aria-hidden="true" size={17} /></button>

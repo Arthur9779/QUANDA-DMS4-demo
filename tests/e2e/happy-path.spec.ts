@@ -6,6 +6,8 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   await expect(
     page.getByText("No API key is configured, so QUANDA will use a dependable sample roadmap."),
   ).toHaveCount(0);
+  await expect(page.locator(".workflow-progress")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "What do you want to make?" })).toBeVisible();
 
   await expect(page.locator(".hero")).toHaveCSS(
     "background-image",
@@ -81,7 +83,7 @@ test("routes software briefs into the separate agentic engineering workflow", as
   await page.getByLabel("Project brief").fill(
     "Build a small TypeScript sign-in website with validation, tests, and a verified production build for a class project.",
   );
-  await page.getByRole("button", { name: "Choose my path" }).click();
+  await page.getByRole("button", { name: "Choose my workflow" }).click();
   await expect(page.getByRole("heading", { name: "Describe the build QUANDA should help you execute" })).toBeVisible();
   await page.getByLabel("Definition of done").fill(
     "The sign-in form validates input, shows useful errors, has focused tests, and the production build passes.",

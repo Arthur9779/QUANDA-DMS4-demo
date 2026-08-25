@@ -863,7 +863,7 @@ export function QuandaApp() {
           onLanguageChange={changeLanguage}
           onLoadExample={loadExample}
         />
-        <WorkflowProgress stage={workflowStage} t={t} />
+        {projectPath && <WorkflowProgress stage={workflowStage} t={t} />}
 
         <section className={`hero hero-${locale}`} aria-labelledby="hero-title">
           <h1 id="hero-title">
