@@ -26,6 +26,8 @@ export interface Translation {
     initialEyebrow: string;
     initialTitle: string;
     initialIntro: string;
+    initialBriefPlaceholder: string;
+    initialBriefHint: string;
     initialSubmit: string;
     clarificationTitle: string;
     clarificationIntro: string;
@@ -388,10 +390,12 @@ const en: Translation = {
     note: "No account needed · Your work stays on this device",
   },
   path: {
-    initialEyebrow: "Start with the deliverable",
-    initialTitle: "What are you primarily delivering?",
-    initialIntro: "QUANDA will send you into one focused workflow. Start with the project brief; we will infer the rest where it is safe to do so.",
-    initialSubmit: "Choose my path",
+    initialEyebrow: "Start with your project",
+    initialTitle: "What do you want to make?",
+    initialIntro: "Describe the main thing you need to deliver. QUANDA will choose one focused workflow and ask only for details that matter.",
+    initialBriefPlaceholder: "For example: Create a product animation in Blender, or build a portfolio website with a searchable gallery and a Vercel preview.",
+    initialBriefHint: "Describe the deliverable, constraints, and deadline if you know them.",
+    initialSubmit: "Choose my workflow",
     clarificationTitle: "One quick clarification",
     clarificationIntro: "Your brief could fit both workflows. Choose the primary deliverable so QUANDA keeps the rest of the experience focused.",
     creativeChoice: "A creative or visual artifact",
@@ -834,10 +838,12 @@ const vi: Translation = {
     note: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
   },
   path: {
-    initialEyebrow: "Bắt đầu từ sản phẩm cần giao",
-    initialTitle: "Bạn chủ yếu đang giao sản phẩm nào?",
-    initialIntro: "QUANDA sẽ đưa bạn vào một quy trình tập trung. Hãy bắt đầu bằng đề bài; hệ thống sẽ tự suy ra phần còn lại khi đủ an toàn.",
-    initialSubmit: "Chọn lộ trình",
+    initialEyebrow: "Bắt đầu từ dự án của bạn",
+    initialTitle: "Bạn muốn tạo ra sản phẩm gì?",
+    initialIntro: "Mô tả sản phẩm chính bạn cần bàn giao. QUANDA sẽ chọn một quy trình phù hợp và chỉ hỏi thêm những điều cần thiết.",
+    initialBriefPlaceholder: "Ví dụ: Làm hoạt hình sản phẩm bằng Blender, hoặc xây website portfolio có gallery tìm kiếm và preview trên Vercel.",
+    initialBriefHint: "Mô tả sản phẩm cần tạo, giới hạn và thời hạn nếu bạn đã biết.",
+    initialSubmit: "Chọn quy trình",
     clarificationTitle: "Một câu hỏi làm rõ",
     clarificationIntro: "Đề bài của bạn có thể thuộc cả hai quy trình. Hãy chọn sản phẩm chính để QUANDA giữ phần còn lại tập trung.",
     creativeChoice: "Một sản phẩm sáng tạo hoặc hình ảnh",
