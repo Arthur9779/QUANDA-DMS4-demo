@@ -4,6 +4,9 @@ import type { Locale } from "@/src/types";
 export const ProjectPathSchema = z.enum(["design", "agentic_engineering"]);
 export type ProjectPath = z.infer<typeof ProjectPathSchema>;
 
+export const PreparationMethodSchema = z.enum(["guided_tutorials", "agentic_project_plan"]);
+export type PreparationMethod = z.infer<typeof PreparationMethodSchema>;
+
 export const PathClassificationSchema = z.object({
   path: z.union([ProjectPathSchema, z.literal("clarification")]),
   confidence: z.number().min(0).max(1),
@@ -130,6 +133,31 @@ export const EngineeringRoadmapSchema = z.object({
   warnings: z.array(z.string()).max(12),
 });
 export type EngineeringRoadmap = z.infer<typeof EngineeringRoadmapSchema>;
+
+export const EngineeringGuidedStepSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1).max(240),
+  outcome: z.string().min(1).max(900),
+  whyItMatters: z.string().min(1).max(700),
+  checks: z.array(z.string().min(1).max(500)).min(1).max(8),
+  resources: z.array(z.object({
+    label: z.string().min(1).max(180),
+    url: z.string().url(),
+    reason: z.string().min(1).max(400),
+  })).max(4),
+});
+export type EngineeringGuidedStep = z.infer<typeof EngineeringGuidedStepSchema>;
+
+export const EngineeringGuidedPlanSchema = z.object({
+  path: z.literal("agentic_engineering"),
+  method: z.literal("guided_tutorials"),
+  id: z.string().min(1),
+  language: z.enum(["en", "vi"]),
+  title: z.string().min(1).max(240),
+  summary: z.string().min(1).max(1_200),
+  steps: z.array(EngineeringGuidedStepSchema).min(3).max(8),
+});
+export type EngineeringGuidedPlan = z.infer<typeof EngineeringGuidedPlanSchema>;
 
 export interface EngineeringDraftDefaults {
   interfaceLanguage: Locale;

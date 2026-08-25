@@ -325,6 +325,9 @@ export function CreativeDnaReview({
         </section>
       )}
 
+      <details className="review-inferred">
+        <summary>{t.review.showInferred}</summary>
+        <p>{t.review.inferredIntro}</p>
       <div className="review-groups">
         {groups.map((group) => {
           const expanded = expandedGroups.has(group.key);
@@ -366,6 +369,7 @@ export function CreativeDnaReview({
           );
         })}
       </div>
+      </details>
 
       {activeUnknowns.length > 0 && (
         <section className="review-group review-unknowns" aria-labelledby="review-unknown-title">

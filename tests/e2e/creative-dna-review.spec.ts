@@ -9,7 +9,7 @@ async function fillY2kProject(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Add application: Blender" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
   await expect(
-    page.getByRole("heading", { name: "QUANDA understood your project" }),
+    page.getByRole("heading", { name: "Let’s shape your project plan" }),
   ).toBeVisible();
 }
 
@@ -93,7 +93,7 @@ test("supports the full review flow in Vietnamese without overflow", async ({
   await page.getByRole("button", { name: "Thêm ứng dụng: Blender" }).click();
   await page.getByRole("button", { name: "Phân tích dự án của tôi" }).click();
   await expect(
-    page.getByRole("heading", { name: "QUANDA đã hiểu dự án của bạn" }),
+    page.getByRole("heading", { name: "Cùng định hình kế hoạch dự án" }),
   ).toBeVisible();
   await expect(page.getByText("Bắt buộc theo đề bài", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: "Đúng hướng — tiếp tục" }).click();

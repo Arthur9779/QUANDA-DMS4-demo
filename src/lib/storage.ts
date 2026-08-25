@@ -21,12 +21,16 @@ import type {
 import type { ProjectAnalysisResponse } from "@/src/project-analysis/contracts";
 import {
   EngineeringInterpretationSchema,
+  EngineeringGuidedPlanSchema,
   EngineeringProjectSchema,
   EngineeringRoadmapSchema,
+  PreparationMethodSchema,
   ProjectPathSchema,
   type EngineeringInterpretation,
+  type EngineeringGuidedPlan,
   type EngineeringProject,
   type EngineeringRoadmap,
+  type PreparationMethod,
   type ProjectPath,
 } from "@/src/project-path/contracts";
 
@@ -43,6 +47,8 @@ export const STORAGE_KEYS = {
   engineeringInterpretation: "quanda:v2:engineering-interpretation",
   engineeringRoadmap: "quanda:v2:engineering-roadmap",
   engineeringCompletion: "quanda:v2:engineering-completion",
+  preparationMethod: "quanda:v3:preparation-method",
+  engineeringGuidedPlan: "quanda:v3:engineering-guided-plan",
 } as const;
 
 function safeParse(value: string | null): unknown {
@@ -139,6 +145,38 @@ export function clearEngineeringState(storage: Storage): void {
   clearEngineeringInterpretation(storage);
   clearEngineeringRoadmap(storage);
   try { storage.removeItem(STORAGE_KEYS.engineeringCompletion); } catch { /* in-memory state still resets */ }
+  clearPreparationState(storage);
+}
+
+export function readPreparationMethod(storage: Storage): PreparationMethod | null {
+  const parsed = PreparationMethodSchema.safeParse(storage.getItem(STORAGE_KEYS.preparationMethod));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writePreparationMethod(storage: Storage, method: PreparationMethod): void {
+  try { storage.setItem(STORAGE_KEYS.preparationMethod, method); } catch { /* progressive enhancement */ }
+}
+
+export function clearPreparationState(storage: Storage): void {
+  try {
+    storage.removeItem(STORAGE_KEYS.preparationMethod);
+    storage.removeItem(STORAGE_KEYS.engineeringGuidedPlan);
+  } catch { /* in-memory state still resets */ }
+}
+
+export function readEngineeringGuidedPlan(storage: Storage): EngineeringGuidedPlan | null {
+  const parsed = EngineeringGuidedPlanSchema.safeParse(safeParse(storage.getItem(STORAGE_KEYS.engineeringGuidedPlan)));
+  return parsed.success ? parsed.data : null;
+}
+
+export function writeEngineeringGuidedPlan(storage: Storage, plan: EngineeringGuidedPlan): void {
+  const parsed = EngineeringGuidedPlanSchema.safeParse(plan);
+  if (!parsed.success) return;
+  try { storage.setItem(STORAGE_KEYS.engineeringGuidedPlan, JSON.stringify(parsed.data)); } catch { /* progressive enhancement */ }
+}
+
+export function clearEngineeringGuidedPlan(storage: Storage): void {
+  try { storage.removeItem(STORAGE_KEYS.engineeringGuidedPlan); } catch { /* progressive enhancement */ }
 }
 
 export function readDraft(storage: Storage): RoadmapRequest | null {

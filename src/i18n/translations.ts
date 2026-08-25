@@ -104,6 +104,31 @@ export interface Translation {
     noValue: string;
     validationError: string;
   };
+  preparation: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    guidedTitle: string;
+    guidedDescription: string;
+    guidedDetail: string;
+    agenticTitle: string;
+    agenticDescription: string;
+    agenticDetail: string;
+    selectedNote: string;
+    guidedEyebrow: string;
+    outcome: string;
+    why: string;
+    checks: string;
+    resources: string;
+    humanNote: string;
+  };
+  workflow: {
+    ariaLabel: string;
+    brief: string;
+    review: string;
+    prepare: string;
+    plan: string;
+  };
   how: {
     eyebrow: string;
     title: string;
@@ -204,6 +229,8 @@ export interface Translation {
     restore: string;
     showMore: string;
     showLess: string;
+    showInferred: string;
+    inferredIntro: string;
     editDetails: string;
     analyzeAgain: string;
     staleTitle: string;
@@ -421,8 +448,8 @@ const en: Translation = {
     blockers: "Existing errors or blockers",
     blockersPlaceholder: "Required for an existing bug; otherwise optional",
     submit: "Review my build plan",
-    interpretTitle: "QUANDA understood your build",
-    interpretIntro: "Check the technical interpretation before QUANDA generates agent-ready work. These fields remain separate from the design workflow.",
+    interpretTitle: "Let’s shape your build plan",
+    interpretIntro: "Check and correct the technical interpretation before QUANDA creates agent-ready work. These fields remain separate from the design workflow.",
     productType: "Product type",
     coreFeatures: "Core features",
     suggestedStack: "Suggested technology stack",
@@ -457,6 +484,25 @@ const en: Translation = {
     noValue: "Not provided",
     validationError: "Please complete the required build details.",
   },
+  preparation: {
+    eyebrow: "Choose your preparation route",
+    title: "Choose how you want to prepare",
+    intro: "Choose one way to move this project forward. QUANDA will show only the selected route, so you are not asked to manage two plans at once.",
+    guidedTitle: "Guided tutorials",
+    guidedDescription: "Learn the small amount needed to supervise the build.",
+    guidedDetail: "Short guidance for repository structure, diffs, tests, and deployment checks.",
+    agenticTitle: "Agentic project plan",
+    agenticDescription: "Work with Codex or another coding agent on the project itself.",
+    agenticDetail: "Concrete tasks with prompts, acceptance criteria, verification, and human checkpoints.",
+    selectedNote: "Your selected preparation route is saved on this device.",
+    guidedEyebrow: "Guided preparation",
+    outcome: "Outcome",
+    why: "Why it matters",
+    checks: "Checks to run",
+    resources: "Verified resources",
+    humanNote: "You remain responsible for reviewing changes, running checks, and accepting the final result.",
+  },
+  workflow: { ariaLabel: "Planning progress", brief: "Brief", review: "Review the plan", prepare: "Choose how to prepare", plan: "Production plan" },
   how: {
     eyebrow: "How it works",
     title: "From a blank page to a clear next step",
@@ -470,8 +516,8 @@ const en: Translation = {
         description: "Correct QUANDA's interpretation before it shapes your path.",
       },
       {
-        title: "Learn, make, finish",
-        description: "Follow curated tutorials and check off concrete outputs.",
+        title: "Prepare, make, finish",
+        description: "Choose guidance or an agentic project plan, then check concrete outputs.",
       },
     ],
   },
@@ -543,9 +589,9 @@ const en: Translation = {
   },
   review: {
     eyebrow: "Check the direction",
-    title: "QUANDA understood your project",
+    title: "Let’s shape your project plan",
     intro:
-      "Check the direction below before I build your learning path. Remove anything that feels wrong or add something I missed.",
+      "Check and correct the important requirements QUANDA found before continuing. You decide what stays in the plan.",
     intentLabel: "Project intent",
     intentHint: "You can refine this summary, or leave it as it is.",
     requirements: "Project requirements",
@@ -613,6 +659,8 @@ const en: Translation = {
       "Try again, or edit the project details. Your draft is still saved on this device.",
     retry: "Try analysis again",
     debugDetails: "Developer details",
+    showInferred: "Show additional suggestions",
+    inferredIntro: "These inferred concepts are optional. Open them only if you want to refine the plan further.",
     constraintLabels: {
       deliverable: "Output",
       deadline: "Deadline",
@@ -623,9 +671,9 @@ const en: Translation = {
   },
   learning: {
     eyebrow: "Your minimum learning path",
-    title: "Learn only what this project needs",
+    title: "Choose what will help you make this project",
     intro:
-      "QUANDA compared the confirmed direction with your experience, then kept the smallest useful skill chain.",
+      "QUANDA compared the confirmed direction with your experience and kept the smallest useful skill chain for your chosen preparation route.",
     alreadyKnow: "You already know",
     needForProject: "Skills to learn for this project",
     knownEmpty: "No project-relevant skills were marked as known yet.",
@@ -846,8 +894,8 @@ const vi: Translation = {
     blockers: "Lỗi hoặc blocker hiện tại",
     blockersPlaceholder: "Bắt buộc với dự án có lỗi; các trường hợp khác không bắt buộc",
     submit: "Xem kế hoạch xây dựng",
-    interpretTitle: "QUANDA đã hiểu phần xây dựng",
-    interpretIntro: "Kiểm tra diễn giải kỹ thuật trước khi QUANDA tạo nhiệm vụ cho agent. Các trường này tách biệt với quy trình thiết kế.",
+    interpretTitle: "Cùng định hình kế hoạch xây dựng",
+    interpretIntro: "Hãy kiểm tra và sửa diễn giải kỹ thuật trước khi QUANDA tạo nhiệm vụ cho agent. Các trường này tách biệt với quy trình thiết kế.",
     productType: "Loại sản phẩm",
     coreFeatures: "Tính năng cốt lõi",
     suggestedStack: "Stack công nghệ đề xuất",
@@ -882,6 +930,25 @@ const vi: Translation = {
     noValue: "Chưa cung cấp",
     validationError: "Vui lòng hoàn thành các thông tin xây dựng bắt buộc.",
   },
+  preparation: {
+    eyebrow: "Chọn cách chuẩn bị",
+    title: "Chọn cách bạn muốn chuẩn bị cho dự án",
+    intro: "Chọn một cách để đưa dự án tiến lên. QUANDA chỉ hiển thị tuyến bạn chọn để bạn không phải quản lý hai kế hoạch cùng lúc.",
+    guidedTitle: "Hướng dẫn từng bước",
+    guidedDescription: "Học một lượng vừa đủ để giám sát việc xây dựng.",
+    guidedDetail: "Hướng dẫn ngắn về cấu trúc repository, diff, test và kiểm tra deployment.",
+    agenticTitle: "Kế hoạch dự án với agent",
+    agenticDescription: "Làm việc với Codex hoặc coding agent khác trên chính dự án.",
+    agenticDetail: "Nhiệm vụ cụ thể kèm prompt, tiêu chí chấp nhận, kiểm tra và điểm review của con người.",
+    selectedNote: "Cách chuẩn bị bạn chọn được lưu trên thiết bị này.",
+    guidedEyebrow: "Chuẩn bị theo hướng dẫn",
+    outcome: "Đầu ra",
+    why: "Vì sao quan trọng",
+    checks: "Kiểm tra cần chạy",
+    resources: "Nguồn đã xác minh",
+    humanNote: "Bạn vẫn chịu trách nhiệm review thay đổi, chạy kiểm tra và chấp nhận kết quả cuối.",
+  },
+  workflow: { ariaLabel: "Tiến độ lập kế hoạch", brief: "Đề bài", review: "Kiểm tra kế hoạch", prepare: "Chọn cách chuẩn bị", plan: "Kế hoạch sản xuất" },
   how: {
     eyebrow: "Cách hoạt động",
     title: "Từ trang giấy trắng đến bước tiếp theo rõ ràng",
@@ -895,8 +962,8 @@ const vi: Translation = {
         description: "Chỉnh cách QUANDA hiểu dự án trước khi tạo lộ trình.",
       },
       {
-        title: "Học, làm, hoàn thành",
-        description: "Theo video hướng dẫn đã tuyển chọn và đánh dấu từng đầu ra cụ thể.",
+        title: "Chuẩn bị, làm, hoàn thành",
+        description: "Chọn hướng dẫn hoặc kế hoạch với agent rồi kiểm tra từng đầu ra cụ thể.",
       },
     ],
   },
@@ -968,9 +1035,9 @@ const vi: Translation = {
   },
   review: {
     eyebrow: "Kiểm tra định hướng",
-    title: "QUANDA đã hiểu dự án của bạn",
+    title: "Cùng định hình kế hoạch dự án",
     intro:
-      "Hãy kiểm tra định hướng bên dưới trước khi QUANDA tạo lộ trình học. Xóa điều chưa đúng hoặc thêm điều còn thiếu.",
+      "Hãy kiểm tra và sửa các yêu cầu quan trọng QUANDA đã tìm thấy trước khi tiếp tục. Bạn quyết định điều gì được giữ trong kế hoạch.",
     intentLabel: "Ý định dự án",
     intentHint: "Bạn có thể chỉnh bản tóm tắt này hoặc giữ nguyên.",
     requirements: "Yêu cầu dự án",
@@ -1038,6 +1105,8 @@ const vi: Translation = {
       "Hãy thử lại hoặc sửa thông tin dự án. Bản nháp vẫn được lưu trên thiết bị này.",
     retry: "Thử phân tích lại",
     debugDetails: "Chi tiết dành cho lập trình viên",
+    showInferred: "Hiện thêm đề xuất",
+    inferredIntro: "Các khái niệm suy ra này là không bắt buộc. Chỉ mở khi bạn muốn tinh chỉnh kế hoạch thêm.",
     constraintLabels: {
       deliverable: "Đầu ra",
       deadline: "Hạn chót",
@@ -1048,9 +1117,9 @@ const vi: Translation = {
   },
   learning: {
     eyebrow: "Lộ trình học tối thiểu",
-    title: "Chỉ học những gì dự án này cần",
+    title: "Chọn điều giúp bạn hoàn thành dự án",
     intro:
-      "QUANDA đã đối chiếu định hướng được xác nhận với kinh nghiệm của bạn và giữ lại chuỗi kỹ năng ngắn nhất có ích.",
+      "QUANDA đã đối chiếu định hướng với kinh nghiệm của bạn và giữ lại chuỗi kỹ năng ngắn nhất hữu ích cho cách chuẩn bị bạn chọn.",
     alreadyKnow: "Bạn đã biết",
     needForProject: "Kỹ năng cần học cho dự án này",
     knownEmpty: "Chưa có kỹ năng liên quan đến dự án được đánh dấu là đã biết.",

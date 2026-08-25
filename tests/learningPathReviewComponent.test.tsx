@@ -19,7 +19,7 @@ describe("LearningPathReview", () => {
         t={getTranslation("en")}
       />,
     );
-    expect(markup).toContain("Learn only what this project needs");
+    expect(markup).toContain("Choose what will help you make this project");
     expect(markup).toContain("Toon shading");
     expect(markup).toContain("I already know this");
     expect(markup).toContain("Too advanced");

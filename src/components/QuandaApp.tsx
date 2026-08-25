@@ -16,6 +16,9 @@ import { PathClarification } from "./PathClarification";
 import { EngineeringProjectForm } from "./EngineeringProjectForm";
 import { EngineeringInterpretation } from "./EngineeringInterpretation";
 import { EngineeringRoadmapResults } from "./EngineeringRoadmapResults";
+import { EngineeringGuidedPlan } from "./EngineeringGuidedPlan";
+import { PreparationMethodChoice } from "./PreparationMethodChoice";
+import { WorkflowProgress } from "./WorkflowProgress";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
 import { CreativeDnaReview } from "./CreativeDnaReview";
@@ -55,6 +58,11 @@ import {
   writeEngineeringInterpretation,
   writeEngineeringRoadmap,
   writeProjectPath,
+  readPreparationMethod,
+  writePreparationMethod,
+  clearPreparationState,
+  readEngineeringGuidedPlan,
+  writeEngineeringGuidedPlan,
 } from "@/src/lib/storage";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { trackEvent } from "@/src/lib/analytics";
@@ -87,8 +95,8 @@ import {
   restorePreviousTutorial,
   type LearningPlan,
 } from "@/src/tutorial-matching";
-import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, type EngineeringInterpretation as EngineeringInterpretationValue, type EngineeringProject, type EngineeringRoadmap, type PathClassification, type ProjectPath } from "@/src/project-path";
-import { generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
+import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, type EngineeringInterpretation as EngineeringInterpretationValue, type EngineeringProject, type EngineeringRoadmap, type PathClassification, type ProjectPath, type PreparationMethod, type EngineeringGuidedPlan as EngineeringGuidedPlanValue } from "@/src/project-path";
+import { generateEngineeringGuidedPlan, generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -142,6 +150,9 @@ export function QuandaApp() {
   const [engineeringForm, setEngineeringForm] = useState<EngineeringProject>(() => emptyEngineeringForm("en"));
   const [engineeringInterpretation, setEngineeringInterpretation] = useState<EngineeringInterpretationValue | null>(null);
   const [engineeringRoadmap, setEngineeringRoadmap] = useState<EngineeringRoadmap | null>(null);
+  const [preparationMethod, setPreparationMethod] = useState<PreparationMethod | null>(null);
+  const [engineeringGuidedPlan, setEngineeringGuidedPlan] = useState<EngineeringGuidedPlanValue | null>(null);
+  const [engineeringInterpretationConfirmed, setEngineeringInterpretationConfirmed] = useState(false);
   const [engineeringCompletion, setEngineeringCompletion] = useState<string[]>([]);
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
   const [creativeDnaReview, setCreativeDnaReview] =
@@ -166,6 +177,11 @@ export function QuandaApp() {
   const learningPlanIsStale = learningPlan
     ? learningPlan.inputFingerprint !== projectInputFingerprint
     : false;
+  const workflowStage: 0 | 1 | 2 | 3 = projectPath === "design"
+    ? roadmap ? 3 : learningPlan ? 2 : creativeDnaReview ? 1 : 0
+    : projectPath === "agentic_engineering"
+      ? engineeringRoadmap || engineeringGuidedPlan ? 3 : preparationMethod ? 2 : engineeringInterpretation ? 1 : 0
+      : 0;
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -178,6 +194,8 @@ export function QuandaApp() {
       const savedEngineeringInterpretation = readEngineeringInterpretation(window.localStorage);
       const savedEngineeringRoadmap = readEngineeringRoadmap(window.localStorage);
       const savedEngineeringCompletion = readEngineeringCompletion(window.localStorage);
+      const savedPreparationMethod = readPreparationMethod(window.localStorage);
+      const savedEngineeringGuidedPlan = readEngineeringGuidedPlan(window.localStorage);
       const restoredLocale =
         savedLocale ?? savedDraft?.interfaceLanguage ?? "en";
       const restoredForm = savedDraft
@@ -204,6 +222,9 @@ export function QuandaApp() {
       setEngineeringForm(savedEngineeringDraft ?? emptyEngineeringForm(restoredLocale, restoredForm.projectBrief));
       setEngineeringInterpretation(savedEngineeringInterpretation);
       setEngineeringRoadmap(savedEngineeringRoadmap);
+      setPreparationMethod(savedPreparationMethod);
+      setEngineeringGuidedPlan(savedEngineeringGuidedPlan);
+      setEngineeringInterpretationConfirmed(Boolean(savedPreparationMethod || savedEngineeringGuidedPlan || savedEngineeringRoadmap));
       setEngineeringCompletion(savedEngineeringCompletion);
       setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
@@ -289,6 +310,16 @@ export function QuandaApp() {
 
   useEffect(() => {
     if (!isHydrated || projectPath !== "agentic_engineering") return;
+    if (preparationMethod) writePreparationMethod(window.localStorage, preparationMethod);
+  }, [isHydrated, preparationMethod, projectPath]);
+
+  useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
+    if (engineeringGuidedPlan) writeEngineeringGuidedPlan(window.localStorage, engineeringGuidedPlan);
+  }, [engineeringGuidedPlan, isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering") return;
     writeEngineeringCompletion(window.localStorage, engineeringCompletion);
   }, [engineeringCompletion, isHydrated, projectPath]);
 
@@ -357,12 +388,16 @@ export function QuandaApp() {
     setCreativeDnaReview(null);
     setLearningPlan(null);
     setEngineeringRoadmap(null);
+    setPreparationMethod(null);
+    setEngineeringGuidedPlan(null);
+    setEngineeringInterpretationConfirmed(false);
     setEngineeringInterpretation(null);
     setEngineeringCompletion([]);
     setEngineeringError(null);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     clearCreativeDnaReview(window.localStorage);
     clearLearningPlan(window.localStorage);
+    clearPreparationState(window.localStorage);
     if (nextPath === "design") {
       setForm((current) => ({ ...current, projectBrief: brief, interfaceLanguage: locale }));
       clearEngineeringState(window.localStorage);
@@ -390,6 +425,9 @@ export function QuandaApp() {
     setEngineeringForm(emptyEngineeringForm(locale));
     setEngineeringInterpretation(null);
     setEngineeringRoadmap(null);
+    setPreparationMethod(null);
+    setEngineeringGuidedPlan(null);
+    setEngineeringInterpretationConfirmed(false);
     setEngineeringCompletion([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
@@ -400,6 +438,7 @@ export function QuandaApp() {
     setAnalysisError(null);
     setMatchingError(null);
     setEngineeringError(null);
+    clearPreparationState(window.localStorage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -408,6 +447,8 @@ export function QuandaApp() {
     setEngineeringError(null);
     setEngineeringInterpretation(null);
     setEngineeringRoadmap(null);
+    setEngineeringGuidedPlan(null);
+    setEngineeringInterpretationConfirmed(false);
     const local = interpretEngineeringProject(request);
     try {
       const response = await fetch("/api/engineering/interpret", {
@@ -424,8 +465,8 @@ export function QuandaApp() {
     requestAnimationFrame(() => document.querySelector("#engineering-interpretation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
-  const generateEngineering = async () => {
-    if (!engineeringInterpretation) return;
+  const generateEngineering = async (method: PreparationMethod = preparationMethod ?? "guided_tutorials") => {
+    if (!engineeringInterpretation || method !== "agentic_project_plan") return;
     setEngineeringError(null);
     try {
       const response = await fetch("/api/engineering/roadmap", {
@@ -443,6 +484,25 @@ export function QuandaApp() {
       }));
     }
     requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const choosePreparationMethod = (method: PreparationMethod) => {
+    if (!engineeringInterpretation || !engineeringInterpretationConfirmed) return;
+    setPreparationMethod(method);
+    setEngineeringRoadmap(null);
+    setEngineeringGuidedPlan(null);
+    setEngineeringCompletion([]);
+    clearPreparationState(window.localStorage);
+    writePreparationMethod(window.localStorage, method);
+    if (method === "guided_tutorials") {
+      const plan = generateEngineeringGuidedPlan(engineeringForm, engineeringInterpretation);
+      setEngineeringGuidedPlan(plan);
+      writeEngineeringGuidedPlan(window.localStorage, plan);
+      requestAnimationFrame(() => document.querySelector("#engineering-guided-plan")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      return;
+    }
+    requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    void generateEngineering(method);
   };
 
   const loadExample = () => {
@@ -468,6 +528,9 @@ export function QuandaApp() {
     clearEngineeringState(window.localStorage);
     setEngineeringRoadmap(null);
     setEngineeringInterpretation(null);
+    setPreparationMethod(null);
+    setEngineeringGuidedPlan(null);
+    setEngineeringInterpretationConfirmed(false);
     setEngineeringCompletion([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
@@ -800,6 +863,7 @@ export function QuandaApp() {
           onLanguageChange={changeLanguage}
           onLoadExample={loadExample}
         />
+        <WorkflowProgress stage={workflowStage} t={t} />
 
         <section className={`hero hero-${locale}`} aria-labelledby="hero-title">
           <h1 id="hero-title">
@@ -880,8 +944,12 @@ export function QuandaApp() {
             onChange={(next) => {
               setEngineeringForm(next);
               setEngineeringInterpretation(null);
+              setEngineeringInterpretationConfirmed(false);
+              setPreparationMethod(null);
+              setEngineeringGuidedPlan(null);
               setEngineeringRoadmap(null);
               setEngineeringCompletion([]);
+              clearPreparationState(window.localStorage);
             }}
             onSubmit={(request) => void interpretEngineering(request)}
             t={t}
@@ -1076,13 +1144,17 @@ export function QuandaApp() {
           tasks={calendarTasks}
         />}
 
-        {projectPath === "agentic_engineering" && engineeringInterpretation && !engineeringRoadmap && (
+        {projectPath === "agentic_engineering" && engineeringInterpretation && !engineeringInterpretationConfirmed && !preparationMethod && (
           <EngineeringInterpretation
-            isBusy={Boolean(engineeringRoadmap)}
+            isBusy={Boolean(engineeringRoadmap) || Boolean(engineeringGuidedPlan)}
             onChange={(next) => setEngineeringInterpretation(next)}
-            onConfirm={() => void generateEngineering()}
+            onConfirm={() => {
+              setEngineeringInterpretationConfirmed(true);
+              requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            }}
             onEdit={() => {
               setEngineeringInterpretation(null);
+              setEngineeringInterpretationConfirmed(false);
               requestAnimationFrame(() => document.querySelector("#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" }));
             }}
             t={t}
@@ -1090,7 +1162,18 @@ export function QuandaApp() {
           />
         )}
 
-        {projectPath === "agentic_engineering" && engineeringRoadmap && (
+        {projectPath === "agentic_engineering" && engineeringInterpretation && engineeringInterpretationConfirmed && !preparationMethod && (
+          <PreparationMethodChoice t={t} value={preparationMethod} onChoose={choosePreparationMethod} />
+        )}
+
+        {projectPath === "agentic_engineering" && engineeringGuidedPlan && preparationMethod === "guided_tutorials" && (
+          <EngineeringGuidedPlan plan={engineeringGuidedPlan} t={t} onStartOver={() => {
+            if (!window.confirm(t.results.startOverConfirm)) return;
+            returnToBeginning();
+          }} />
+        )}
+
+        {projectPath === "agentic_engineering" && engineeringRoadmap && preparationMethod === "agentic_project_plan" && (
           <EngineeringRoadmapResults
             completedTaskIds={engineeringCompletion}
             onStartOver={() => {
