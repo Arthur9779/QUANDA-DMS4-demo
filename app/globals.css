@@ -3199,17 +3199,17 @@ footer {
   .matched-tutorial-card dl { grid-template-columns: 1fr; }
 }
 
-.path-entry-section, .engineering-form-section, .engineering-interpretation, .engineering-roadmap-results, .path-clarification { margin: 64px auto 0; max-width: 980px; }
-.path-status { align-items: center; background: var(--green-soft); border: 1px solid #b7cda2; border-radius: 999px; display: flex; gap: 16px; justify-content: space-between; margin: 34px auto -34px; max-width: 980px; padding: 8px 10px 8px 16px; }
+.path-entry-section, .engineering-form-section, .engineering-interpretation, .engineering-roadmap-results, .path-clarification { margin: 64px auto 0; max-width: 1180px; }
+.path-status { align-items: center; background: var(--green-soft); border: 1px solid #b7cda2; border-radius: 999px; box-sizing: border-box; display: flex; gap: 16px; justify-content: space-between; margin: 34px auto 24px; max-width: 1180px; padding: 11px 14px 11px 20px; }
 .path-status .button-text { color: var(--ink); font-size: 0.82rem; }
 .path-clarification { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: clamp(26px, 5vw, 54px); }
 .path-clarification h2, .engineering-interpretation h2, .engineering-roadmap-results h2 { font-family: var(--font-newsreader), Georgia, serif; font-size: clamp(2rem, 5vw, 3.7rem); letter-spacing: -0.045em; line-height: 0.98; margin: 8px 0 14px; }
 .path-clarification > p:not(.eyebrow) { color: var(--muted); max-width: 700px; }
 .path-choice-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
-.path-choice-card { align-items: flex-start; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; color: var(--ink); cursor: pointer; display: grid; gap: 10px; padding: 22px; text-align: left; transition: border-color 160ms ease, transform 160ms ease; }
+.path-choice-card { align-items: flex-start; background: var(--paper); border: 1px solid var(--line); border-radius: 22px; color: var(--ink); cursor: pointer; display: grid; gap: 14px; min-height: 238px; padding: 30px; text-align: left; transition: border-color 160ms ease, transform 160ms ease; }
 .path-choice-card:hover, .path-choice-card:focus-visible { border-color: var(--palm); transform: translateY(-2px); }
-.path-choice-card span { font-size: 1.1rem; font-weight: 850; }
-.path-choice-card small { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+.path-choice-card span { font-size: 1.2rem; font-weight: 850; }
+.path-choice-card small { color: var(--muted); font-size: 1rem; line-height: 1.6; }
 .path-choice-card svg:last-child { justify-self: end; }
 .engineering-interpretation, .engineering-roadmap-results { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: clamp(26px, 5vw, 54px); }
 .engineering-interpretation-grid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -3277,17 +3277,17 @@ footer {
   border-radius: 28px;
   box-sizing: border-box;
   display: grid;
-  gap: clamp(28px, 6vw, 76px);
-  grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1.18fr);
+  gap: clamp(36px, 7vw, 96px);
+  grid-template-columns: minmax(0, 0.86fr) minmax(440px, 1.14fr);
   margin: 64px auto 0;
-  max-width: 980px;
-  padding: clamp(30px, 5vw, 58px);
+  max-width: 1180px;
+  padding: clamp(42px, 6vw, 78px);
 }
 .path-entry-section .form-intro {
   position: static;
 }
 .path-entry-section .form-intro h2 {
-  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-size: clamp(2.8rem, 5.5vw, 5.1rem);
   line-height: 0.98;
   max-width: 9ch;
 }
@@ -3298,10 +3298,17 @@ footer {
 }
 .path-entry-section .project-form {
   align-self: start;
-  padding: clamp(22px, 3vw, 32px);
+  padding: clamp(28px, 3.5vw, 42px);
 }
 .path-entry-section .project-form textarea {
-  min-height: 170px;
+  min-height: 220px;
+}
+
+.path-clarification {
+  padding: clamp(42px, 6vw, 78px);
+}
+.path-clarification h2 {
+  font-size: clamp(2.8rem, 5.5vw, 4.8rem);
 }
 
 @media (max-width: 800px) {
@@ -3313,6 +3320,19 @@ footer {
   .path-entry-section .form-intro h2 {
     max-width: 14ch;
   }
+  .path-status {
+    align-items: flex-start;
+    border-radius: 18px;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 20px;
+  }
+  .path-status .button-text {
+    margin-left: auto;
+  }
+  .path-choice-card {
+    min-height: 0;
+  }
 }
 
 @media (max-width: 520px) {
@@ -3323,6 +3343,12 @@ footer {
   .path-entry-section .form-intro h2 {
     font-size: clamp(2.2rem, 12vw, 3.2rem);
     max-width: none;
+  }
+  .path-clarification {
+    padding: 30px 20px;
+  }
+  .path-clarification h2 {
+    font-size: clamp(2.3rem, 12vw, 3.5rem);
   }
 }
 
