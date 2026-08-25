@@ -8,6 +8,12 @@ import {
 import { toLocalDateKey } from "@/src/lib/date";
 import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import type { CalendarTask, RoadmapRequest } from "@/src/types";
+import { generateEngineeringRoadmap } from "@/src/agentic-engineering";
+import {
+  createEngineeringRoadmapCalendarTasks,
+  removeEngineeringRoadmapCalendarTasks,
+  syncEngineeringRoadmapCalendarTasks,
+} from "@/src/lib/engineering-calendar";
 
 const request: RoadmapRequest = {
   interfaceLanguage: "en",
@@ -95,5 +101,90 @@ describe("project calendar", () => {
         createdAt: "now",
       }),
     ).toBe(false);
+  });
+
+  it("distributes engineering outcomes without mixing design milestones", () => {
+    const project = {
+      path: "agentic_engineering" as const,
+      interfaceLanguage: "en" as const,
+      technicalBrief: "Build a small REST API for a student project with tests and deployment.",
+      startingPoint: "new_project" as const,
+      repositoryUrl: "",
+      projectLocation: "",
+      definitionOfDone: "The documented endpoint works and the automated tests pass.",
+      targetPlatform: "api_backend" as const,
+      technologies: "Python, FastAPI",
+      currentExperience: "Basic Python knowledge.",
+      deploymentTarget: "A reviewable preview deployment",
+      deadline: "2026-08-20",
+      hoursPerDay: 2,
+      daysPerWeek: 5,
+      constraints: "Solo project",
+      existingErrors: "",
+    };
+    const roadmap = generateEngineeringRoadmap(project);
+    const tasks = createEngineeringRoadmapCalendarTasks(
+      roadmap,
+      project.deadline,
+      [roadmap.tasks[0].id],
+      new Date(2026, 7, 5, 12),
+    );
+    expect(tasks).toHaveLength(roadmap.tasks.length);
+    expect(tasks[0].done).toBe(true);
+    expect(tasks.every((task) => task.roadmapId?.startsWith("engineering-roadmap:") === true)).toBe(true);
+    expect(tasks.every((task) => task.title === roadmap.tasks.find((item) => item.id === task.stageId)?.title)).toBe(true);
+    expect(tasks.every((task) => task.deadline <= project.deadline)).toBe(true);
+  });
+
+  it("syncs engineering milestones while preserving manual engineering tasks", () => {
+    const project = {
+      path: "agentic_engineering" as const,
+      interfaceLanguage: "en" as const,
+      technicalBrief: "Build a small browser extension for a student project with tests.",
+      startingPoint: "new_project" as const,
+      repositoryUrl: "",
+      projectLocation: "",
+      definitionOfDone: "The extension works in the browser and tests pass.",
+      targetPlatform: "plugin_extension" as const,
+      technologies: "TypeScript",
+      currentExperience: "Basic programming knowledge.",
+      deploymentTarget: "A packaged extension build",
+      deadline: "2026-08-20",
+      hoursPerDay: 2,
+      daysPerWeek: 5,
+      constraints: "Solo project",
+      existingErrors: "",
+    };
+    const roadmap = generateEngineeringRoadmap(project);
+    const manualTask: CalendarTask = {
+      id: "engineering-manual-1",
+      title: "Review the preview build",
+      deadline: "2026-08-10",
+      category: "peach",
+      source: "manual",
+      done: false,
+      createdAt: "2026-08-05T00:00:00.000Z",
+    };
+    const staleTask: CalendarTask = {
+      id: "engineering-roadmap:old:stale",
+      title: "Stale engineering task",
+      deadline: "2026-08-06",
+      category: "sage",
+      source: "roadmap",
+      done: false,
+      createdAt: "2026-08-05T00:00:00.000Z",
+      roadmapId: "engineering-roadmap:old",
+      stageId: "stale",
+    };
+    const synced = syncEngineeringRoadmapCalendarTasks(
+      [manualTask, staleTask],
+      roadmap,
+      project.deadline,
+      [],
+      new Date(2026, 7, 5, 12),
+    );
+    expect(synced).toContainEqual(manualTask);
+    expect(synced.some((task) => task.id === staleTask.id)).toBe(false);
+    expect(removeEngineeringRoadmapCalendarTasks(synced)).toEqual([manualTask]);
   });
 });

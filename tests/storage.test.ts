@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   readCalendarTasks,
+  readEngineeringCalendarTasks,
   readCompletion,
   readCreativeDnaAnalysis,
   readCreativeDnaReview,
@@ -19,6 +20,8 @@ import {
   readProjectPath,
   writeEngineeringDraft,
   writeEngineeringRoadmap,
+  writeEngineeringCalendarTasks,
+  clearEngineeringState,
   writeProjectPath,
 } from "@/src/lib/storage";
 import { generateEngineeringRoadmap } from "@/src/agentic-engineering";
@@ -260,5 +263,27 @@ describe("local storage recovery", () => {
     expect(readEngineeringRoadmap(storage)?.tasks).toHaveLength(9);
     expect(readRoadmap(storage)).toBeNull();
     expect(storage.getItem(STORAGE_KEYS.creativeDnaAnalysis)).toBeNull();
+  });
+
+  it("persists engineering calendar tasks under their own key", () => {
+    const storage = new MemoryStorage();
+    const task = {
+      id: "engineering-roadmap:demo:inspect",
+      title: "Inspect the repository",
+      deadline: "2026-08-20",
+      category: "sage" as const,
+      source: "roadmap" as const,
+      done: true,
+      createdAt: "2026-08-05T00:00:00.000Z",
+      roadmapId: "engineering-roadmap:demo",
+      stageId: "inspect",
+    };
+    writeEngineeringCalendarTasks(storage, [task]);
+    expect(readEngineeringCalendarTasks(storage)).toEqual([task]);
+    expect(readCalendarTasks(storage)).toEqual([]);
+    expect(storage.getItem(STORAGE_KEYS.engineeringCalendar)).not.toBeNull();
+    clearEngineeringState(storage);
+    expect(readEngineeringCalendarTasks(storage)).toEqual([]);
+    expect(readCalendarTasks(storage)).toEqual([]);
   });
 });
