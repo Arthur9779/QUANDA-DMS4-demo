@@ -14,14 +14,12 @@ import { ProjectBriefForm } from "./ProjectBriefForm";
 import { InitialBriefForm } from "./InitialBriefForm";
 import { PathClarification } from "./PathClarification";
 import { EngineeringProjectForm } from "./EngineeringProjectForm";
-import { EngineeringInterpretation } from "./EngineeringInterpretation";
 import { EngineeringRoadmapResults } from "./EngineeringRoadmapResults";
 import { EngineeringGuidedPlan } from "./EngineeringGuidedPlan";
 import { PreparationMethodChoice } from "./PreparationMethodChoice";
 import { WorkflowProgress } from "./WorkflowProgress";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
-import { CreativeDnaReview } from "./CreativeDnaReview";
 import { LoadingAnalysis } from "./LoadingAnalysis";
 import { LoadingLearningPath } from "./LoadingLearningPath";
 import { LearningPathReview } from "./LearningPathReview";
@@ -81,17 +79,9 @@ import { toLocalDateKey } from "@/src/lib/date";
 import {
   CREATIVE_DNA_REVIEW_VERSION,
   createProjectInputFingerprint,
-  addOntologyConcept,
-  addUnknownConcept,
   confirmCreativeDna,
   mergeReviewOverrides,
-  rejectConcept,
-  rejectConstraint,
-  rejectUnknownConcept,
-  restoreConcept,
-  updateProjectIntent,
   type CreativeDnaReviewRecord,
-  type OntologySearchResult,
 } from "@/src/creative-dna-review";
 import { ProjectAnalysisResponseSchema } from "@/src/project-analysis/contracts";
 import {
@@ -487,11 +477,13 @@ export function QuandaApp() {
       });
       if (!response.ok) throw new Error("engineering_interpretation_failed");
       setEngineeringInterpretation(local);
+      setEngineeringInterpretationConfirmed(true);
     } catch {
       setEngineeringInterpretation({ ...local, source: "fallback" });
+      setEngineeringInterpretationConfirmed(true);
       setEngineeringError(t.errors.networkFallback);
     }
-    requestAnimationFrame(() => document.querySelector("#engineering-interpretation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const generateEngineering = async (method: PreparationMethod = preparationMethod ?? "guided_tutorials") => {
@@ -626,7 +618,16 @@ export function QuandaApp() {
         analysis: { ...parsed.data, creativeDna },
         confirmed: false,
       };
-      setCreativeDnaReview(review);
+      const confirmedReview: CreativeDnaReviewRecord = {
+        ...review,
+        analysis: {
+          ...review.analysis,
+          creativeDna: confirmCreativeDna(review.analysis.creativeDna),
+        },
+        confirmed: true,
+      };
+      setCreativeDnaReview(confirmedReview);
+      writeCreativeDnaReview(window.localStorage, confirmedReview);
       trackEvent("creative_dna_review_viewed", { source: parsed.data.source });
       trackEvent(
         parsed.data.source === "fallback"
@@ -638,12 +639,7 @@ export function QuandaApp() {
           unknownCount: creativeDna.unknownConcepts.length,
         },
       );
-      window.setTimeout(() => {
-        document.querySelector("#creative-dna-review")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
+      void matchTutorials(confirmedReview, request);
     } catch {
       setAnalysisError(getTranslation(request.interfaceLanguage).review.errorMessage);
     } finally {
@@ -652,35 +648,15 @@ export function QuandaApp() {
     }
   };
 
-  const updateCreativeDna = (
-    operation: (
-      creativeDna: CreativeDnaReviewRecord["analysis"]["creativeDna"],
-    ) => CreativeDnaReviewRecord["analysis"]["creativeDna"],
+  const matchTutorials = async (
+    review: CreativeDnaReviewRecord,
+    project: RoadmapRequest = form,
   ) => {
-    setRoadmap(null);
-    setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
-    setLearningPlan(null);
-    clearLearningPlan(window.localStorage);
-    setCreativeDnaReview((current) =>
-      current
-        ? {
-            ...current,
-            analysis: {
-              ...current.analysis,
-              creativeDna: operation(current.analysis.creativeDna),
-            },
-            confirmed: false,
-          }
-        : current,
-    );
-  };
-
-  const matchTutorials = async (review: CreativeDnaReviewRecord) => {
     setIsMatchingTutorials(true);
     setMatchingError(null);
     setRoadmap(null);
     trackEvent("tutorial_matching_started", {
-      language: form.tutorialLanguage,
+      language: project.tutorialLanguage,
     });
     requestAnimationFrame(() => {
       document.querySelector("#learning-path-loading")?.scrollIntoView({
@@ -694,7 +670,7 @@ export function QuandaApp() {
       const response = await fetch("/api/tutorial-matching", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project: form, review }),
+        body: JSON.stringify({ project, review }),
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`tutorial_matching_${response.status}`);
@@ -720,24 +696,6 @@ export function QuandaApp() {
       window.clearTimeout(timeout);
       setIsMatchingTutorials(false);
     }
-  };
-
-  const confirmCreativeDnaReview = () => {
-    if (!creativeDnaReview) return;
-    const confirmedReview: CreativeDnaReviewRecord = {
-      ...creativeDnaReview,
-      analysis: {
-        ...creativeDnaReview.analysis,
-        creativeDna: confirmCreativeDna(creativeDnaReview.analysis.creativeDna),
-      },
-      confirmed: true,
-    };
-    setCreativeDnaReview(confirmedReview);
-    writeCreativeDnaReview(window.localStorage, confirmedReview);
-    trackEvent("creative_dna_confirmed", {
-      conceptCount: confirmedReview.analysis.creativeDna.concepts.length,
-    });
-    void matchTutorials(confirmedReview);
   };
 
   const generateRoadmap = async (request: RoadmapRequest) => {
@@ -1084,64 +1042,6 @@ export function QuandaApp() {
           )}
         </div>
 
-        {projectPath === "design" && creativeDnaReview && !isAnalyzing && !isMatchingTutorials && (
-          <CreativeDnaReview
-            creativeDna={creativeDnaReview.analysis.creativeDna}
-            isBusy={isLoading || isAnalyzing || isMatchingTutorials}
-            isFallback={creativeDnaReview.analysis.source === "fallback"}
-            isStale={creativeDnaIsStale}
-            onAddOntology={(node: OntologySearchResult) => {
-              updateCreativeDna((creativeDna) => addOntologyConcept(creativeDna, node));
-              trackEvent("creative_dna_concept_added", {
-                family: node.family,
-                category: node.category,
-              });
-            }}
-            onAddUnknown={(wording) => {
-              updateCreativeDna((creativeDna) => addUnknownConcept(creativeDna, wording));
-              trackEvent("creative_dna_unknown_added");
-            }}
-            onConfirm={confirmCreativeDnaReview}
-            onEditDetails={scrollToForm}
-            onIntentChange={(intent) =>
-              updateCreativeDna((creativeDna) => updateProjectIntent(creativeDna, intent))
-            }
-            onReanalyze={() => {
-              trackEvent("creative_dna_reanalysis_requested");
-              void analyzeProject(form);
-            }}
-            onRejectConcept={(identity, deliberate) => {
-              updateCreativeDna((creativeDna) =>
-                rejectConcept(creativeDna, identity, {
-                  allowExplicitRequirement: deliberate,
-                }),
-              );
-              trackEvent("creative_dna_concept_removed", {
-                explicitOverride: Boolean(deliberate),
-              });
-            }}
-            onRejectConstraint={(identity, deliberate) =>
-              updateCreativeDna((creativeDna) =>
-                rejectConstraint(creativeDna, identity, {
-                  allowExplicitRequirement: deliberate,
-                }),
-              )
-            }
-            onRejectUnknown={(identity) => {
-              updateCreativeDna((creativeDna) =>
-                rejectUnknownConcept(creativeDna, identity),
-              );
-              trackEvent("creative_dna_concept_removed", {
-                explicitOverride: false,
-              });
-            }}
-            onRestore={(identity) =>
-              updateCreativeDna((creativeDna) => restoreConcept(creativeDna, identity))
-            }
-            t={t}
-          />
-        )}
-
         {projectPath === "design" && learningPlan &&
           creativeDnaReview?.confirmed &&
           !learningPlanIsStale &&
@@ -1222,24 +1122,6 @@ export function QuandaApp() {
           t={t}
           tasks={calendarTasks}
         />}
-
-        {projectPath === "agentic_engineering" && engineeringInterpretation && !engineeringInterpretationConfirmed && !preparationMethod && (
-          <EngineeringInterpretation
-            isBusy={Boolean(engineeringRoadmap) || Boolean(engineeringGuidedPlan)}
-            onChange={(next) => setEngineeringInterpretation(next)}
-            onConfirm={() => {
-              setEngineeringInterpretationConfirmed(true);
-              requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-            }}
-            onEdit={() => {
-              setEngineeringInterpretation(null);
-              setEngineeringInterpretationConfirmed(false);
-              requestAnimationFrame(() => document.querySelector("#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-            }}
-            t={t}
-            value={engineeringInterpretation}
-          />
-        )}
 
         {projectPath === "agentic_engineering" && engineeringInterpretation && engineeringInterpretationConfirmed && !preparationMethod && (
           <PreparationMethodChoice t={t} value={preparationMethod} onChoose={choosePreparationMethod} />

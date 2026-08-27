@@ -33,9 +33,8 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   }
 
   await page.getByRole("button", { name: "Understand my project" }).click();
-  await expect(page.getByRole("heading", { name: "Let’s shape your project plan" })).toBeVisible();
-  await page.getByRole("button", { name: "Looks right — continue" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
+  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
   await page.getByRole("button", { name: "Continue to my roadmap" }).click();
 
   await expect(page.locator("#roadmap-results")).toBeVisible();
@@ -93,17 +92,16 @@ test("routes software briefs into the separate agentic engineering workflow", as
   );
   await page.getByLabel("Required or preferred technologies").fill("TypeScript, Next.js");
   await page.getByRole("button", { name: "Review my build plan" }).click();
-  await expect(page.getByRole("heading", { name: "Let’s shape your build plan" })).toBeVisible();
-  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
-  await expect(page.locator("#learning-path-review")).toHaveCount(0);
-  await page.getByRole("button", { name: "Generate the engineering roadmap" }).click();
   await expect(page.getByRole("heading", { name: "Choose how you want to prepare" })).toBeVisible();
+  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
+  await expect(page.locator("#engineering-interpretation")).toHaveCount(0);
+  await expect(page.locator("#learning-path-review")).toHaveCount(0);
   await page.getByRole("button", { name: /Agentic project plan/ }).click();
   await expect(page.locator("#engineering-roadmap-results")).toBeVisible();
   await expect(page.locator(".engineering-task-card")).toHaveCount(9);
   await expect(page.getByText("Agent-ready implementation prompt")).toBeVisible();
-  await expect(page.getByText("Acceptance criteria")).toBeVisible();
-  await expect(page.getByText("Verification checks")).toBeVisible();
+  await expect(page.getByText("Acceptance criteria", { exact: true }).last()).toBeVisible();
+  await expect(page.getByText("Verification checks", { exact: true }).last()).toBeVisible();
 
   await page.getByRole("button", { name: "VI", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Thực thi pipeline sản xuất" })).toBeVisible();
