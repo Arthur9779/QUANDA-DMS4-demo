@@ -101,6 +101,9 @@ export interface Translation {
     human: string;
     hybrid: string;
     minutes: string;
+    taskCount: string;
+    collapse: string;
+    expand: string;
     notice: string;
     warnings: string;
     noValue: string;
@@ -438,8 +441,8 @@ const en: Translation = {
       { value: "plugin_extension", label: "Plugin / extension" },
       { value: "other", label: "Other technical system" },
     ],
-    technologies: "Required or preferred technologies",
-    technologiesPlaceholder: "For example: Next.js, TypeScript, PostgreSQL",
+    technologies: "Preferred tools and technologies",
+    technologiesPlaceholder: "For example: Next.js, TypeScript, PostgreSQL (optional)",
     experience: "Current technical experience",
     experiencePlaceholder: "For example: comfortable editing React, new to deployment",
     deployment: "Deployment target",
@@ -447,8 +450,8 @@ const en: Translation = {
     deadline: "Deadline",
     hoursPerDay: "Available hours per day",
     daysPerWeek: "Available days per week",
-    constraints: "Known constraints",
-    constraintsPlaceholder: "Access, package, device, privacy, or scope constraints",
+    constraints: "Important project constraints",
+    constraintsPlaceholder: "Access, device, privacy, scope, or other limits to keep in mind",
     blockers: "Existing errors or blockers",
     blockersPlaceholder: "Required for an existing bug; otherwise optional",
     submit: "Review my build plan",
@@ -483,6 +486,9 @@ const en: Translation = {
     human: "Human-only",
     hybrid: "Hybrid",
     minutes: "min",
+    taskCount: "concrete tasks",
+    collapse: "Collapse",
+    expand: "Expand",
     notice: "Deterministic fallback used",
     warnings: "Important limits",
     noValue: "Not provided",
@@ -886,8 +892,8 @@ const vi: Translation = {
       { value: "plugin_extension", label: "Plugin / extension" },
       { value: "other", label: "Hệ thống kỹ thuật khác" },
     ],
-    technologies: "Công nghệ bắt buộc hoặc ưu tiên",
-    technologiesPlaceholder: "Ví dụ: Next.js, TypeScript, PostgreSQL",
+    technologies: "Công cụ và công nghệ muốn dùng",
+    technologiesPlaceholder: "Ví dụ: Next.js, TypeScript, PostgreSQL (không bắt buộc)",
     experience: "Kinh nghiệm kỹ thuật hiện tại",
     experiencePlaceholder: "Ví dụ: biết sửa React, mới làm deployment",
     deployment: "Mục tiêu triển khai",
@@ -895,8 +901,8 @@ const vi: Translation = {
     deadline: "Hạn chót",
     hoursPerDay: "Số giờ có thể làm mỗi ngày",
     daysPerWeek: "Số ngày có thể làm mỗi tuần",
-    constraints: "Ràng buộc đã biết",
-    constraintsPlaceholder: "Quyền truy cập, package, thiết bị, riêng tư hoặc phạm vi",
+    constraints: "Các giới hạn quan trọng của dự án",
+    constraintsPlaceholder: "Quyền truy cập, thiết bị, riêng tư, phạm vi hoặc giới hạn khác cần lưu ý",
     blockers: "Lỗi hoặc blocker hiện tại",
     blockersPlaceholder: "Bắt buộc với dự án có lỗi; các trường hợp khác không bắt buộc",
     submit: "Xem kế hoạch xây dựng",
@@ -931,6 +937,9 @@ const vi: Translation = {
     human: "Chỉ con người",
     hybrid: "Kết hợp",
     minutes: "phút",
+    taskCount: "nhiệm vụ cụ thể",
+    collapse: "Thu gọn",
+    expand: "Mở rộng",
     notice: "Đã dùng phương án xác định",
     warnings: "Giới hạn quan trọng",
     noValue: "Chưa cung cấp",

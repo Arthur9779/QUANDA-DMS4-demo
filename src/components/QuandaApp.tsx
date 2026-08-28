@@ -17,7 +17,6 @@ import { EngineeringProjectForm } from "./EngineeringProjectForm";
 import { EngineeringRoadmapResults } from "./EngineeringRoadmapResults";
 import { EngineeringGuidedPlan } from "./EngineeringGuidedPlan";
 import { PreparationMethodChoice } from "./PreparationMethodChoice";
-import { WorkflowProgress } from "./WorkflowProgress";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
 import { LoadingAnalysis } from "./LoadingAnalysis";
@@ -175,12 +174,6 @@ export function QuandaApp() {
   const learningPlanIsStale = learningPlan
     ? learningPlan.inputFingerprint !== projectInputFingerprint
     : false;
-  const workflowStage: 0 | 1 | 2 | 3 = projectPath === "design"
-    ? roadmap ? 3 : learningPlan ? 2 : creativeDnaReview ? 1 : 0
-    : projectPath === "agentic_engineering"
-      ? engineeringRoadmap || engineeringGuidedPlan ? 3 : preparationMethod ? 2 : engineeringInterpretation ? 1 : 0
-      : 0;
-
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       const savedLocale = readLanguage(window.localStorage);
@@ -544,20 +537,11 @@ export function QuandaApp() {
         locale === "en"
           ? "I need to create a 20-second product animation for a university assignment. I know Photoshop at an intermediate level, but I have never used Blender. The project is due in seven days. The final output should be a 1080p MP4 with simple sound."
           : "Tôi cần làm một video hoạt hình sản phẩm dài 20 giây cho bài tập đại học. Tôi sử dụng Photoshop ở mức trung cấp nhưng chưa từng dùng Blender. Dự án phải hoàn thành trong bảy ngày. Sản phẩm cuối là video MP4 1080p có âm thanh đơn giản.",
-      currentExperience:
-        locale === "en"
-          ? "Photoshop: intermediate; Blender: complete beginner"
-          : "Photoshop: trung cấp; Blender: chưa từng sử dụng",
-      requiredApplications: ["blender"],
-      outputType: "video",
-      targetQuality: "basic",
     };
+    clearProjectStorage(window.localStorage);
     setForm(nextForm);
-    setProjectPath("design");
-    setPathClassification({ path: "design", confidence: 0.99, reason: "The loaded example explicitly asks for a product animation.", signals: ["creative deliverable"] });
-    clearProjectPath(window.localStorage);
-    writeProjectPath(window.localStorage, "design");
-    clearEngineeringState(window.localStorage);
+    setProjectPath(null);
+    setPathClassification(null);
     setEngineeringRoadmap(null);
     setEngineeringInterpretation(null);
     setPreparationMethod(null);
@@ -574,7 +558,7 @@ export function QuandaApp() {
     setError(null);
     setAnalysisError(null);
     setMatchingError(null);
-    requestAnimationFrame(scrollToForm);
+    requestAnimationFrame(() => document.querySelector("#project-form")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const analyzeProject = async (request: RoadmapRequest) => {
@@ -899,22 +883,47 @@ export function QuandaApp() {
           onLanguageChange={changeLanguage}
           onLoadExample={loadExample}
         />
-        {projectPath && <WorkflowProgress stage={workflowStage} t={t} />}
-
-        <section className={`hero hero-${locale}`} aria-labelledby="hero-title">
-          <h1 id="hero-title">
-            {t.hero.titleLead}{t.hero.titleAccent ? <> <em>{t.hero.titleAccent}</em></> : null}
-          </h1>
-          <p className="hero-tagline">{t.hero.tagline}</p>
-          <p className="hero-description">{t.hero.description}</p>
-          <div className="hero-actions">
-            <button className="button button-primary" onClick={scrollToForm} type="button">
-              {t.hero.start}
-              <ArrowDown aria-hidden="true" size={17} />
-            </button>
-            <span>{t.hero.note}</span>
-          </div>
-        </section>
+        {!projectPath && !pathClassification ? (
+          <section className="landing-entry-section" id="project-form" aria-labelledby="hero-title">
+            <div className={`landing-entry-copy hero-${locale}`}>
+              <p className="eyebrow">{t.hero.eyebrow}</p>
+              <h1 id="hero-title">
+                {t.hero.titleLead}{t.hero.titleAccent ? <> <em>{t.hero.titleAccent}</em></> : null}
+              </h1>
+              <p className="hero-tagline">{t.hero.tagline}</p>
+              <p className="hero-description">{t.hero.description}</p>
+              <div className="hero-actions">
+                <span>{t.hero.note}</span>
+              </div>
+            </div>
+            <div className="landing-entry-form">
+              <InitialBriefForm
+                brief={form.projectBrief}
+                embedded
+                isSubmitting={!isHydrated}
+                onChange={(brief) => setForm((current) => ({ ...current, projectBrief: brief }))}
+                onSubmit={submitInitialBrief}
+                t={t}
+              />
+            </div>
+          </section>
+        ) : (
+          <section className={`hero hero-${locale}`} aria-labelledby="hero-title">
+            <p className="eyebrow">{t.hero.eyebrow}</p>
+            <h1 id="hero-title">
+              {t.hero.titleLead}{t.hero.titleAccent ? <> <em>{t.hero.titleAccent}</em></> : null}
+            </h1>
+            <p className="hero-tagline">{t.hero.tagline}</p>
+            <p className="hero-description">{t.hero.description}</p>
+            <div className="hero-actions">
+              <button className="button button-primary" onClick={scrollToForm} type="button">
+                {t.hero.start}
+                <ArrowDown aria-hidden="true" size={17} />
+              </button>
+              <span>{t.hero.note}</span>
+            </div>
+          </section>
+        )}
         <section className="how-section" id="how-it-works" aria-labelledby="how-title">
           <div className="section-heading">
             <p className="eyebrow">{t.how.eyebrow}</p>
@@ -939,16 +948,6 @@ export function QuandaApp() {
             })}
           </ol>
         </section>
-
-        {!projectPath && !pathClassification && (
-          <InitialBriefForm
-            brief={form.projectBrief}
-            isSubmitting={!isHydrated}
-            onChange={(brief) => setForm((current) => ({ ...current, projectBrief: brief }))}
-            onSubmit={submitInitialBrief}
-            t={t}
-          />
-        )}
 
         {!projectPath && pathClassification?.path === "clarification" && (
           <PathClarification t={t} onChoose={(nextPath) => selectPath(nextPath, form.projectBrief)} />

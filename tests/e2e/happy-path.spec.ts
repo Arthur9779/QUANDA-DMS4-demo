@@ -7,12 +7,9 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
     page.getByText("No API key is configured, so QUANDA will use a dependable sample roadmap."),
   ).toHaveCount(0);
   await expect(page.locator(".workflow-progress")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "What do you want to make?" })).toBeVisible();
-
-  await expect(page.locator(".hero")).toHaveCSS(
-    "background-image",
-    /hero-vector-garden\.svg/,
-  );
+  await expect(page.getByRole("heading", { name: "Agentic planner find the most optimal path for the deadline" })).toBeVisible();
+  await expect(page.locator(".landing-entry-section")).toBeVisible();
+  await expect(page.locator(".landing-entry-section .project-form")).toBeVisible();
 
   const loadExample = page.getByRole("button", { name: "Load example" });
   await expect(loadExample).toBeEnabled();
@@ -32,6 +29,8 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
     await loadExample.click();
   }
 
+  await expect(page.getByLabel("Project brief")).toHaveValue(/20-second product animation/);
+  await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
@@ -90,7 +89,7 @@ test("routes software briefs into the separate agentic engineering workflow", as
   await page.getByLabel("Current technical experience").fill(
     "Complete beginner with TypeScript and Visual Studio Code",
   );
-  await page.getByLabel("Required or preferred technologies").fill("TypeScript, Next.js");
+  await page.getByLabel("Preferred tools and technologies").fill("TypeScript, Next.js");
   await page.getByRole("button", { name: "Review my build plan" }).click();
   await expect(page.getByRole("heading", { name: "Choose how you want to prepare" })).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);

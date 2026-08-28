@@ -10,7 +10,7 @@ test("renders and persists the isolated engineering calendar for Last Night", as
   await page.getByLabel("Definition of done").fill(
     "The game supports Start, Gameplay, Game Over, Restart, movement, attacks, enemy waves, three enemy types, HP, damage, healing items, score, survival time, and a stable playable Windows build.",
   );
-  await page.getByLabel("Required or preferred technologies").fill("Godot 4, GDScript");
+  await page.getByLabel("Preferred tools and technologies").fill("Godot 4, GDScript");
   await page.getByLabel("Deployment target").fill("Playable Windows build");
   await page.getByLabel("Current technical experience").fill("Basic programming knowledge; new to Godot and GDScript.");
   await page.getByLabel("Deadline").fill("2026-09-01");

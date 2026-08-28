@@ -13,7 +13,7 @@ function TaskCard({ task, t, complete, onToggle }: { task: EngineeringTask; t: T
       <label className="engineering-task-check"><input checked={complete} onChange={onToggle} type="checkbox" /><span className="sr-only">{task.title}</span></label>
       <span className="engineering-task-number">{String(task.order).padStart(2, "0")}</span>
       <div><p className="eyebrow">{executor}</p><h3>{task.title}</h3></div>
-      <button aria-expanded={open} aria-label={open ? `Collapse ${task.title}` : `Expand ${task.title}`} className="icon-button" onClick={() => setOpen((current) => !current)} type="button">{open ? <ChevronUp aria-hidden="true" size={19} /> : <ChevronDown aria-hidden="true" size={19} />}</button>
+      <button aria-expanded={open} aria-label={`${open ? t.engineering.collapse : t.engineering.expand}: ${task.title}`} className="icon-button" onClick={() => setOpen((current) => !current)} type="button">{open ? <ChevronUp aria-hidden="true" size={19} /> : <ChevronDown aria-hidden="true" size={19} />}</button>
     </div>
     {open && <div className="engineering-task-content">
       <div className="engineering-task-summary"><div><strong>{t.engineering.outcome}</strong><p>{task.outcome}</p></div><div><strong>{t.engineering.whyItMatters}</strong><p>{task.whyItMatters}</p></div></div>
@@ -26,7 +26,7 @@ function TaskCard({ task, t, complete, onToggle }: { task: EngineeringTask; t: T
 export function EngineeringRoadmapResults({ roadmap, completedTaskIds, onToggleTask, onStartOver, t }: { roadmap: EngineeringRoadmap; completedTaskIds: string[]; onToggleTask: (id: string) => void; onStartOver: () => void; t: Translation }) {
   return <section className="engineering-roadmap-results" id="engineering-roadmap-results" aria-labelledby="engineering-roadmap-title">
     <div className="section-heading"><p className="eyebrow">{t.engineering.roadmapEyebrow}</p><h2 id="engineering-roadmap-title">{t.engineering.roadmapTitle}</h2><p>{t.engineering.roadmapIntro}</p></div>
-    <div className="engineering-roadmap-summary"><div><strong>{roadmap.title}</strong><p>{roadmap.summary}</p></div><div><strong>{roadmap.totalEstimatedAgentMinutes + roadmap.totalEstimatedHumanReviewMinutes} {t.engineering.minutes}</strong><p>{roadmap.tasks.length} concrete tasks</p></div></div>
+    <div className="engineering-roadmap-summary"><div><strong>{roadmap.title}</strong><p>{roadmap.summary}</p></div><div><strong>{roadmap.totalEstimatedAgentMinutes + roadmap.totalEstimatedHumanReviewMinutes} {t.engineering.minutes}</strong><p>{roadmap.tasks.length} {t.engineering.taskCount}</p></div></div>
     {roadmap.notice && <p className="engineering-notice" role="status">{roadmap.notice}</p>}
     <div className="engineering-task-list">{roadmap.tasks.map((task) => <TaskCard key={task.id} complete={completedTaskIds.includes(task.id)} onToggle={() => onToggleTask(task.id)} task={task} t={t} />)}</div>
     <div className="engineering-warnings"><strong>{t.engineering.warnings}</strong><ul>{roadmap.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>

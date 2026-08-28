@@ -35,4 +35,21 @@ describe("path selection UI", () => {
     expect(markup).toContain('class="path-choice-grid"');
     expect((markup.match(/<button/g) ?? []).length).toBe(2);
   });
+
+  it("supports embedding the neutral brief form beside the landing copy", () => {
+    const markup = renderToStaticMarkup(
+      React.createElement(InitialBriefForm, {
+        brief: "",
+        embedded: true,
+        isSubmitting: false,
+        onChange: vi.fn(),
+        onSubmit: vi.fn(),
+        t: getTranslation("en"),
+      }),
+    );
+
+    expect(markup).toContain('class="project-form"');
+    expect(markup).not.toContain("path-entry-section");
+    expect(markup).toContain('for="initialProjectBrief"');
+  });
 });

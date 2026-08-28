@@ -6,18 +6,20 @@ import {
   type EngineeringProject,
 } from "@/src/project-path/contracts";
 
-const resources = [
-  {
-    label: "Codex overview",
-    url: "https://developers.openai.com/codex",
-    reason: "Understand how a coding agent works across a repository and where human supervision remains necessary.",
-  },
-  {
-    label: "Review a GitHub pull request",
-    url: "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/reviewing-proposed-changes-in-a-pull-request",
-    reason: "Use a concrete review loop for inspecting the agent's diff before merging.",
-  },
-];
+function resources(vi: boolean) {
+  return [
+    {
+      label: vi ? "Tổng quan về Codex" : "Codex overview",
+      url: "https://developers.openai.com/codex",
+      reason: vi ? "Hiểu coding agent làm việc trong repository như thế nào và khi nào vẫn cần con người giám sát." : "Understand how a coding agent works across a repository and where human supervision remains necessary.",
+    },
+    {
+      label: vi ? "Review pull request trên GitHub" : "Review a GitHub pull request",
+      url: "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/reviewing-proposed-changes-in-a-pull-request",
+      reason: vi ? "Dùng một vòng review cụ thể để kiểm tra diff của agent trước khi merge." : "Use a concrete review loop for inspecting the agent's diff before merging.",
+    },
+  ];
+}
 
 export function generateEngineeringGuidedPlan(
   project: EngineeringProject,
@@ -25,6 +27,7 @@ export function generateEngineeringGuidedPlan(
 ): EngineeringGuidedPlan {
   const id = createHash("sha256").update(JSON.stringify({ project, interpretation, method: "guided_tutorials" })).digest("hex").slice(0, 12);
   const vi = project.interfaceLanguage === "vi";
+  const resourceList = resources(vi);
   return EngineeringGuidedPlanSchema.parse({
     path: "agentic_engineering",
     method: "guided_tutorials",
@@ -41,7 +44,7 @@ export function generateEngineeringGuidedPlan(
         outcome: vi ? `Bạn xác định được entry point, script và quy ước của ${interpretation.repositoryContext}.` : `You can identify the entry points, scripts, and conventions in ${interpretation.repositoryContext}.`,
         whyItMatters: vi ? "Agent chỉ an toàn khi làm việc trên đúng repository và đúng quy ước hiện có." : "An agent is safer when it works in the intended repository and follows its existing conventions.",
         checks: vi ? ["Ghi lại package manager và lệnh test/build hiện có.", "Xác nhận repository hoặc thư mục làm việc là đúng."] : ["Record the package manager and available test/build commands.", "Confirm the repository or workspace is the intended one."],
-        resources,
+        resources: resourceList,
       },
       {
         id: "review-diffs",
@@ -49,7 +52,7 @@ export function generateEngineeringGuidedPlan(
         outcome: vi ? "Bạn có thể đối chiếu thay đổi với definition of done trước khi chấp nhận." : "You can compare the proposed changes with the definition of done before accepting them.",
         whyItMatters: vi ? "Agent có thể hoàn thành code nhưng không tự quyết định thay đổi có đúng ý bạn hay không." : "An agent can produce code, but it cannot decide whether a change matches your intent without your review.",
         checks: vi ? ["Kiểm tra file thay đổi có nằm trong phạm vi không.", "Đọc test và phần xử lý lỗi cùng với diff."] : ["Check that changed files stay within scope.", "Read the tests and failure handling alongside the diff."],
-        resources: [resources[1]],
+        resources: [resourceList[1]],
       },
       {
         id: "run-verification",
