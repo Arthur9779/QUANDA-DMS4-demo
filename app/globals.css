@@ -2793,6 +2793,30 @@ footer {
     padding: 30px 24px;
   }
 
+  .landing-entry-section {
+    align-items: stretch;
+    gap: 28px;
+    grid-template-columns: 1fr;
+    margin-top: 32px;
+    padding: 30px 16px;
+  }
+
+  .landing-entry-copy h1,
+  .landing-entry-copy.hero-vi h1 {
+    font-size: clamp(2.35rem, 11.5vw, 3.35rem);
+    line-height: 1.06;
+    max-width: 10ch;
+  }
+
+  .landing-entry-copy .hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .landing-entry-form .project-form {
+    padding: 22px 16px;
+  }
+
   .project-form {
     padding: 22px 16px;
     border-radius: 24px;
@@ -3305,6 +3329,55 @@ footer {
 .path-entry-section .project-form textarea {
   min-height: 220px;
 }
+
+.landing-entry-section {
+  align-items: center;
+  background: #e8ebd6;
+  border: 1px solid #c5ccb0;
+  border-radius: 28px;
+  box-sizing: border-box;
+  display: grid;
+  gap: clamp(36px, 7vw, 96px);
+  grid-template-columns: minmax(0, 0.86fr) minmax(440px, 1.14fr);
+  margin: 64px auto 0;
+  max-width: 1180px;
+  padding: clamp(42px, 6vw, 78px);
+}
+.landing-entry-copy { min-width: 0; }
+.landing-entry-copy .eyebrow { color: var(--green); }
+.landing-entry-copy h1 {
+  max-width: 9ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2.8rem, 5.5vw, 5.1rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+.landing-entry-copy h1 em {
+  display: block;
+  width: fit-content;
+  color: var(--green);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-weight: 500;
+  line-height: 0.92;
+  text-transform: none;
+}
+.landing-entry-copy.hero-vi h1 {
+  font-size: clamp(2.7rem, 5.2vw, 4.8rem);
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  max-width: 10ch;
+  text-wrap: balance;
+}
+.landing-entry-copy .hero-tagline { color: var(--ink); font-size: 1.05rem; margin: 26px 0 0; }
+.landing-entry-copy .hero-description { color: var(--muted); font-size: 1rem; line-height: 1.65; max-width: 34rem; }
+.landing-entry-copy .hero-actions { margin-top: 22px; }
+.landing-entry-copy .hero-actions > span { color: var(--muted); font-size: 0.9rem; }
+.landing-entry-form { min-width: 0; }
+.landing-entry-form .project-form { padding: clamp(28px, 3.5vw, 42px); }
+.landing-entry-form .project-form textarea { min-height: 220px; }
 
 .path-clarification {
   padding: clamp(42px, 6vw, 78px);

@@ -43,4 +43,17 @@ describe("agentic engineering workflow", () => {
     }
     expect(roadmap.tasks.map((task) => task.title).join(" ")).not.toMatch(/Learn Git|JavaScript|Coding$/i);
   });
+
+  it("localizes the engineering interpretation and executable tasks", () => {
+    const viProject = EngineeringProjectSchema.parse({ ...project, interfaceLanguage: "vi" });
+    const interpretation = interpretEngineeringProject(viProject);
+    const roadmap = generateEngineeringRoadmap(viProject, interpretation);
+
+    expect(interpretation.productType).toBe("ứng dụng web");
+    expect(roadmap.title).toContain("Lộ trình kỹ thuật tác nhân");
+    expect(roadmap.tasks[0].title).toBe("Khởi tạo workspace của dự án");
+    expect(roadmap.tasks[0].agentPrompt).toContain("Kiểm tra bối cảnh dự án");
+    expect(roadmap.tasks[0].acceptanceCriteria[0]).toContain("Đã ghi lại");
+    expect(roadmap.warnings[0]).toContain("review diff");
+  });
 });
