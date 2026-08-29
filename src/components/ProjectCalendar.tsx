@@ -18,6 +18,7 @@ interface ProjectCalendarProps {
   onAddTask: (task: CalendarTask) => void;
   onDeleteTask: (taskId: string) => void;
   onToggleTask: (taskId: string) => void;
+  onNavigate: (direction: "previous" | "today" | "next") => void;
 }
 
 function monthStart(date: Date): Date {
@@ -54,6 +55,7 @@ export function ProjectCalendar({
   onAddTask,
   onDeleteTask,
   onToggleTask,
+  onNavigate,
 }: ProjectCalendarProps) {
   const [today] = useState(() => atLocalNoon(new Date()));
   const [visibleMonth, setVisibleMonth] = useState(() => monthStart(today));
@@ -144,7 +146,8 @@ export function ProjectCalendar({
               <div aria-label={t.calendar.controlsLabel} className="calendar-controls">
                 <button
                   aria-label={t.calendar.previousMonth}
-                  onClick={() =>
+                  onClick={() => {
+                    onNavigate("previous");
                     setVisibleMonth(
                       new Date(
                         visibleMonth.getFullYear(),
@@ -152,18 +155,25 @@ export function ProjectCalendar({
                         1,
                         12,
                       ),
-                    )
-                  }
+                    );
+                  }}
                   type="button"
                 >
                   <ChevronLeft aria-hidden="true" size={18} />
                 </button>
-                <button onClick={() => selectDate(today)} type="button">
+                <button
+                  onClick={() => {
+                    onNavigate("today");
+                    selectDate(today);
+                  }}
+                  type="button"
+                >
                   {t.calendar.today}
                 </button>
                 <button
                   aria-label={t.calendar.nextMonth}
-                  onClick={() =>
+                  onClick={() => {
+                    onNavigate("next");
                     setVisibleMonth(
                       new Date(
                         visibleMonth.getFullYear(),
@@ -171,8 +181,8 @@ export function ProjectCalendar({
                         1,
                         12,
                       ),
-                    )
-                  }
+                    );
+                  }}
                   type="button"
                 >
                   <ChevronRight aria-hidden="true" size={18} />
