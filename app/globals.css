@@ -3446,6 +3446,9 @@ footer {
   margin: 12px auto 0;
   max-width: 100%;
   padding: 10px 12px 10px 16px;
+  position: sticky;
+  top: 94px;
+  z-index: 900;
 }
 .workflow-toast span:last-child { color: #d9e9bd; }
 .workflow-toast-dot { background: #9be79f; border-radius: 50%; flex: 0 0 8px; height: 8px; width: 8px; }
@@ -3505,7 +3508,7 @@ footer {
 .route-rejection { background: #fff1e9; border-left: 3px solid var(--amber); padding: 10px 12px; }
 
 @media (max-width: 760px) {
-  .workflow-toast { align-items: flex-start; border-radius: 16px; flex-wrap: wrap; }
+  .workflow-toast { align-items: flex-start; border-radius: 16px; flex-wrap: wrap; top: 84px; }
   .workflow-toast-dismiss { margin-left: auto; }
   .route-evaluation-heading, .route-score-grid, .route-evidence-grid, .route-strengths { grid-template-columns: 1fr; }
   .route-score { grid-row: 1; }
