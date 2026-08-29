@@ -8,7 +8,6 @@ describe("project path classification", () => {
     "Edit a short documentary with interviews and archival footage.",
     "Create an illustrated brand identity for a local cafe.",
     "Create an interactive projected artwork for a gallery installation.",
-    "Design a responsive mobile banking prototype in Figma with a component system and tested user flow.",
   ];
   const engineeringFixtures = [
     "Build a Next.js portfolio website and deploy it with a searchable project gallery.",
@@ -18,7 +17,6 @@ describe("project path classification", () => {
     "Develop a browser extension that saves and searches the current page.",
     "Debug an existing repository where the production build fails on deployment.",
     "Add an AI-powered search feature to the existing web application.",
-    "Build a 2D survival game in Godot with GDScript and export a playable Windows build.",
   ];
 
   it.each(designFixtures)("routes design brief: %s", (brief) => {

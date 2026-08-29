@@ -7,9 +7,7 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
     page.getByText("No API key is configured, so QUANDA will use a dependable sample roadmap."),
   ).toHaveCount(0);
   await expect(page.locator(".workflow-progress")).toHaveCount(0);
-  if (testInfo.project.name === "chromium") {
-    await expect(page.getByRole("heading", { name: "Agentic planner find the most optimal path for the deadline" })).toBeVisible();
-  }
+  await expect(page.getByRole("heading", { name: "Agentic planner find the most optimal path for the deadline" })).toBeVisible();
   await expect(page.locator(".landing-entry-section")).toBeVisible();
   await expect(page.locator(".landing-entry-section .project-form")).toBeVisible();
 

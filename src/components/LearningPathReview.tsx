@@ -14,7 +14,6 @@ import type { SkillGap } from "@/src/contracts/knowledge";
 import type { Translation } from "@/src/i18n/translations";
 import type { LearningPlan } from "@/src/tutorial-matching";
 import { extractYouTubeVideoId } from "@/src/lib/tutorialMatcher";
-import { trackEvent } from "@/src/lib/analytics";
 
 interface LearningPathReviewProps {
   plan: LearningPlan;
@@ -151,13 +150,6 @@ export function LearningPathReview({
                       aria-label={`${t.learning.useThis}: ${selected.tutorial.title}`}
                       className={`matched-tutorial-thumbnail${thumbnailUrl ? " has-image" : ""}`}
                       href={selected.tutorial.url}
-                      onClick={() =>
-                        trackEvent("tutorial_opened", {
-                          tutorialId: selected.tutorial.id,
-                          skillId: gap.skillId,
-                          surface: "learning_path",
-                        })
-                      }
                       rel="noreferrer"
                       style={thumbnailUrl ? { backgroundImage: `url(${thumbnailUrl})` } : undefined}
                       target="_blank"
@@ -196,18 +188,7 @@ export function LearningPathReview({
                         <p>{t.learning.whyTutorialCopy}</p>
                       </div>
                       <div className="tutorial-match-actions">
-                        <a
-                          href={selected.tutorial.url}
-                          onClick={() =>
-                            trackEvent("tutorial_opened", {
-                              tutorialId: selected.tutorial.id,
-                              skillId: gap.skillId,
-                              surface: "learning_path",
-                            })
-                          }
-                          rel="noreferrer"
-                          target="_blank"
-                        >
+                        <a href={selected.tutorial.url} rel="noreferrer" target="_blank">
                           {t.learning.useThis}<ArrowUpRight aria-hidden="true" size={14} />
                         </a>
                         <button onClick={() => need && onReplace(need.id)} type="button">
