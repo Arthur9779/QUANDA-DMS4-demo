@@ -721,18 +721,16 @@ export function QuandaApp() {
         ? "Solo project. No Blender or Photoshop. Use free assets or simple self-created shapes. No multiplayer, backend, or user accounts. Prioritise working gameplay before graphics and animation."
         : "Làm một mình. Không dùng Blender hoặc Photoshop. Chỉ dùng asset miễn phí hoặc hình dạng đơn giản tự tạo. Không multiplayer, backend hoặc tài khoản người dùng. Ưu tiên gameplay hoạt động trước đồ họa và animation.",
     };
-    const nextInterpretation = interpretEngineeringProject(nextEngineering);
     clearProjectStorage(window.localStorage);
     setProjectPath("agentic_engineering");
     setPathClassification({ path: "agentic_engineering", confidence: 1, reason: "The example is a working software project.", signals: ["example engineering brief"] });
     setEngineeringForm(nextEngineering);
-    setEngineeringInterpretation(nextInterpretation);
-    setEngineeringInterpretationConfirmed(true);
-    setPreparationMethod("agentic_project_plan");
+    setEngineeringInterpretation(null);
+    setEngineeringInterpretationConfirmed(false);
+    setPreparationMethod(null);
     setEngineeringRoadmap(null);
     setEngineeringGuidedPlan(null);
-    setForm({ ...emptyForm(locale), projectBrief: technicalBrief });
-    setWorkflowStage("brief");
+    setForm(emptyForm(locale));
     setEngineeringCompletion([]);
     setEngineeringCalendarTasks([]);
     setRoadmap(null);
@@ -745,7 +743,9 @@ export function QuandaApp() {
     setAnalysisError(null);
     setMatchingError(null);
     setEngineeringError(null);
-    void generateEngineering("agentic_project_plan", nextEngineering, nextInterpretation);
+    requestAnimationFrame(() => {
+      document.querySelector("#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const analyzeProject = async (request: RoadmapRequest) => {
@@ -1087,15 +1087,15 @@ export function QuandaApp() {
 
   return (
     <main id="top">
+      <Header
+        isReady={isHydrated}
+        locale={locale}
+        t={t}
+        onLanguageChange={changeLanguage}
+        onLoadExample={loadExample}
+      />
       <div className="page-shell">
-        <Header
-          isReady={isHydrated}
-          locale={locale}
-          t={t}
-          onLanguageChange={changeLanguage}
-          onLoadExample={loadExample}
-        />
-        {workflowStage && <WorkflowToast stage={workflowStage} t={t} />}
+        {workflowStage && <WorkflowToast onDismiss={() => setWorkflowStage(null)} stage={workflowStage} t={t} />}
         {!projectPath && !pathClassification ? (
           <section className="landing-entry-section" id="project-form" aria-labelledby="hero-title">
             <div className={`landing-entry-copy hero-${locale}`}>
