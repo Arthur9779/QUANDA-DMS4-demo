@@ -22,6 +22,7 @@ import { ProjectCalendar } from "./ProjectCalendar";
 import { LoadingAnalysis } from "./LoadingAnalysis";
 import { LoadingLearningPath } from "./LoadingLearningPath";
 import { LearningPathReview } from "./LearningPathReview";
+import { ApplicationPathComparison } from "./ApplicationPathComparison";
 import { createSampleRoadmap } from "@/src/data/sampleRoadmaps";
 import { LoadingRoadmap } from "./LoadingRoadmap";
 import {
@@ -742,9 +743,17 @@ export function QuandaApp() {
         creativeDnaReview?.analysis.creativeDna ?? null,
         parsed.data.creativeDna,
       );
+      const planningRequest =
+        request.requiredApplications.length === 0 && parsed.data.applicationPaths
+          ? {
+              ...request,
+              requiredApplications:
+                parsed.data.applicationPaths.recommended.applicationIds,
+            }
+          : request;
       const review: CreativeDnaReviewRecord = {
         reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
-        inputFingerprint: createProjectInputFingerprint(request),
+        inputFingerprint: createProjectInputFingerprint(planningRequest),
         analysis: { ...parsed.data, creativeDna },
         confirmed: false,
       };
@@ -756,6 +765,7 @@ export function QuandaApp() {
         },
         confirmed: true,
       };
+      setForm(planningRequest);
       setCreativeDnaReview(confirmedReview);
       writeCreativeDnaReview(window.localStorage, confirmedReview);
       trackEvent("creative_dna_review_viewed", { source: parsed.data.source });
@@ -769,7 +779,7 @@ export function QuandaApp() {
           unknownCount: creativeDna.unknownConcepts.length,
         },
       );
-      void matchTutorials(confirmedReview, request);
+      void matchTutorials(confirmedReview, planningRequest);
     } catch {
       setAnalysisError(getTranslation(request.interfaceLanguage).review.errorMessage);
     } finally {
@@ -1199,40 +1209,50 @@ export function QuandaApp() {
           )}
         </div>
 
+        {projectPath === "design" &&
+          creativeDnaReview?.confirmed &&
+          !creativeDnaIsStale &&
+          creativeDnaReview.analysis.applicationPaths && (
+            <ApplicationPathComparison
+              decision={creativeDnaReview.analysis.applicationPaths}
+              t={t}
+            />
+          )}
+
         {projectPath === "design" && learningPlan &&
           creativeDnaReview?.confirmed &&
           !learningPlanIsStale &&
           !isMatchingTutorials && (
             <LearningPathReview
-              isBusy={isLoading}
-              onContinue={() => void generateRoadmap(form)}
-              onReplace={(needId, feedback) => {
-                setRoadmap(null);
-                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
-                setLearningPlan((current) =>
-                  current ? replaceTutorial(current, needId, feedback) : current,
-                );
-                trackEvent("tutorial_replaced", { feedback: feedback ?? "none" });
-              }}
-              onRestoreTutorial={(needId) => {
-                setRoadmap(null);
-                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
-                setLearningPlan((current) =>
-                  current ? restorePreviousTutorial(current, needId) : current,
-                );
-                trackEvent("tutorial_replacement_undone");
-              }}
-              onSkillStatus={(skillId, status) => {
-                setRoadmap(null);
-                setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
-                setLearningPlan((current) =>
-                  current ? markSkillGap(current, skillId, status) : current,
-                );
-                trackEvent("skill_gap_updated", { status });
-              }}
-              plan={learningPlan}
-              t={t}
-            />
+                isBusy={isLoading}
+                onContinue={() => void generateRoadmap(form)}
+                onReplace={(needId, feedback) => {
+                  setRoadmap(null);
+                  setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+                  setLearningPlan((current) =>
+                    current ? replaceTutorial(current, needId, feedback) : current,
+                  );
+                  trackEvent("tutorial_replaced", { feedback: feedback ?? "none" });
+                }}
+                onRestoreTutorial={(needId) => {
+                  setRoadmap(null);
+                  setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+                  setLearningPlan((current) =>
+                    current ? restorePreviousTutorial(current, needId) : current,
+                  );
+                  trackEvent("tutorial_replacement_undone");
+                }}
+                onSkillStatus={(skillId, status) => {
+                  setRoadmap(null);
+                  setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+                  setLearningPlan((current) =>
+                    current ? markSkillGap(current, skillId, status) : current,
+                  );
+                  trackEvent("skill_gap_updated", { status });
+                }}
+                plan={learningPlan}
+                t={t}
+              />
           )}
 
         {projectPath === "design" && roadmap &&
