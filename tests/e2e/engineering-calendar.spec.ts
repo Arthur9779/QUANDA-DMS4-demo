@@ -13,12 +13,11 @@ test("renders and persists the isolated engineering calendar for Last Night", as
   await page.getByLabel("Preferred tools and technologies").fill("Godot 4, GDScript");
   await page.getByLabel("Deployment target").fill("Playable Windows build");
   await page.getByLabel("Current technical experience").fill("Basic programming knowledge; new to Godot and GDScript.");
-  await page.getByLabel("Deadline").fill("2026-09-01");
+  await page.locator("#engineeringDeadline").fill("2026-09-01");
   await page.getByRole("button", { name: "Review my build plan" }).click();
 
-  await expect(page.getByRole("heading", { name: "Let’s shape your build plan" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Choose how you want to prepare" })).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
-  await page.getByRole("button", { name: "Generate the engineering roadmap" }).click();
   await page.getByRole("button", { name: /Agentic project plan/ }).click();
 
   await expect(page.locator("#engineering-roadmap-results")).toBeVisible();

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, BookOpenCheck, ListChecks, PencilLine } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Header } from "./Header";
 import { getTranslation } from "@/src/i18n/translations";
 import type {
@@ -66,6 +66,18 @@ import {
 } from "@/src/lib/storage";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
 import { trackEvent } from "@/src/lib/analytics";
+import {
+  archiveCurrentQuandaProject,
+  initializeQuandaApi,
+  persistQuandaProject,
+  restoreLatestQuandaProject,
+} from "@/src/lib/quandaApi";
+import {
+  createProjectSnapshot,
+  parseProjectSnapshot,
+  projectStatus,
+  projectTitle,
+} from "@/src/lib/projectSnapshot";
 import {
   removeRoadmapCalendarTasks,
   syncRoadmapCalendarTasks,
@@ -168,6 +180,8 @@ export function QuandaApp() {
   const [matchingError, setMatchingError] = useState<string | null>(null);
   const [engineeringError, setEngineeringError] = useState<string | null>(null);
   const [workflowStage, setWorkflowStage] = useState<WorkflowStage | null>(null);
+  const calendarViewTracked = useRef(false);
+  const viewedRoadmapIds = useRef(new Set<string>());
   const t = getTranslation(locale);
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
   const projectInputFingerprint = createProjectInputFingerprint(form);
@@ -252,6 +266,49 @@ export function QuandaApp() {
           : removeRoadmapCalendarTasks(savedCalendarTasks),
       );
       setIsHydrated(true);
+
+      const hasLocalProject = Boolean(
+        savedDraft?.projectBrief.trim() ||
+          savedRoadmap ||
+          savedCreativeDnaReview ||
+          savedLearningPlan ||
+          savedCalendarTasks.length ||
+          savedEngineeringDraft?.technicalBrief.trim() ||
+          savedEngineeringInterpretation ||
+          savedEngineeringRoadmap ||
+          savedPreparationMethod ||
+          savedEngineeringGuidedPlan ||
+          savedEngineeringCalendarTasks.length,
+      );
+      void initializeQuandaApi().then(async (session) => {
+        if (!session) return;
+        trackEvent("site_opened", {
+          returningUser: session.returningUser,
+          language: restoredLocale,
+        });
+        if (hasLocalProject) return;
+        const remoteProject = await restoreLatestQuandaProject();
+        const snapshot = parseProjectSnapshot(remoteProject?.data);
+        if (!snapshot) return;
+        setProjectPath("design");
+        setPathClassification(null);
+        setLocale(snapshot.form.interfaceLanguage);
+        setForm(snapshot.form);
+        setRoadmap(snapshot.roadmap);
+        setCreativeDnaReview(snapshot.creativeDnaReview);
+        setLearningPlan(snapshot.learningPlan);
+        setCompletion(snapshot.completion);
+        setCalendarTasks(
+          snapshot.roadmap
+            ? syncRoadmapCalendarTasks(
+                snapshot.calendarTasks,
+                snapshot.roadmap,
+                snapshot.form.deadline,
+                snapshot.completion[snapshot.roadmap.id] ?? [],
+              )
+            : removeRoadmapCalendarTasks(snapshot.calendarTasks),
+        );
+      });
     });
 
     return () => window.cancelAnimationFrame(frame);
@@ -346,6 +403,82 @@ export function QuandaApp() {
       writeEngineeringCalendarTasks(window.localStorage, engineeringCalendarTasks);
     }
   }, [engineeringCalendarTasks, isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (
+      !isHydrated ||
+      projectPath !== "design" ||
+      form.projectBrief.trim().length < 30
+    ) {
+      return;
+    }
+    const snapshot = createProjectSnapshot({
+      form,
+      creativeDnaReview,
+      learningPlan,
+      roadmap,
+      completion,
+      calendarTasks,
+    });
+    const timeout = window.setTimeout(() => {
+      void persistQuandaProject({
+        title: projectTitle(snapshot),
+        status: projectStatus(snapshot),
+        inputFingerprint: createProjectInputFingerprint(form),
+        data: snapshot,
+      });
+    }, 1_200);
+    return () => window.clearTimeout(timeout);
+  }, [
+    calendarTasks,
+    completion,
+    creativeDnaReview,
+    form,
+    isHydrated,
+    learningPlan,
+    projectPath,
+    roadmap,
+  ]);
+
+  useEffect(() => {
+    if (
+      !isHydrated ||
+      projectPath !== "design" ||
+      calendarViewTracked.current
+    ) {
+      return;
+    }
+    const calendar = document.querySelector("#calendar");
+    if (!calendar || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        calendarViewTracked.current = true;
+        trackEvent("calendar_opened");
+        observer.disconnect();
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(calendar);
+    return () => observer.disconnect();
+  }, [isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (
+      !isHydrated ||
+      projectPath !== "design" ||
+      !roadmap ||
+      roadmap.projectInputFingerprint !== projectInputFingerprint ||
+      viewedRoadmapIds.current.has(roadmap.id)
+    ) {
+      return;
+    }
+    viewedRoadmapIds.current.add(roadmap.id);
+    trackEvent("roadmap_viewed", {
+      source: roadmap.source ?? "ai",
+      stageCount: roadmap.stages.length,
+    });
+  }, [isHydrated, projectInputFingerprint, projectPath, roadmap]);
 
   const changeLanguage = (nextLocale: Locale) => {
     setLocale(nextLocale);
@@ -443,6 +576,7 @@ export function QuandaApp() {
   };
 
   const returnToBeginning = () => {
+    void archiveCurrentQuandaProject();
     clearProjectStorage(window.localStorage);
     setProjectPath(null);
     setPathClassification(null);
@@ -624,6 +758,11 @@ export function QuandaApp() {
     trackEvent("creative_dna_analysis_started", {
       language: request.interfaceLanguage,
       outputType: request.outputType,
+    });
+    trackEvent("brief_submitted", {
+      language: request.interfaceLanguage,
+      outputType: request.outputType,
+      requiredApplicationCount: request.requiredApplications.length,
     });
     requestAnimationFrame(() => {
       document.querySelector("#analysis-loading")?.scrollIntoView({
@@ -851,11 +990,12 @@ export function QuandaApp() {
       if (isCompleting) {
         trackEvent("stage_completed", { roadmapId: roadmap.id, stageId });
       }
+      const nextStageIds = isCompleting
+        ? [...new Set([...roadmapCompletion, stageId])]
+        : roadmapCompletion.filter((id) => id !== stageId);
       return {
         ...current,
-        [roadmap.id]: isCompleting
-          ? [...new Set([...roadmapCompletion, stageId])]
-          : roadmapCompletion.filter((id) => id !== stageId),
+        [roadmap.id]: nextStageIds,
       };
     });
     setCalendarTasks((current) =>
@@ -894,6 +1034,17 @@ export function QuandaApp() {
             : roadmapCompletion.filter((id) => id !== task.stageId),
         };
       });
+    }
+    if (nextDone) {
+      trackEvent(
+        task.source === "roadmap"
+          ? "roadmap_stage_completed"
+          : "calendar_item_completed",
+        {
+          taskSource: task.source,
+          ...(task.stageId ? { stageId: task.stageId } : {}),
+        },
+      );
     }
   };
 
@@ -1173,13 +1324,22 @@ export function QuandaApp() {
 
         {projectPath === "design" && <ProjectCalendar
           locale={locale}
-          onAddTask={(task) => setCalendarTasks((current) => [...current, task])}
+          onAddTask={(task) => {
+            setCalendarTasks((current) => [...current, task]);
+            trackEvent("calendar_item_created", {
+              taskSource: task.source,
+              category: task.category,
+            });
+          }}
           onDeleteTask={(taskId) =>
             setCalendarTasks((current) =>
               current.filter((task) => task.id !== taskId),
             )
           }
           onToggleTask={toggleCalendarTask}
+          onNavigate={(direction) =>
+            trackEvent("calendar_navigation_used", { direction })
+          }
           t={t}
           tasks={calendarTasks}
         />}
@@ -1214,6 +1374,12 @@ export function QuandaApp() {
                 setEngineeringCalendarTasks((current) =>
                   current.filter((task) => task.id !== taskId),
                 )
+              }
+              onNavigate={(direction) =>
+                trackEvent("calendar_navigation_used", {
+                  direction,
+                  path: "agentic_engineering",
+                })
               }
               onToggleTask={toggleEngineeringCalendarTask}
               t={t}
