@@ -13,7 +13,7 @@ function illustratorRequest(): RoadmapRequest {
     interfaceLanguage: "en",
     projectBrief:
       "Create a clean vector logo and icon set in Adobe Illustrator for a student brand project.",
-    deadline: "2099-08-20",
+    deadline: "2026-08-20",
     currentExperience: "Complete beginner in Adobe Illustrator",
     hoursPerDay: 2,
     daysPerWeek: 5,

@@ -10,7 +10,7 @@ The app is designed for students and early-career creatives who need to learn un
 - Ordered learning and production tasks
 - Curated tutorial recommendations
 - English and Vietnamese interface modes
-- Immediate browser recovery plus optional backend-synced projects and progress
+- Saved drafts, roadmap progress, and stage completion in the browser
 - Optional Google Gemini-generated roadmaps with a deterministic demo fallback
 
 ## 2. MVP scope
@@ -53,30 +53,12 @@ Open `http://localhost:3000`.
 | `GEMINI_RETRIEVAL_TIMEOUT_MS` | No | Semantic retrieval timeout between 250 and 15,000 ms. |
 | `YOUTUBE_API_KEY` | No | Server-only YouTube Data API key for optional live video discovery. Curated and indexed matching works without it. |
 | `NEXT_PUBLIC_APP_URL` | No | Public app origin for local documentation and deployment configuration. |
-| `NEXT_PUBLIC_QUANDA_API_URL` | No | Public QUANDA backend origin, such as `http://localhost:3001` locally. When omitted, backend persistence and analytics remain disabled without affecting planning. |
 
 Creative DNA uses a compact, OpenAPI-compatible Gemini structured-output schema, then validates the complete response against the stricter server-side contract. Fallback diagnostics log only a bounded error class and status, never model output or secrets.
 
 Never prefix the Gemini key with `NEXT_PUBLIC_` and never place it in client-side code. `.env.local` is ignored by Git.
 
-## 6. Anonymous persistence and analytics
-
-When `NEXT_PUBLIC_QUANDA_API_URL` is configured, the browser creates a random
-anonymous identity and session through the QUANDA backend. It stores only the
-opaque identity and session tokens needed to resume that browser; there is no
-email login and no device fingerprinting.
-
-The frontend keeps local storage as its immediate offline-safe copy, then
-debounces complete project snapshots to the backend. If the browser has no
-usable local project, it can recover the latest valid backend snapshot. Remote
-data is validated before it enters React state.
-
-Meaningful product events are queued through one client module and sent in
-batches. Failures are swallowed by design: analytics, session renewal, and
-project synchronization must never interrupt Creative DNA analysis, tutorial
-matching, roadmap generation, or the calendar.
-
-## 7. Google AI Studio setup
+## 6. Google AI Studio setup
 
 1. Open Google AI Studio and create an API key for the project that will run QUANDA.
 2. Copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`.
@@ -93,11 +75,11 @@ API access, models, quotas, regional availability, and billing depend on the Goo
 
 The browser sends only the validated roadmap request to `/api/roadmap`. The server route reads the key, calls the Gemini API, validates the JSON, attempts one repair when necessary, and returns normalized data. The key is never included in browser code or API responses.
 
-## 8. Demo mode
+## 7. Demo mode
 
 When `GEMINI_API_KEY` is absent, `/api/roadmap` returns a deterministic roadmap based on the confirmed Creative DNA and learning plan. AI roadmaps must carry every selected tutorial into the production path exactly once; invalid responses receive one constrained repair. If that repair fails, the fallback groups the complete skill-gap set into at most eight stages while preserving every selected verified tutorial, with a bilingual explanation.
 
-## 9. Add tutorials
+## 8. Add tutorials
 
 Edit `src/data/tutorials.json`. Each entry needs:
 
@@ -109,11 +91,11 @@ Edit `src/data/tutorials.json`. Each entry needs:
 
 Only catalogue IDs may be rendered as tutorial links. Every catalogue entry must be a verified, direct YouTube video URL with a matching 11-character video ID. If no video matches, QUANDA shows an empty-state message instead of inventing a link or sending the user to search results.
 
-## 10. Add translations
+## 9. Add translations
 
 Edit `src/i18n/translations.ts`. Add the same key to both the `en` and `vi` objects, then use the typed translation object in the relevant component. Keep loading, validation, timeout, and fallback messages bilingual.
 
-## 11. Test commands
+## 10. Test commands
 
 ```bash
 pnpm run lint
@@ -148,13 +130,13 @@ pnpm tutorial:match --case blender-beginner-toon
 
 The compiled runtime ontology and update workflow are documented in [`docs/ontology.md`](docs/ontology.md). Semantic retrieval, File Search indexing, freshness checks, diagnostics, and fallback behavior are documented in [`docs/ontology-retrieval.md`](docs/ontology-retrieval.md). Ontology-backed classification is documented in [`docs/creative-dna-analysis.md`](docs/creative-dna-analysis.md), the editable review/persistence flow in [`docs/creative-dna-review.md`](docs/creative-dna-review.md), and contextual skill-gap/tutorial matching in [`docs/tutorial-matching.md`](docs/tutorial-matching.md).
 
-## 12. Vercel deployment
+## 11. Vercel deployment
 
 1. Push this repository to GitHub.
 2. Import the repository into Vercel and keep the detected Next.js framework preset.
 3. Add `GEMINI_API_KEY` as a server environment variable. Optionally add `YOUTUBE_API_KEY` for live YouTube discovery; the verified local catalogue remains the first source tier.
 4. Run `pnpm ontology:index` locally with the same API key, then add the printed `GEMINI_FILE_SEARCH_STORE` and `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` values to Vercel. Skip this step to use deterministic local ontology retrieval.
-5. After the backend deployment phase, add `NEXT_PUBLIC_QUANDA_API_URL=https://quanda-api.dms.onl` to enable persistence and analytics. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
+5. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
 6. Deploy and test the public URL in English and Vietnamese.
 7. Temporarily test without the API key, with a stale index hash, or with the upstream service unavailable, to confirm demo and retrieval fallback behaviour.
 
@@ -162,20 +144,19 @@ On a Vercel Hobby project, merge production changes through the GitHub account t
 
 The server endpoint uses bounded request sizes, a short in-memory rate limit, and request timeouts; it does not start background jobs.
 
-## 13. Known limitations
+## 12. Known limitations
 
-- Anonymous recovery follows the opaque identity stored in the same browser;
-  cross-device account sync is intentionally not implemented.
+- Browser persistence is device-local and has no account sync.
 - The in-memory rate limit is best-effort and is not shared across server instances.
 - The catalogue is intentionally small and covers the applications required by this MVP.
 - AI output quality depends on the selected Gemini model and account availability.
 - Feasibility estimates are planning guidance, not guarantees.
 - The demo templates cover Blender, Figma, and DaVinci Resolve project patterns.
 
-## 14. Future features
+## 13. Future features
 
-- Optional account upgrades and cross-device project sync
+- Cloud-synced projects and accounts
 - Instructor feedback and shared roadmaps
 - A larger, periodically re-verified tutorial catalogue
-- A protected visual analytics dashboard
+- Privacy-conscious production analytics
 - Export to calendar or printable project plan

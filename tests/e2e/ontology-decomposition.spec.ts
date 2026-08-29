@@ -7,16 +7,22 @@ test("uses quanda.skills to build a tutorial-backed Figma workflow", async ({
   await page.getByLabel("Project brief").fill(
     "I know basic Figma. I need to design and prototype a responsive mobile banking app with reusable components and a tested user flow for a university assignment.",
   );
-  await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByLabel("Current experience").fill(
     "I know Figma basics but not Auto Layout, components, user flows, or prototyping.",
   );
   await page.getByLabel("Desired output type").selectOption("uiux");
   await page.getByLabel("Search applications").fill("Figma");
-  await page.getByRole("button", { name: "Add application: Figma", exact: true }).click();
+  await page.getByRole("button", { name: "Add application: Figma" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
 
-  await expect(page.locator("#creative-dna-review")).toHaveCount(0);
+  const creativeDna = page.locator("#creative-dna-review");
+  await expect(creativeDna).toBeVisible();
+  await creativeDna.getByRole("button", { name: "Add concept" }).first().click();
+  await page.getByLabel("Search concepts").fill("user flow");
+  await page.getByRole("button", { name: "Add user flow" }).first().click();
+  await expect(creativeDna.getByText("Added by you", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Looks right — continue" }).click();
   const learning = page.locator("#learning-path-review");
   await expect(learning).toBeVisible();
   for (const skill of [
