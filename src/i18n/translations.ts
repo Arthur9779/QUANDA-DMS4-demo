@@ -133,6 +133,26 @@ export interface Translation {
     review: string;
     prepare: string;
     plan: string;
+    completed: string;
+    next: string;
+  };
+  routeEvaluation: {
+    eyebrow: string;
+    title: string;
+    outOf: string;
+    recommended: string;
+    alternative: string;
+    rejected: string;
+    tools: string;
+    strengths: string;
+    tradeoffs: string;
+    showEvidence: string;
+    showAlternatives: string;
+    hideAlternatives: string;
+    showDetails: string;
+    hideDetails: string;
+    whyRejected: string;
+    criteria: Record<string, string>;
   };
   how: {
     eyebrow: string;
@@ -512,7 +532,25 @@ const en: Translation = {
     resources: "Verified resources",
     humanNote: "You remain responsible for reviewing changes, running checks, and accepting the final result.",
   },
-  workflow: { ariaLabel: "Planning progress", brief: "Brief", review: "Review the plan", prepare: "Choose how to prepare", plan: "Production plan" },
+  workflow: { ariaLabel: "Planning progress", brief: "Brief", review: "Review the plan", prepare: "Choose how to prepare", plan: "Production plan", completed: "complete", next: "Next" },
+  routeEvaluation: {
+    eyebrow: "Evidence-backed route choice",
+    title: "Why this route is the strongest fit",
+    outOf: "out of 100",
+    recommended: "Recommended route",
+    alternative: "Alternative route",
+    rejected: "Rejected route",
+    tools: "Tools in this route",
+    strengths: "Strengths",
+    tradeoffs: "Trade-offs",
+    showEvidence: "Show score evidence",
+    showAlternatives: "Compare alternative routes",
+    hideAlternatives: "Hide alternative routes",
+    showDetails: "Show details",
+    hideDetails: "Hide details",
+    whyRejected: "Why it was rejected",
+    criteria: { requirements_fit: "Requirements fit", familiarity: "User familiarity", time_fit: "Deadline and time fit", switching_cost: "Tool switching cost", resources: "Verified resources", risk: "Project risk" },
+  },
   how: {
     eyebrow: "How it works",
     title: "From a blank page to a clear next step",
@@ -963,7 +1001,25 @@ const vi: Translation = {
     resources: "Nguồn đã xác minh",
     humanNote: "Bạn vẫn chịu trách nhiệm review thay đổi, chạy kiểm tra và chấp nhận kết quả cuối.",
   },
-  workflow: { ariaLabel: "Tiến độ lập kế hoạch", brief: "Đề bài", review: "Kiểm tra kế hoạch", prepare: "Chọn cách chuẩn bị", plan: "Kế hoạch sản xuất" },
+  workflow: { ariaLabel: "Tiến độ lập kế hoạch", brief: "Đề bài", review: "Kiểm tra kế hoạch", prepare: "Chọn cách chuẩn bị", plan: "Kế hoạch sản xuất", completed: "đã xong", next: "Tiếp theo" },
+  routeEvaluation: {
+    eyebrow: "Lựa chọn tuyến có bằng chứng",
+    title: "Vì sao tuyến này phù hợp nhất",
+    outOf: "trên 100",
+    recommended: "Tuyến được đề xuất",
+    alternative: "Tuyến thay thế",
+    rejected: "Tuyến bị loại",
+    tools: "Công cụ trong tuyến này",
+    strengths: "Điểm mạnh",
+    tradeoffs: "Đánh đổi",
+    showEvidence: "Xem bằng chứng chấm điểm",
+    showAlternatives: "So sánh các tuyến thay thế",
+    hideAlternatives: "Ẩn các tuyến thay thế",
+    showDetails: "Xem chi tiết",
+    hideDetails: "Ẩn chi tiết",
+    whyRejected: "Vì sao bị loại",
+    criteria: { requirements_fit: "Mức đáp ứng yêu cầu", familiarity: "Mức quen thuộc của bạn", time_fit: "Mức phù hợp thời hạn", switching_cost: "Chi phí đổi công cụ", resources: "Nguồn đã xác minh", risk: "Rủi ro dự án" },
+  },
   how: {
     eyebrow: "Cách hoạt động",
     title: "Từ trang giấy trắng đến bước tiếp theo rõ ràng",

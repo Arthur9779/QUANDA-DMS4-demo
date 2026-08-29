@@ -42,6 +42,8 @@ describe("agentic engineering workflow", () => {
       expect(task.executor).toMatch(/agent|human|hybrid/);
     }
     expect(roadmap.tasks.map((task) => task.title).join(" ")).not.toMatch(/Learn Git|JavaScript|Coding$/i);
+    expect(roadmap.routeEvaluation?.routes.length).toBeGreaterThanOrEqual(2);
+    expect(roadmap.routeEvaluation?.routes[0].scoreBreakdown).toHaveLength(6);
   });
 
   it("localizes the engineering interpretation and executable tasks", () => {
@@ -55,5 +57,6 @@ describe("agentic engineering workflow", () => {
     expect(roadmap.tasks[0].agentPrompt).toContain("Kiểm tra bối cảnh dự án");
     expect(roadmap.tasks[0].acceptanceCriteria[0]).toContain("Đã ghi lại");
     expect(roadmap.warnings[0]).toContain("review diff");
+    expect(roadmap.routeEvaluation?.explanation).toContain("sáu tiêu chí");
   });
 });

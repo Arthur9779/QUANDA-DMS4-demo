@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Locale } from "@/src/types";
+import { RouteEvaluationSchema } from "@/src/route-planning/contracts";
 
 export const ProjectPathSchema = z.enum(["design", "agentic_engineering"]);
 export type ProjectPath = z.infer<typeof ProjectPathSchema>;
@@ -131,6 +132,7 @@ export const EngineeringRoadmapSchema = z.object({
   totalEstimatedAgentMinutes: z.number().int().nonnegative(),
   totalEstimatedHumanReviewMinutes: z.number().int().nonnegative(),
   warnings: z.array(z.string()).max(12),
+  routeEvaluation: RouteEvaluationSchema.optional(),
 });
 export type EngineeringRoadmap = z.infer<typeof EngineeringRoadmapSchema>;
 

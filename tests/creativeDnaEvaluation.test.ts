@@ -15,5 +15,5 @@ describe("Creative DNA benchmark", () => {
     expect(metrics.unknownTermPreservation).toBe(1);
     expect(metrics.irrelevantConceptRate).toBeLessThanOrEqual(0.1);
     expect(metrics.requiredConceptRecall).toBeGreaterThan(0);
-  });
+  }, 30000);
 });

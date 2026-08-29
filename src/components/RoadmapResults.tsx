@@ -10,6 +10,7 @@ import { RoadmapStageCard } from "./RoadmapStageCard";
 import { extractYouTubeVideoId } from "@/src/lib/tutorialMatcher";
 import { getApplicationName } from "@/src/data/applications";
 import { createQuandaGuide } from "@/src/lib/quandaGuide";
+import { RouteEvaluationCard } from "./RouteEvaluationCard";
 
 interface RoadmapResultsProps {
   roadmap: RoadmapResponse;
@@ -104,6 +105,8 @@ export function RoadmapResults({
       {roadmap.notice && (
         <p className="fallback-notice" role="status">{roadmap.notice}</p>
       )}
+
+      {roadmap.routeEvaluation && <RouteEvaluationCard evaluation={roadmap.routeEvaluation} t={t} />}
 
       {allComplete && (
         <div className="success-state" role="status">
