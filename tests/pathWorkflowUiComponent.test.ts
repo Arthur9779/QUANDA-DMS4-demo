@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { InitialBriefForm } from "@/src/components/InitialBriefForm";
 import { PathClarification } from "@/src/components/PathClarification";
 import { getTranslation } from "@/src/i18n/translations";
+import { WorkflowToast } from "@/src/components/WorkflowToast";
 
 describe("path selection UI", () => {
   it("keeps the landing brief copy neutral for creative and software projects", () => {
@@ -51,5 +52,14 @@ describe("path selection UI", () => {
     expect(markup).toContain('class="project-form"');
     expect(markup).not.toContain("path-entry-section");
     expect(markup).toContain('for="initialProjectBrief"');
+  });
+
+  it("announces a completed workflow stage without rendering a progress bar", () => {
+    const markup = renderToStaticMarkup(
+      React.createElement(WorkflowToast, { stage: "brief", t: getTranslation("vi") }),
+    );
+    expect(markup).toContain('aria-live="polite"');
+    expect(markup).toContain("Đề bài đã xong");
+    expect(markup).not.toContain("workflow-progress");
   });
 });

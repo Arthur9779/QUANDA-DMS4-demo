@@ -1,3 +1,5 @@
+import type { RouteEvaluation } from "@/src/route-planning/contracts";
+
 export type Locale = "en" | "vi";
 
 export type TutorialLanguage = Locale | "either";
@@ -97,4 +99,5 @@ export interface RoadmapResponse {
   inputFingerprint?: string;
   /** Identifies the project brief this roadmap belongs to for safe restoration. */
   projectInputFingerprint?: string;
+  routeEvaluation?: RouteEvaluation;
 }
