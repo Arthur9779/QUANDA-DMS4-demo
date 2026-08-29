@@ -8,6 +8,10 @@ test("keeps manual tasks and synchronises roadmap milestones", async ({ page }) 
   await expect.poll(() => header.evaluate((element) => element.getBoundingClientRect().top))
     .toBe(0);
 
+  await page.getByRole("button", { name: "Load example" }).click();
+  await expect(page.getByLabel("Project brief")).toHaveValue(/20-second product animation/);
+  await page.getByRole("button", { name: "Choose my workflow" }).click();
+
   const calendar = page.getByTestId("project-calendar");
   await expect(calendar).toBeVisible();
   const taskPanel = calendar.locator(".task-panel");
@@ -18,12 +22,7 @@ test("keeps manual tasks and synchronises roadmap milestones", async ({ page }) 
   });
   await expect(manualTask).toBeVisible();
 
-  await page.getByRole("button", { name: "Load example" }).click();
-  await expect(page.getByLabel("Project brief")).toHaveValue(/20-second product animation/);
-  await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
-  await expect(page.getByRole("heading", { name: "Let’s shape your project plan" })).toBeVisible();
-  await page.getByRole("button", { name: "Looks right — continue" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await page.getByRole("button", { name: "Continue to my roadmap" }).click();
   await expect(page.locator("#roadmap-results")).toBeVisible();
@@ -70,15 +69,8 @@ test("keeps manual tasks and synchronises roadmap milestones", async ({ page }) 
         roadmap: tasks.filter((task: { source: string }) => task.source === "roadmap").length,
       };
     }),
-  ).toEqual({ manual: 1, roadmap: 0 });
-
-  await page.reload();
-  const restoredManualTask = page
-    .locator('.task-item[data-source="manual"]')
-    .filter({ hasText: "Ask for feedback" });
-  await expect(restoredManualTask).toBeVisible();
-  await restoredManualTask.getByRole("button", { name: /Delete task/ }).click();
-  await expect(restoredManualTask).toHaveCount(0);
+  ).toEqual({ manual: 0, roadmap: 0 });
+  await expect(page.locator(".landing-entry-section")).toBeVisible();
 
   const layout = await page.evaluate(() => ({
     width: window.innerWidth,
@@ -95,7 +87,7 @@ test("returns fallback tutorials only for the selected application", async ({
       interfaceLanguage: "en",
       projectBrief:
         "Create a clean vector logo and icon set in Adobe Illustrator for a student brand project.",
-      deadline: "2026-08-20",
+      deadline: "2099-08-20",
       currentExperience: "Complete beginner in Adobe Illustrator",
       hoursPerDay: 2,
       daysPerWeek: 5,

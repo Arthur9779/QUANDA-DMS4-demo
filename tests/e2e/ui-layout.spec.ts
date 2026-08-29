@@ -18,8 +18,10 @@ test("keeps the design route status above the project form", async ({ page }) =>
   await expect(status).toBeVisible();
   await expect(form).toBeVisible();
 
-  const statusBox = await status.boundingBox();
-  const formBox = await form.boundingBox();
+  const { statusBox, formBox } = await page.evaluate(() => ({
+    statusBox: document.querySelector(".path-status")?.getBoundingClientRect().toJSON() ?? null,
+    formBox: document.querySelector("section.form-section#project-form")?.getBoundingClientRect().toJSON() ?? null,
+  }));
   expect(statusBox).not.toBeNull();
   expect(formBox).not.toBeNull();
   expect(statusBox!.y + statusBox!.height).toBeLessThanOrEqual(formBox!.y);
