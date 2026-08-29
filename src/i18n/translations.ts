@@ -135,6 +135,7 @@ export interface Translation {
     plan: string;
     completed: string;
     next: string;
+    dismiss: string;
   };
   routeEvaluation: {
     eyebrow: string;
@@ -532,7 +533,7 @@ const en: Translation = {
     resources: "Verified resources",
     humanNote: "You remain responsible for reviewing changes, running checks, and accepting the final result.",
   },
-  workflow: { ariaLabel: "Planning progress", brief: "Brief", review: "Review the plan", prepare: "Choose how to prepare", plan: "Production plan", completed: "complete", next: "Next" },
+  workflow: { ariaLabel: "Planning progress", brief: "Brief", review: "Review the plan", prepare: "Choose how to prepare", plan: "Production plan", completed: "complete", next: "Next", dismiss: "Got it" },
   routeEvaluation: {
     eyebrow: "Evidence-backed route choice",
     title: "Why this route is the strongest fit",
@@ -1001,7 +1002,7 @@ const vi: Translation = {
     resources: "Nguồn đã xác minh",
     humanNote: "Bạn vẫn chịu trách nhiệm review thay đổi, chạy kiểm tra và chấp nhận kết quả cuối.",
   },
-  workflow: { ariaLabel: "Tiến độ lập kế hoạch", brief: "Đề bài", review: "Kiểm tra kế hoạch", prepare: "Chọn cách chuẩn bị", plan: "Kế hoạch sản xuất", completed: "đã xong", next: "Tiếp theo" },
+  workflow: { ariaLabel: "Tiến độ lập kế hoạch", brief: "Đề bài", review: "Kiểm tra kế hoạch", prepare: "Chọn cách chuẩn bị", plan: "Kế hoạch sản xuất", completed: "đã xong", next: "Tiếp theo", dismiss: "Đã hiểu" },
   routeEvaluation: {
     eyebrow: "Lựa chọn tuyến có bằng chứng",
     title: "Vì sao tuyến này phù hợp nhất",

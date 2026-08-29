@@ -104,7 +104,6 @@ a:focus-visible {
   z-index: 1000;
   width: 100%;
   min-height: 82px;
-  margin-left: calc(50% - 50vw);
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--paper) 94%, transparent);
   backdrop-filter: blur(14px);
@@ -2757,7 +2756,7 @@ footer {
     width: min(100% - 24px, 1180px);
   }
 
-  .button-secondary {
+  .site-header .button-secondary {
     width: 44px;
     padding: 0;
     font-size: 0;
@@ -3444,16 +3443,26 @@ footer {
   color: #fffdf1;
   display: flex;
   gap: 10px;
-  left: 50%;
-  max-width: min(calc(100vw - 32px), 620px);
-  padding: 10px 16px;
-  position: fixed;
-  top: 86px;
-  transform: translateX(-50%);
-  z-index: 1100;
+  margin: 12px auto 0;
+  max-width: 100%;
+  padding: 10px 12px 10px 16px;
 }
 .workflow-toast span:last-child { color: #d9e9bd; }
 .workflow-toast-dot { background: #9be79f; border-radius: 50%; flex: 0 0 8px; height: 8px; width: 8px; }
+.workflow-toast-dismiss {
+  flex: 0 0 auto;
+  min-height: 36px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 253, 241, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 253, 241, 0.12);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.workflow-toast-dismiss:hover { background: rgba(255, 253, 241, 0.2); }
 .route-evaluation { background: #f5f8ec; border: 1px solid #b7cda2; border-radius: 22px; margin: 24px 0; padding: clamp(20px, 3vw, 32px); }
 .route-evaluation-heading { align-items: start; display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr) auto; }
 .route-evaluation-heading h3 { font-family: var(--font-newsreader), Georgia, serif; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -0.04em; line-height: 1; margin: 4px 0 10px; }
@@ -3496,7 +3505,8 @@ footer {
 .route-rejection { background: #fff1e9; border-left: 3px solid var(--amber); padding: 10px 12px; }
 
 @media (max-width: 760px) {
-  .workflow-toast { border-radius: 16px; flex-wrap: wrap; justify-content: center; text-align: center; top: 80px; }
+  .workflow-toast { align-items: flex-start; border-radius: 16px; flex-wrap: wrap; }
+  .workflow-toast-dismiss { margin-left: auto; }
   .route-evaluation-heading, .route-score-grid, .route-evidence-grid, .route-strengths { grid-template-columns: 1fr; }
   .route-score { grid-row: 1; }
   .route-alternative-details .route-score-grid { grid-template-columns: 1fr; }
@@ -3548,5 +3558,19 @@ footer {
 
   .landing-entry-form .project-form {
     padding: 22px 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .route-alternatives > .button-secondary {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 0.9rem;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
   }
 }
