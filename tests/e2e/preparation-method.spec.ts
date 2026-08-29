@@ -7,7 +7,6 @@ async function openEngineeringReview(page: Page) {
   await page.getByLabel("Definition of done").fill("The gallery works on mobile and desktop, is keyboard accessible, and the production build passes.");
   await page.getByLabel("Current technical experience").fill("I can review React code and run project scripts.");
   await page.getByRole("button", { name: "Review my build plan" }).click();
-  await page.getByRole("button", { name: "Generate the engineering roadmap" }).click();
 }
 
 test("renders only the selected preparation method", async ({ page }) => {

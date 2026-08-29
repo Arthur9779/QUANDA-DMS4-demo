@@ -2,16 +2,16 @@ import type { EngineeringPlatform, EngineeringStartingPoint, PathClassification,
 
 const engineeringSignals: Array<[RegExp, string, number]> = [
   [/\b(build|implement|develop|debug|extend|ship|deploy|code)\b/i, "software delivery verb", 3],
-  [/\b(website|web app|web application|mobile app|desktop app|api|backend|database|automation|plugin|extension|repository|repo|bug|feature|system|AI-powered search|search feature)\b/i, "software deliverable", 4],
-  [/\b(react|next\.js|react native|python|typescript|javascript|rest|graphql|sql|github|vercel|docker|AI integration)\b/i, "engineering technology", 3],
+  [/\b(website|web app|web application|mobile app|desktop app|game|gameplay|video game|api|backend|database|automation|plugin|extension|repository|repo|bug|feature|system|AI-powered search|search feature)\b/i, "software deliverable", 4],
+  [/\b(react|next\.js|react native|python|typescript|javascript|godot|gdscript|unity|unreal engine|c#|c\+\+|rest|graphql|sql|github|vercel|docker|AI integration)\b/i, "engineering technology", 3],
   [/\b(test|acceptance criteria|pull request|environment variable|deploy|deployment|error|debugging)\b/i, "engineering workflow", 3],
 ];
 
 const designSignals: Array<[RegExp, string, number]> = [
   [/\b(create|make|design|edit|produce|shoot|illustrate|animate|compose)\b/i, "creative production verb", 2],
-  [/\b(animation|illustration|poster|documentary|brand identity|visual identity|3d artwork|sound design|visual installation|projected artwork|interactive artwork|photography|graphic design|storyboard|film|motion graphics)\b/i, "creative deliverable", 4],
-  [/\b(blender|maya|touchdesigner|figma|photoshop|illustrator|premiere|davinci|after effects)\b/i, "creative application", 2],
-  [/\b(style|aesthetic|visual|colour|color|composition|lighting|render|look)\b/i, "creative context", 1],
+  [/\b(animation|illustration|poster|documentary|brand identity|visual identity|3d artwork|sound design|visual installation|projected artwork|interactive artwork|photography|graphic design|storyboard|film|motion graphics|ui\/ux|user interface|interactive prototype|design system)\b/i, "creative deliverable", 4],
+  [/\b(blender|maya|touchdesigner|figma|photoshop|illustrator|premiere|davinci|after effects)\b/i, "creative application", 3],
+  [/\b(style|aesthetic|visual|colour|color|composition|lighting|render|look|prototype|prototyping|auto layout|component system|user flow|usability testing)\b/i, "creative context", 2],
 ];
 
 export function classifyProjectPath(brief: string): PathClassification {

@@ -4,9 +4,10 @@ async function fillY2kProject(page: import("@playwright/test").Page) {
   await page.getByLabel("Project brief").fill(
     "I need a glossy Y2K product animation with chrome materials and a fisheye camera. The assignment requires Blender.",
   );
+  await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByLabel("Current experience").fill("Blender beginner");
   await page.getByLabel("Search applications").fill("Blender");
-  await page.getByRole("button", { name: "Add application: Blender" }).click();
+  await page.getByRole("button", { name: "Add application: Blender", exact: true }).click();
   await page.getByRole("button", { name: "Understand my project" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
@@ -28,9 +29,10 @@ test("skips the review in Vietnamese without horizontal overflow", async ({ page
   await page.getByLabel("Đề bài dự án").fill(
     "Tôi cần làm animation sản phẩm phong cách Y2K bằng Blender, với bề mặt chrome và góc máy fisheye cho bài tập đại học.",
   );
+  await page.getByRole("button", { name: "Chọn quy trình" }).click();
   await page.getByLabel("Kinh nghiệm hiện tại").fill("Mới bắt đầu dùng Blender");
   await page.getByLabel("Tìm ứng dụng").fill("Blender");
-  await page.getByRole("button", { name: "Thêm ứng dụng: Blender" }).click();
+  await page.getByRole("button", { name: "Thêm ứng dụng: Blender", exact: true }).click();
   await page.getByRole("button", { name: "Phân tích dự án của tôi" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
