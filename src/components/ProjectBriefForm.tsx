@@ -7,6 +7,8 @@ import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import type { RoadmapRequest } from "@/src/types";
 import { toLocalDateKey } from "@/src/lib/date";
 import { ApplicationPicker } from "./ApplicationPicker";
+import { ReferenceImageInput } from "./ReferenceImageInput";
+import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 
 interface ProjectBriefFormProps {
   value: RoadmapRequest;
@@ -14,6 +16,7 @@ interface ProjectBriefFormProps {
   onChange: (value: RoadmapRequest) => void;
   onSubmit: (value: RoadmapRequest) => void;
   isSubmitting: boolean;
+  onApprovedReferenceFindingsChange?: (findings: ReferenceImageFinding[]) => void;
 }
 
 export function ProjectBriefForm({
@@ -22,6 +25,7 @@ export function ProjectBriefForm({
   onChange,
   onSubmit,
   isSubmitting,
+  onApprovedReferenceFindingsChange,
 }: ProjectBriefFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -97,6 +101,12 @@ export function ProjectBriefForm({
             <p className="field-error" id="brief-error">{errors.projectBrief}</p>
           )}
         </div>
+
+        <ReferenceImageInput
+          onApprovedFindingsChange={onApprovedReferenceFindingsChange}
+          projectBrief={value.projectBrief}
+          t={t}
+        />
 
         <div className="form-grid">
           <div className="field">

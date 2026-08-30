@@ -7,6 +7,7 @@ import {
   type UnknownConcept,
 } from "@/src/contracts/knowledge";
 import { normalizeOntologyLabel } from "@/src/ontology/normalization";
+import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 
 export interface RejectOptions {
   allowExplicitRequirement?: boolean;
@@ -182,6 +183,65 @@ export function addUnknownConcept(
   );
   unknownConcepts.push(addition);
   return validated({ ...creativeDna, unknownConcepts });
+}
+
+export function mergeApprovedReferenceFindings(
+  creativeDna: CreativeDNA,
+  findings: ReferenceImageFinding[],
+): CreativeDNA {
+  let merged = creativeDna;
+  for (const finding of findings) {
+    if (finding.ontology) {
+      const addition: CreativeDNAConcept = {
+        ontologyId: finding.ontology.id,
+        label: finding.ontology.label,
+        family: finding.ontology.family,
+        category: finding.ontology.category,
+        source: "user_added",
+        status: "user_confirmed",
+        confidence: finding.confidence,
+        evidence: {
+          sourceField: "reference",
+          excerpt: finding.evidence,
+        },
+      };
+      const existingIndex = merged.concepts.findIndex(
+        (concept) => concept.ontologyId === finding.ontology?.id,
+      );
+      const concepts = [...merged.concepts];
+      if (existingIndex >= 0) {
+        const existing = concepts[existingIndex];
+        concepts[existingIndex] =
+          existing.source === "explicit_requirement"
+            ? { ...existing, status: "user_confirmed" }
+            : addition;
+      } else {
+        concepts.push(addition);
+      }
+      merged = validated({ ...merged, concepts });
+      continue;
+    }
+
+    const identity = normalizeOntologyLabel(finding.label);
+    const addition: UnknownConcept = {
+      raw: finding.label,
+      suggestedCategory: finding.category.replaceAll("_", " "),
+      nearestOntologyIds: [],
+      source: "user_added",
+      status: "user_confirmed",
+      confidence: finding.confidence,
+      evidence: {
+        sourceField: "reference",
+        excerpt: finding.evidence,
+      },
+    };
+    const unknownConcepts = merged.unknownConcepts.filter(
+      (concept) => unknownIdentity(concept) !== identity,
+    );
+    unknownConcepts.push(addition);
+    merged = validated({ ...merged, unknownConcepts });
+  }
+  return merged;
 }
 
 export function updateProjectIntent(
