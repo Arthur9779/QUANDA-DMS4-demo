@@ -3177,6 +3177,188 @@ footer {
   text-decoration: none;
 }
 .matched-tutorial-thumbnail.has-image::after { background: linear-gradient(0deg, rgba(28, 26, 26, 0.28), transparent 55%); content: ""; inset: 0; position: absolute; }
+
+.reference-image-fieldset {
+  display: grid;
+  gap: 1rem;
+}
+
+.reference-image-intro {
+  color: var(--muted);
+  margin: 0;
+  max-width: 68rem;
+}
+
+.reference-image-dropzone {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px dashed var(--line);
+  border-radius: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.9rem;
+  min-height: 6.5rem;
+  padding: 1.25rem;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.reference-image-dropzone:hover,
+.reference-image-dropzone:focus-within {
+  background: rgba(230, 240, 216, 0.5);
+  border-color: var(--green);
+}
+
+.reference-image-dropzone input {
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+}
+
+.reference-image-dropzone span,
+.reference-image-file > div,
+.reference-finding span {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.reference-image-dropzone small,
+.reference-image-file small,
+.reference-finding small {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.reference-image-file {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid var(--line);
+  border-radius: 1.1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  padding: 0.8rem;
+}
+
+.reference-image-file img {
+  aspect-ratio: 4 / 3;
+  border-radius: 0.75rem;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.reference-image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.45rem;
+}
+
+.reference-image-error {
+  margin: 0;
+}
+
+.reference-findings {
+  background: rgba(225, 241, 244, 0.44);
+  border: 1px solid rgba(91, 133, 140, 0.35);
+  border-radius: 1.15rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.reference-findings-heading {
+  align-items: start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.reference-findings-heading p {
+  color: var(--muted);
+  margin: 0.25rem 0 0;
+}
+
+.reference-approved {
+  align-items: center;
+  background: rgba(227, 241, 211, 0.9);
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  color: var(--moss);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 0.35rem;
+  padding: 0.42rem 0.7rem;
+}
+
+.reference-finding-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reference-finding {
+  align-items: start;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: auto 1fr;
+  padding: 0.85rem;
+}
+
+.reference-finding:has(input:checked) {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.reference-finding input {
+  accent-color: var(--moss);
+  margin-top: 0.2rem;
+}
+
+.reference-finding em {
+  color: var(--moss);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.reference-approve-button {
+  justify-self: start;
+}
+
+.reference-image-actions .spin {
+  animation: loading-spin 1.2s linear infinite;
+}
+
+@media (max-width: 720px) {
+  .reference-image-file {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
+
+  .reference-finding-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reference-findings-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reference-approved {
+    align-self: start;
+  }
+}
 .matched-tutorial-play { align-items: center; background: var(--ink); border-radius: 50%; color: white; display: flex; height: 44px; justify-content: center; position: absolute; width: 44px; z-index: 1; }
 .matched-tutorial-thumbnail:hover .matched-tutorial-play { background: var(--palm); transform: scale(1.05); }
 .matched-tutorial-main { min-width: 0; }

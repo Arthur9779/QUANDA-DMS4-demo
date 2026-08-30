@@ -92,6 +92,7 @@ import {
   CREATIVE_DNA_REVIEW_VERSION,
   createProjectInputFingerprint,
   confirmCreativeDna,
+  mergeApprovedReferenceFindings,
   mergeReviewOverrides,
   type CreativeDnaReviewRecord,
 } from "@/src/creative-dna-review";
@@ -108,6 +109,7 @@ import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, t
 import { generateEngineeringGuidedPlan, generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
 import { WorkflowToast, type WorkflowStage } from "./WorkflowToast";
 import { createDesignRouteEvaluation, createEngineeringRouteEvaluation } from "@/src/route-planning/generate";
+import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -168,6 +170,9 @@ export function QuandaApp() {
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
   const [creativeDnaReview, setCreativeDnaReview] =
     useState<CreativeDnaReviewRecord | null>(null);
+  const [approvedReferenceFindings, setApprovedReferenceFindings] = useState<
+    ReferenceImageFinding[]
+  >([]);
   const [learningPlan, setLearningPlan] = useState<LearningPlan | null>(null);
   const [completion, setCompletion] = useState<Record<string, string[]>>({});
   const [calendarTasks, setCalendarTasks] = useState<CalendarTask[]>([]);
@@ -555,6 +560,7 @@ export function QuandaApp() {
     setPathClassification(null);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     setLearningPlan(null);
     setEngineeringRoadmap(null);
     setPreparationMethod(null);
@@ -605,6 +611,7 @@ export function QuandaApp() {
     setEngineeringCalendarTasks([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     setLearningPlan(null);
     setCompletion({});
     setCalendarTasks([]);
@@ -752,6 +759,7 @@ export function QuandaApp() {
     setEngineeringCalendarTasks([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     clearCreativeDnaReview(window.localStorage);
     setLearningPlan(null);
     clearLearningPlan(window.localStorage);
@@ -801,10 +809,10 @@ export function QuandaApp() {
       const parsed = ProjectAnalysisResponseSchema.safeParse(await response.json());
       if (!parsed.success) throw new Error("analysis_invalid");
 
-      const creativeDna = mergeReviewOverrides(
+      const creativeDna = mergeApprovedReferenceFindings(mergeReviewOverrides(
         creativeDnaReview?.analysis.creativeDna ?? null,
         parsed.data.creativeDna,
-      );
+      ), approvedReferenceFindings);
       const review: CreativeDnaReviewRecord = {
         reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
         inputFingerprint: createProjectInputFingerprint(request),
@@ -1198,6 +1206,13 @@ export function QuandaApp() {
               }
             }}
             onSubmit={(request) => void analyzeProject(request)}
+            onApprovedReferenceFindingsChange={(findings) => {
+              setApprovedReferenceFindings(findings);
+              setCreativeDnaReview(null);
+              setLearningPlan(null);
+              setRoadmap(null);
+              setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+            }}
             t={t}
             value={form}
           />

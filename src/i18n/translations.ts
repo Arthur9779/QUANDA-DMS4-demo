@@ -183,6 +183,25 @@ export interface Translation {
     applicationSearchHint: string;
     applicationSearching: string;
     applicationNoResults: string;
+    referenceImage: {
+      title: string;
+      intro: string;
+      choose: string;
+      fileHint: string;
+      previewAlt: string;
+      privacy: string;
+      analyze: string;
+      analyzeAgain: string;
+      analyzing: string;
+      remove: string;
+      invalidFile: string;
+      analysisError: string;
+      findingsTitle: string;
+      findingsHint: string;
+      knowledgeMatch: string;
+      useSelected: string;
+      approved: string;
+    };
     selectedApplications: string;
     addApplication: string;
     removeApplication: string;
@@ -596,6 +615,25 @@ const en: Translation = {
     applicationSearchHint: "Suggestions are restricted to applications and production software.",
     applicationSearching: "Searching applications…",
     applicationNoResults: "No indexed application matches yet.",
+    referenceImage: {
+      title: "Visual reference",
+      intro: "Optionally add one reference image. QUANDA will suggest visible creative attributes for you to review before they affect the plan.",
+      choose: "Choose a reference image",
+      fileHint: "JPEG, PNG, or WebP · maximum 4 MB",
+      previewAlt: "Selected visual reference preview",
+      privacy: "The image is sent to the configured AI service for this analysis and is not stored by QUANDA.",
+      analyze: "Analyze reference",
+      analyzeAgain: "Analyze again",
+      analyzing: "Analyzing…",
+      remove: "Remove image",
+      invalidFile: "Choose a JPEG, PNG, or WebP image smaller than 4 MB.",
+      analysisError: "QUANDA couldn't analyze this reference. You can retry or continue without it.",
+      findingsTitle: "Review what QUANDA sees",
+      findingsHint: "Uncheck anything that does not describe the direction you want. Nothing is used until you approve it.",
+      knowledgeMatch: "Matched to QUANDA knowledge",
+      useSelected: "Use selected findings",
+      approved: "Added to Creative DNA",
+    },
     selectedApplications: "Selected applications",
     addApplication: "Add application",
     removeApplication: "Remove application",
@@ -1065,6 +1103,25 @@ const vi: Translation = {
     applicationSearchHint: "Gợi ý chỉ bao gồm ứng dụng và phần mềm sản xuất.",
     applicationSearching: "Đang tìm ứng dụng…",
     applicationNoResults: "Chưa có ứng dụng nào trong danh mục phù hợp.",
+    referenceImage: {
+      title: "Hình ảnh tham chiếu",
+      intro: "Bạn có thể thêm một hình ảnh tham chiếu. QUANDA sẽ gợi ý các thuộc tính sáng tạo nhìn thấy được để bạn duyệt trước khi chúng ảnh hưởng đến kế hoạch.",
+      choose: "Chọn hình ảnh tham chiếu",
+      fileHint: "JPEG, PNG hoặc WebP · tối đa 4 MB",
+      previewAlt: "Bản xem trước hình ảnh tham chiếu đã chọn",
+      privacy: "Hình ảnh được gửi đến dịch vụ AI đã cấu hình cho lần phân tích này và QUANDA không lưu trữ hình.",
+      analyze: "Phân tích hình ảnh",
+      analyzeAgain: "Phân tích lại",
+      analyzing: "Đang phân tích…",
+      remove: "Xóa hình ảnh",
+      invalidFile: "Chọn hình JPEG, PNG hoặc WebP nhỏ hơn 4 MB.",
+      analysisError: "QUANDA không thể phân tích hình ảnh này. Bạn có thể thử lại hoặc tiếp tục mà không dùng hình.",
+      findingsTitle: "Kiểm tra những gì QUANDA nhận thấy",
+      findingsHint: "Bỏ chọn nội dung không đúng với định hướng của bạn. Không có gì được dùng cho đến khi bạn xác nhận.",
+      knowledgeMatch: "Khớp với kho kiến thức QUANDA",
+      useSelected: "Dùng các gợi ý đã chọn",
+      approved: "Đã thêm vào Creative DNA",
+    },
     selectedApplications: "Ứng dụng đã chọn",
     addApplication: "Thêm ứng dụng",
     removeApplication: "Xóa ứng dụng",
