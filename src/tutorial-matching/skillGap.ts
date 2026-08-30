@@ -485,6 +485,23 @@ function decompositionDefinitions(
   return definitions;
 }
 
+function fitsSelectedApplicationPath(
+  definition: SkillDefinition,
+  selectedApplicationIds: string[],
+): boolean {
+  if (definition.softwareIds.length === 0 || selectedApplicationIds.length === 0) {
+    return true;
+  }
+  const selectedNames = new Set(
+    selectedApplicationIds.map((id) =>
+      normalizeOntologyLabel(getApplicationName(id)),
+    ),
+  );
+  return definition.softwareIds.some((id) =>
+    selectedNames.has(normalizeOntologyLabel(getApplicationName(id))),
+  );
+}
+
 function boundedId(prefix: "gap" | "need", id: string): string {
   const value = `${prefix}:${id}`;
   if (value.length <= 160) return value;
@@ -613,6 +630,10 @@ export function deriveSkillGaps(
     .filter(
       (definition) =>
         definition.triggers.length > 0 &&
+        fitsSelectedApplicationPath(
+          definition,
+          project.requiredApplications,
+        ) &&
         containsAny(requiredText, definition.triggers),
     )
     .map((definition) => definition.id);

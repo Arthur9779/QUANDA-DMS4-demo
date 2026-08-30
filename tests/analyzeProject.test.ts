@@ -68,6 +68,11 @@ describe("project analysis service", () => {
       }),
     );
     expect(result.capabilityContext.currentExperience).toContain("Photoshop");
+    expect(result.applicationPaths?.recommended.applicationIds).toContain("blender");
+    expect(result.applicationPaths?.hardRequiredApplicationIds).toEqual(["blender"]);
+    expect(result.applicationPaths?.alternatives.every((path) =>
+      path.applicationIds.includes("blender"),
+    )).toBe(true);
   });
 
   it("uses a substitutable classifier and rejects invented IDs", async () => {

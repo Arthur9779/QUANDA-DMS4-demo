@@ -1,4 +1,5 @@
 import { getApplicationName } from "@/src/data/applications";
+import { scoreDesignApplicationPaths } from "@/src/application-paths";
 import { buildOntologyRetrievalQuery } from "@/src/ontology/retrieval/queryBuilder";
 import {
   createOntologyRetriever,
@@ -175,6 +176,10 @@ export async function analyzeProject(
 
   const response = ProjectAnalysisResponseSchema.parse({
     creativeDna: normalized.creativeDna,
+    applicationPaths: scoreDesignApplicationPaths(
+      request,
+      normalized.creativeDna,
+    ),
     retrieval: {
       candidateCount: retrieval.candidates.length,
       backend: retrieval.diagnostics.backend,

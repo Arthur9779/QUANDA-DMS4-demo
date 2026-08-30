@@ -298,6 +298,36 @@ export interface Translation {
       daysPerWeek: string;
     };
   };
+  applicationPaths: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    recommended: string;
+    score: string;
+    whyWins: string;
+    alternatives: string;
+    comparedWith: string;
+    learningEstimate: string;
+    productionEstimate: string;
+    minutes: string;
+    scoreDetails: string;
+    strengths: string;
+    tradeoffs: string;
+    alternativeStrengths: string;
+    proofNote: string;
+    noAlternatives: string;
+    fitBands: Record<"strong" | "good" | "conditional", string>;
+    factorLabels: Record<
+      | "requirements"
+      | "deliverableFit"
+      | "familiarity"
+      | "techniqueCoverage"
+      | "tutorialCoverage"
+      | "switchingCost"
+      | "deadlineFit",
+      string
+    >;
+  };
   learning: {
     eyebrow: string;
     title: string;
@@ -754,6 +784,35 @@ const en: Translation = {
       targetQuality: "Target quality",
       hoursPerDay: "hours/day",
       daysPerWeek: "days/week",
+    },
+  },
+  applicationPaths: {
+    eyebrow: "Application route",
+    title: "The strongest way to make this project",
+    intro: "QUANDA filtered routes against your hard requirements, then scored the viable options for output fit, experience, techniques, learning support, handoffs, and deadline.",
+    recommended: "Recommended path",
+    score: "Fit score",
+    whyWins: "Why this route wins",
+    alternatives: "Other viable routes considered",
+    comparedWith: "Why the winner fits better",
+    learningEstimate: "Estimated learning",
+    productionEstimate: "Estimated production",
+    minutes: "min",
+    scoreDetails: "See scoring evidence",
+    strengths: "Route strengths",
+    tradeoffs: "Tradeoffs",
+    alternativeStrengths: "Where this alternative is stronger",
+    proofNote: "Scores compare only the viable routes QUANDA evaluated for this brief. Required applications are never scored away.",
+    noAlternatives: "No other route met every hard application requirement.",
+    fitBands: { strong: "Strong fit", good: "Good fit", conditional: "Conditional fit" },
+    factorLabels: {
+      requirements: "Requirements",
+      deliverableFit: "Deliverable fit",
+      familiarity: "Familiarity",
+      techniqueCoverage: "Technique coverage",
+      tutorialCoverage: "Verified tutorials",
+      switchingCost: "Workflow simplicity",
+      deadlineFit: "Deadline fit",
     },
   },
   learning: {
@@ -1242,6 +1301,35 @@ const vi: Translation = {
       targetQuality: "Mức chất lượng",
       hoursPerDay: "giờ/ngày",
       daysPerWeek: "ngày/tuần",
+    },
+  },
+  applicationPaths: {
+    eyebrow: "Tuyến ứng dụng",
+    title: "Cách phù hợp nhất để hoàn thành dự án này",
+    intro: "QUANDA lọc các tuyến theo yêu cầu bắt buộc, rồi chấm điểm những lựa chọn khả thi dựa trên đầu ra, kinh nghiệm, kỹ thuật, nguồn học, số lần chuyển ứng dụng và thời hạn.",
+    recommended: "Tuyến được đề xuất",
+    score: "Điểm phù hợp",
+    whyWins: "Vì sao tuyến này thắng",
+    alternatives: "Các tuyến khả thi khác đã xem xét",
+    comparedWith: "Vì sao tuyến thắng phù hợp hơn",
+    learningEstimate: "Thời gian học ước tính",
+    productionEstimate: "Thời gian sản xuất ước tính",
+    minutes: "phút",
+    scoreDetails: "Xem bằng chứng chấm điểm",
+    strengths: "Điểm mạnh của tuyến",
+    tradeoffs: "Đánh đổi",
+    alternativeStrengths: "Điểm mạnh hơn của phương án này",
+    proofNote: "Điểm số chỉ so sánh các tuyến khả thi QUANDA đã đánh giá cho đề bài này. Ứng dụng bắt buộc không bao giờ bị loại bằng điểm số.",
+    noAlternatives: "Không có tuyến nào khác đáp ứng mọi yêu cầu ứng dụng bắt buộc.",
+    fitBands: { strong: "Rất phù hợp", good: "Phù hợp", conditional: "Phù hợp có điều kiện" },
+    factorLabels: {
+      requirements: "Yêu cầu",
+      deliverableFit: "Phù hợp đầu ra",
+      familiarity: "Độ quen thuộc",
+      techniqueCoverage: "Bao phủ kỹ thuật",
+      tutorialCoverage: "Video đã xác minh",
+      switchingCost: "Độ đơn giản quy trình",
+      deadlineFit: "Phù hợp thời hạn",
     },
   },
   learning: {

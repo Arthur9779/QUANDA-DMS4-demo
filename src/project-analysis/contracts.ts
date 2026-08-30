@@ -5,6 +5,7 @@ import {
   CreativeDNASchema,
   ProjectConstraintSchema,
 } from "@/src/contracts/knowledge";
+import { DesignApplicationPathDecisionSchema } from "@/src/application-paths/contracts";
 
 const StableOntologyIdSchema = z
   .string()
@@ -67,6 +68,9 @@ export const CreativeDnaModelOutputSchema = z
 
 export const ProjectAnalysisResponseSchema = z.object({
   creativeDna: CreativeDNASchema,
+  // Optional only for backwards-compatible restoration of reviews saved before
+  // application-path scoring existed. New analysis responses always include it.
+  applicationPaths: DesignApplicationPathDecisionSchema.optional(),
   retrieval: z.object({
     candidateCount: z.number().int().nonnegative().max(150),
     backend: z.enum(["local", "gemini_file_search", "hybrid"]),
