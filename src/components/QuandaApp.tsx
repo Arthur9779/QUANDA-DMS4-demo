@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, BookOpenCheck, ListChecks, PencilLine } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./Header";
 import { getTranslation } from "@/src/i18n/translations";
 import type {
@@ -84,7 +84,8 @@ import {
   syncRoadmapCalendarTasks,
 } from "@/src/lib/calendar";
 import {
-  removeEngineeringRoadmapCalendarTasks,
+  removeEngineeringCalendarTasks,
+  syncEngineeringGuidedPlanCalendarTasks,
   syncEngineeringRoadmapCalendarTasks,
 } from "@/src/lib/engineering-calendar";
 import { toLocalDateKey } from "@/src/lib/date";
@@ -92,6 +93,7 @@ import {
   CREATIVE_DNA_REVIEW_VERSION,
   createProjectInputFingerprint,
   confirmCreativeDna,
+  mergeApprovedReferenceFindings,
   mergeReviewOverrides,
   type CreativeDnaReviewRecord,
 } from "@/src/creative-dna-review";
@@ -106,6 +108,9 @@ import {
 } from "@/src/tutorial-matching";
 import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, type EngineeringInterpretation as EngineeringInterpretationValue, type EngineeringProject, type EngineeringRoadmap, type PathClassification, type ProjectPath, type PreparationMethod, type EngineeringGuidedPlan as EngineeringGuidedPlanValue } from "@/src/project-path";
 import { generateEngineeringGuidedPlan, generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
+import { WorkflowToast, type WorkflowStage } from "./WorkflowToast";
+import { createDesignRouteEvaluation, createEngineeringRouteEvaluation } from "@/src/route-planning/generate";
+import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -166,6 +171,9 @@ export function QuandaApp() {
   const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
   const [creativeDnaReview, setCreativeDnaReview] =
     useState<CreativeDnaReviewRecord | null>(null);
+  const [approvedReferenceFindings, setApprovedReferenceFindings] = useState<
+    ReferenceImageFinding[]
+  >([]);
   const [learningPlan, setLearningPlan] = useState<LearningPlan | null>(null);
   const [completion, setCompletion] = useState<Record<string, string[]>>({});
   const [calendarTasks, setCalendarTasks] = useState<CalendarTask[]>([]);
@@ -178,9 +186,17 @@ export function QuandaApp() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [matchingError, setMatchingError] = useState<string | null>(null);
   const [engineeringError, setEngineeringError] = useState<string | null>(null);
+  const [workflowStage, setWorkflowStage] = useState<WorkflowStage | null>(null);
   const calendarViewTracked = useRef(false);
   const viewedRoadmapIds = useRef(new Set<string>());
   const t = getTranslation(locale);
+  const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
+  const guidedRouteEvaluation = useMemo(() => {
+    if (!engineeringGuidedPlan || !engineeringInterpretation) return null;
+    // Use the existing engineering estimate and route scorer so guided preparation
+    // shows the same evidence-backed evaluation as the project-plan route.
+    return generateEngineeringRoadmap(engineeringForm, engineeringInterpretation).routeEvaluation ?? null;
+  }, [engineeringForm, engineeringGuidedPlan, engineeringInterpretation]);
   const projectInputFingerprint = createProjectInputFingerprint(form);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
   const creativeDnaIsStale = creativeDnaReview
@@ -233,15 +249,22 @@ export function QuandaApp() {
       setEngineeringGuidedPlan(savedEngineeringGuidedPlan);
       setEngineeringInterpretationConfirmed(Boolean(savedPreparationMethod || savedEngineeringGuidedPlan || savedEngineeringRoadmap));
       setEngineeringCompletion(savedEngineeringCompletion);
+      const engineeringDeadline = savedEngineeringDraft?.deadline ?? emptyEngineeringForm(restoredLocale).deadline;
       setEngineeringCalendarTasks(
         savedEngineeringRoadmap
           ? syncEngineeringRoadmapCalendarTasks(
               savedEngineeringCalendarTasks,
               savedEngineeringRoadmap,
-              savedEngineeringDraft?.deadline ?? emptyEngineeringForm(restoredLocale).deadline,
+              engineeringDeadline,
               savedEngineeringCompletion,
             )
-          : removeEngineeringRoadmapCalendarTasks(savedEngineeringCalendarTasks),
+          : savedEngineeringGuidedPlan
+            ? syncEngineeringGuidedPlanCalendarTasks(
+                savedEngineeringCalendarTasks,
+                savedEngineeringGuidedPlan,
+                engineeringDeadline,
+              )
+            : removeEngineeringCalendarTasks(savedEngineeringCalendarTasks),
       );
       setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
@@ -482,9 +505,18 @@ export function QuandaApp() {
     trackEvent("language_changed", { language: nextLocale });
     const nextForm = { ...form, interfaceLanguage: nextLocale };
     setForm(nextForm);
-    setEngineeringForm((current) => ({ ...current, interfaceLanguage: nextLocale }));
+    const nextEngineeringForm = { ...engineeringForm, interfaceLanguage: nextLocale };
+    setEngineeringForm(nextEngineeringForm);
     if (projectPath === "agentic_engineering" && engineeringRoadmap) {
-      setEngineeringRoadmap((current) => current ? { ...current, language: nextLocale } : current);
+      setEngineeringRoadmap((current) => current ? {
+        ...current,
+        language: nextLocale,
+        routeEvaluation: createEngineeringRouteEvaluation(
+          nextEngineeringForm,
+          current.interpretation,
+          current.totalEstimatedAgentMinutes + current.totalEstimatedHumanReviewMinutes,
+        ),
+      } : current);
     }
     if (projectPath === "agentic_engineering") return;
     if (roadmap?.source === "demo") {
@@ -507,6 +539,7 @@ export function QuandaApp() {
         ...roadmap,
         language: nextLocale,
         projectInputFingerprint: createProjectInputFingerprint(nextForm),
+        routeEvaluation: createDesignRouteEvaluation(nextForm, roadmap.totalEstimatedMinutes),
         title: isProductAnimationExample
           ? nextLocale === "vi"
             ? "Lộ trình làm hoạt hình sản phẩm 20 giây"
@@ -528,6 +561,7 @@ export function QuandaApp() {
     setPathClassification(null);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     setLearningPlan(null);
     setEngineeringRoadmap(null);
     setPreparationMethod(null);
@@ -555,6 +589,7 @@ export function QuandaApp() {
   };
 
   const submitInitialBrief = (brief: string) => {
+    announceWorkflowStage("brief");
     const classification = classifyProjectPath(brief);
     setPathClassification(classification);
     if (classification.path !== "clarification") selectPath(classification.path, brief);
@@ -577,6 +612,7 @@ export function QuandaApp() {
     setEngineeringCalendarTasks([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     setLearningPlan(null);
     setCompletion({});
     setCalendarTasks([]);
@@ -584,6 +620,7 @@ export function QuandaApp() {
     setAnalysisError(null);
     setMatchingError(null);
     setEngineeringError(null);
+    setWorkflowStage(null);
     clearPreparationState(window.localStorage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -593,7 +630,7 @@ export function QuandaApp() {
     setEngineeringError(null);
     setEngineeringInterpretation(null);
     setEngineeringRoadmap(null);
-    setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+    setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
     setEngineeringGuidedPlan(null);
     setEngineeringInterpretationConfirmed(false);
     const local = interpretEngineeringProject(request);
@@ -606,6 +643,7 @@ export function QuandaApp() {
       if (!response.ok) throw new Error("engineering_interpretation_failed");
       setEngineeringInterpretation(local);
       setEngineeringInterpretationConfirmed(true);
+      announceWorkflowStage("review");
     } catch {
       setEngineeringInterpretation({ ...local, source: "fallback" });
       setEngineeringInterpretationConfirmed(true);
@@ -614,31 +652,46 @@ export function QuandaApp() {
     requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
-  const generateEngineering = async (method: PreparationMethod = preparationMethod ?? "guided_tutorials") => {
-    if (!engineeringInterpretation || method !== "agentic_project_plan") return;
+  const generateEngineering = async (
+    method: PreparationMethod = preparationMethod ?? "guided_tutorials",
+    project: EngineeringProject = engineeringForm,
+    interpretation: EngineeringInterpretationValue | null = engineeringInterpretation,
+  ) => {
+    if (!interpretation || method !== "agentic_project_plan") return;
     setEngineeringError(null);
     let finalRoadmap: EngineeringRoadmap;
     try {
       const response = await fetch("/api/engineering/roadmap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project: engineeringForm, interpretation: engineeringInterpretation }),
+        body: JSON.stringify({ project, interpretation }),
       });
       if (!response.ok) throw new Error("engineering_roadmap_failed");
       const parsed = EngineeringRoadmapSchema.parse(await response.json());
       finalRoadmap = parsed;
     } catch {
-      finalRoadmap = generateEngineeringRoadmap(engineeringForm, engineeringInterpretation, {
+      finalRoadmap = generateEngineeringRoadmap(project, interpretation, {
         source: "fallback",
         notice: t.engineering.notice,
       });
     }
-    setEngineeringRoadmap(finalRoadmap);
+    const withEvaluation = finalRoadmap.routeEvaluation
+      ? finalRoadmap
+      : {
+          ...finalRoadmap,
+          routeEvaluation: createEngineeringRouteEvaluation(
+            project,
+            finalRoadmap.interpretation,
+            finalRoadmap.totalEstimatedAgentMinutes + finalRoadmap.totalEstimatedHumanReviewMinutes,
+          ),
+        };
+    setEngineeringRoadmap(withEvaluation);
+    announceWorkflowStage("plan");
     setEngineeringCalendarTasks((current) =>
       syncEngineeringRoadmapCalendarTasks(
         current,
-        finalRoadmap,
-        engineeringForm.deadline,
+        withEvaluation,
+        project.deadline,
         engineeringCompletion,
       ),
     );
@@ -648,51 +701,66 @@ export function QuandaApp() {
   const choosePreparationMethod = (method: PreparationMethod) => {
     if (!engineeringInterpretation || !engineeringInterpretationConfirmed) return;
     setPreparationMethod(method);
+    announceWorkflowStage("prepare");
     setEngineeringRoadmap(null);
     setEngineeringGuidedPlan(null);
     setEngineeringCompletion([]);
-    setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+    setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
     clearPreparationState(window.localStorage);
     writePreparationMethod(window.localStorage, method);
     if (method === "guided_tutorials") {
       const plan = generateEngineeringGuidedPlan(engineeringForm, engineeringInterpretation);
       setEngineeringGuidedPlan(plan);
       writeEngineeringGuidedPlan(window.localStorage, plan);
+      setEngineeringCalendarTasks((current) =>
+        syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
+      );
       requestAnimationFrame(() => document.querySelector("#engineering-guided-plan")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       return;
     }
     requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-    void generateEngineering(method);
+    void generateEngineering(method, engineeringForm, engineeringInterpretation);
   };
 
   const loadExample = () => {
-    const nextForm: RoadmapRequest = {
-      ...emptyForm(locale),
-      projectBrief:
-        locale === "en"
-          ? "I need to create a 20-second product animation for a university assignment. I know Photoshop at an intermediate level, but I have never used Blender. The project is due in seven days. The final output should be a 1080p MP4 with simple sound."
-          : "Tôi cần làm một video hoạt hình sản phẩm dài 20 giây cho bài tập đại học. Tôi sử dụng Photoshop ở mức trung cấp nhưng chưa từng dùng Blender. Dự án phải hoàn thành trong bảy ngày. Sản phẩm cuối là video MP4 1080p có âm thanh đơn giản.",
-      currentExperience:
-        locale === "en"
-          ? "Photoshop: intermediate; Blender: complete beginner"
-          : "Photoshop: trung cấp; Blender: chưa từng sử dụng",
-      requiredApplications: ["blender", "photoshop"],
-      outputType: "video",
-      targetQuality: "portfolio",
+    const technicalBrief = locale === "en"
+      ? "Build a 2D top-down survival game called Last Night. The player controls a character on a small map and must survive enemy waves. The character can move, attack, and collect healing items. Enemies automatically find and approach the player. Each wave increases the number and difficulty of enemies. The game needs Start, Gameplay, Game Over, Restart, HP, score, survival time, at least three enemy types, and a playable Windows build."
+      : "Xây dựng game sinh tồn 2D góc nhìn từ trên xuống tên Last Night. Người chơi điều khiển nhân vật trên bản đồ nhỏ và phải sống sót trước các đợt quái vật. Nhân vật có thể di chuyển, tấn công và nhặt vật phẩm hồi máu. Quái vật tự tìm và tiến về phía người chơi. Mỗi đợt tăng số lượng và độ khó của quái vật. Game cần Start, Gameplay, Game Over, Restart, HP, điểm số, thời gian sống sót, ít nhất ba loại quái vật và bản build Windows có thể chơi được.";
+    const nextEngineering: EngineeringProject = {
+      ...emptyEngineeringForm(locale, technicalBrief),
+      technicalBrief,
+      startingPoint: "new_project",
+      targetPlatform: "game",
+      definitionOfDone: locale === "en"
+        ? "Complete playable flow from Start to Gameplay to Game Over to Restart. Player movement and attacks work; enemies find the player; there are at least three enemy types; HP, damage, healing items, score, survival time, enemy waves; and a stable playable Windows build."
+        : "Luồng chơi hoàn chỉnh từ Start đến Gameplay, Game Over rồi Restart. Nhân vật di chuyển và tấn công được; quái vật tìm đến người chơi; có ít nhất ba loại quái vật; HP, damage, vật phẩm hồi máu, điểm số, thời gian sống sót, các đợt quái vật và bản build Windows ổn định có thể chơi được.",
+      technologies: "Godot 4, GDScript",
+      currentExperience: locale === "en"
+        ? "Basic programming knowledge of variables, conditions, loops, and functions; new to Godot and GDScript."
+        : "Biết kiến thức lập trình cơ bản như variable, condition, loop và function; mới bắt đầu sử dụng Godot và GDScript.",
+      deploymentTarget: locale === "en" ? "Playable Windows build" : "Bản build Windows có thể chơi được",
+      deadline: "2026-09-01",
+      hoursPerDay: 2,
+      daysPerWeek: 6,
+      constraints: locale === "en"
+        ? "Solo project. No Blender or Photoshop. Use free assets or simple self-created shapes. No multiplayer, backend, or user accounts. Prioritise working gameplay before graphics and animation."
+        : "Làm một mình. Không dùng Blender hoặc Photoshop. Chỉ dùng asset miễn phí hoặc hình dạng đơn giản tự tạo. Không multiplayer, backend hoặc tài khoản người dùng. Ưu tiên gameplay hoạt động trước đồ họa và animation.",
     };
     clearProjectStorage(window.localStorage);
-    setForm(nextForm);
-    setProjectPath(null);
-    setPathClassification(null);
-    setEngineeringRoadmap(null);
+    setProjectPath("agentic_engineering");
+    setPathClassification({ path: "agentic_engineering", confidence: 1, reason: "The example is a working software project.", signals: ["example engineering brief"] });
+    setEngineeringForm(nextEngineering);
     setEngineeringInterpretation(null);
-    setPreparationMethod(null);
-    setEngineeringGuidedPlan(null);
     setEngineeringInterpretationConfirmed(false);
+    setPreparationMethod(null);
+    setEngineeringRoadmap(null);
+    setEngineeringGuidedPlan(null);
+    setForm(emptyForm(locale));
     setEngineeringCompletion([]);
     setEngineeringCalendarTasks([]);
     setRoadmap(null);
     setCreativeDnaReview(null);
+    setApprovedReferenceFindings([]);
     clearCreativeDnaReview(window.localStorage);
     setLearningPlan(null);
     clearLearningPlan(window.localStorage);
@@ -700,7 +768,10 @@ export function QuandaApp() {
     setError(null);
     setAnalysisError(null);
     setMatchingError(null);
-    requestAnimationFrame(() => document.querySelector("#project-form")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    setEngineeringError(null);
+    requestAnimationFrame(() => {
+      document.querySelector("#engineering-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const analyzeProject = async (request: RoadmapRequest) => {
@@ -739,7 +810,7 @@ export function QuandaApp() {
       const parsed = ProjectAnalysisResponseSchema.safeParse(await response.json());
       if (!parsed.success) throw new Error("analysis_invalid");
 
-      const creativeDna = mergeReviewOverrides(
+      const creativeDna = mergeApprovedReferenceFindings(mergeReviewOverrides(
         creativeDnaReview?.analysis.creativeDna ?? null,
         parsed.data.creativeDna,
       );
@@ -751,6 +822,7 @@ export function QuandaApp() {
                 parsed.data.applicationPaths.recommended.applicationIds,
             }
           : request;
+      ), approvedReferenceFindings);
       const review: CreativeDnaReviewRecord = {
         reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
         inputFingerprint: createProjectInputFingerprint(planningRequest),
@@ -767,6 +839,7 @@ export function QuandaApp() {
       };
       setForm(planningRequest);
       setCreativeDnaReview(confirmedReview);
+      announceWorkflowStage("review");
       writeCreativeDnaReview(window.localStorage, confirmedReview);
       trackEvent("creative_dna_review_viewed", { source: parsed.data.source });
       trackEvent(
@@ -818,6 +891,7 @@ export function QuandaApp() {
       if (!parsed.success) throw new Error("tutorial_matching_invalid");
       const next = mergeLearningDecisions(learningPlan, parsed.data);
       setLearningPlan(next);
+      announceWorkflowStage("prepare");
       trackEvent("tutorial_matching_succeeded", {
         gapCount: next.skillGaps.length,
         matchedCount: next.tutorialMatches.filter(
@@ -910,8 +984,14 @@ export function QuandaApp() {
       window.clearTimeout(timeout);
       setIsLoading(false);
       if (generatedRoadmap) {
-        const finalRoadmap = generatedRoadmap;
+        const finalRoadmap = generatedRoadmap.routeEvaluation
+          ? generatedRoadmap
+          : {
+              ...generatedRoadmap,
+              routeEvaluation: createDesignRouteEvaluation(request, generatedRoadmap.totalEstimatedMinutes),
+            };
         setRoadmap(finalRoadmap);
+        announceWorkflowStage("plan");
         setCompletion((current) => ({
           ...current,
           [finalRoadmap.id]: [],
@@ -1043,14 +1123,15 @@ export function QuandaApp() {
 
   return (
     <main id="top">
+      <Header
+        isReady={isHydrated}
+        locale={locale}
+        t={t}
+        onLanguageChange={changeLanguage}
+        onLoadExample={loadExample}
+      />
       <div className="page-shell">
-        <Header
-          isReady={isHydrated}
-          locale={locale}
-          t={t}
-          onLanguageChange={changeLanguage}
-          onLoadExample={loadExample}
-        />
+        {workflowStage && <WorkflowToast onDismiss={() => setWorkflowStage(null)} stage={workflowStage} t={t} />}
         {!projectPath && !pathClassification ? (
           <section className="landing-entry-section" id="project-form" aria-labelledby="hero-title">
             <div className={`landing-entry-copy hero-${locale}`}>
@@ -1136,6 +1217,13 @@ export function QuandaApp() {
               }
             }}
             onSubmit={(request) => void analyzeProject(request)}
+            onApprovedReferenceFindingsChange={(findings) => {
+              setApprovedReferenceFindings(findings);
+              setCreativeDnaReview(null);
+              setLearningPlan(null);
+              setRoadmap(null);
+              setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+            }}
             t={t}
             value={form}
           />
@@ -1152,7 +1240,7 @@ export function QuandaApp() {
               setEngineeringGuidedPlan(null);
               setEngineeringRoadmap(null);
               setEngineeringCompletion([]);
-              setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+              setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
               clearPreparationState(window.localStorage);
             }}
             onSubmit={(request) => void interpretEngineering(request)}
@@ -1314,10 +1402,35 @@ export function QuandaApp() {
         )}
 
         {projectPath === "agentic_engineering" && engineeringGuidedPlan && preparationMethod === "guided_tutorials" && (
-          <EngineeringGuidedPlan plan={engineeringGuidedPlan} t={t} onStartOver={() => {
-            if (!window.confirm(t.results.startOverConfirm)) return;
-            returnToBeginning();
-          }} />
+          <>
+            <EngineeringGuidedPlan
+              plan={engineeringGuidedPlan}
+              routeEvaluation={guidedRouteEvaluation}
+              t={t}
+              onStartOver={() => {
+                if (!window.confirm(t.results.startOverConfirm)) return;
+                returnToBeginning();
+              }}
+            />
+            <ProjectCalendar
+              locale={locale}
+              onAddTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
+              onDeleteTask={(taskId) =>
+                setEngineeringCalendarTasks((current) =>
+                  current.filter((task) => task.id !== taskId),
+                )
+              }
+              onNavigate={(direction) =>
+                trackEvent("calendar_navigation_used", {
+                  direction,
+                  path: "agentic_engineering_guided",
+                })
+              }
+              onToggleTask={toggleEngineeringCalendarTask}
+              t={t}
+              tasks={engineeringCalendarTasks}
+            />
+          </>
         )}
 
         {projectPath === "agentic_engineering" && engineeringRoadmap && preparationMethod === "agentic_project_plan" && (

@@ -31,6 +31,14 @@ function renderForm(value: RoadmapRequest) {
 }
 
 describe("ProjectBriefForm application picker", () => {
+  it("offers optional, explicitly approved design-reference analysis", () => {
+    const markup = renderForm(request);
+    expect(markup).toContain("Visual reference");
+    expect(markup).toContain("Choose a reference image");
+    expect(markup).toContain("review before they affect the plan");
+    expect(markup).toContain('accept="image/jpeg,image/png,image/webp"');
+  });
+
   it("renders an application search instead of the old preset grid", () => {
     const markup = renderForm(request);
     expect(markup).toContain("Search applications");

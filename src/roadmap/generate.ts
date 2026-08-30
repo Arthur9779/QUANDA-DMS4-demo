@@ -9,6 +9,7 @@ import type { RoadmapResponse, RoadmapStage } from "@/src/types";
 import type { RoadmapGenerationInput } from "./contracts";
 import { ROADMAP_GENERATOR_VERSION } from "./contracts";
 import { createProjectInputFingerprint } from "@/src/creative-dna-review/fingerprint";
+import { createDesignRouteEvaluation } from "@/src/route-planning/generate";
 
 function copy(input: RoadmapGenerationInput, en: string, vi: string) {
   return input.projectInput.interfaceLanguage === "vi" ? vi : en;
@@ -304,6 +305,7 @@ export function createIntegratedFallback(input: RoadmapGenerationInput): Roadmap
     roadmapGeneratorVersion: ROADMAP_GENERATOR_VERSION,
     inputFingerprint: input.inputFingerprint,
     projectInputFingerprint: createProjectInputFingerprint(project),
+    routeEvaluation: createDesignRouteEvaluation(project, totalEstimatedMinutes),
   };
 }
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RouteEvaluationSchema } from "@/src/route-planning/contracts";
 
 export const RoadmapStageSchema = z.object({
   id: z.string().min(1).max(80),
@@ -53,6 +54,7 @@ export const RoadmapResponseSchema = z.object({
   roadmapGeneratorVersion: z.number().int().positive().optional(),
   inputFingerprint: z.string().regex(/^[a-f0-9]{8}$/).optional(),
   projectInputFingerprint: z.string().regex(/^[a-f0-9]{8}$/).optional(),
+  routeEvaluation: RouteEvaluationSchema.optional(),
 });
 
 export type RoadmapResponseData = z.infer<typeof RoadmapResponseSchema>;

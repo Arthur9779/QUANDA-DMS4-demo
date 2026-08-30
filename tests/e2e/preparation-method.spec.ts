@@ -16,6 +16,9 @@ test("renders only the selected preparation method", async ({ page }) => {
   await expect(page.locator("#engineering-guided-plan")).toBeVisible();
   await expect(page.locator("#engineering-roadmap-results")).toHaveCount(0);
   await expect(page.getByText("This is not a general programming course.")).toBeVisible();
+  await expect(page.getByTestId("project-calendar")).toBeVisible();
+  await expect(page.locator(".engineering-guided-plan .route-evaluation")).toBeVisible();
+  await expect(page.locator(".engineering-guided-plan .route-score-item")).toHaveCount(6);
 });
 
 test("agentic preparation produces concrete verifiable tasks", async ({ page }) => {

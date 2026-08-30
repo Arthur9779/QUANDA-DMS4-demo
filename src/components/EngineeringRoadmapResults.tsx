@@ -4,6 +4,7 @@ import { CheckCircle2, ChevronDown, ChevronUp, CircleDot, Clock3, ShieldCheck } 
 import { useState } from "react";
 import type { Translation } from "@/src/i18n/translations";
 import type { EngineeringRoadmap, EngineeringTask } from "@/src/project-path/contracts";
+import { RouteEvaluationCard } from "./RouteEvaluationCard";
 
 function TaskCard({ task, t, complete, onToggle }: { task: EngineeringTask; t: Translation; complete: boolean; onToggle: () => void }) {
   const [open, setOpen] = useState(task.order === 1);
@@ -27,7 +28,8 @@ export function EngineeringRoadmapResults({ roadmap, completedTaskIds, onToggleT
   return <section className="engineering-roadmap-results" id="engineering-roadmap-results" aria-labelledby="engineering-roadmap-title">
     <div className="section-heading"><p className="eyebrow">{t.engineering.roadmapEyebrow}</p><h2 id="engineering-roadmap-title">{t.engineering.roadmapTitle}</h2><p>{t.engineering.roadmapIntro}</p></div>
     <div className="engineering-roadmap-summary"><div><strong>{roadmap.title}</strong><p>{roadmap.summary}</p></div><div><strong>{roadmap.totalEstimatedAgentMinutes + roadmap.totalEstimatedHumanReviewMinutes} {t.engineering.minutes}</strong><p>{roadmap.tasks.length} {t.engineering.taskCount}</p></div></div>
-    {roadmap.notice && <p className="engineering-notice" role="status">{roadmap.notice}</p>}
+      {roadmap.notice && <p className="engineering-notice" role="status">{roadmap.notice}</p>}
+      {roadmap.routeEvaluation && <RouteEvaluationCard evaluation={roadmap.routeEvaluation} t={t} />}
     <div className="engineering-task-list">{roadmap.tasks.map((task) => <TaskCard key={task.id} complete={completedTaskIds.includes(task.id)} onToggle={() => onToggleTask(task.id)} task={task} t={t} />)}</div>
     <div className="engineering-warnings"><strong>{t.engineering.warnings}</strong><ul>{roadmap.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>
     <button className="button button-secondary" onClick={onStartOver} type="button"><CheckCircle2 aria-hidden="true" size={17} />{t.results.startOver}</button>
