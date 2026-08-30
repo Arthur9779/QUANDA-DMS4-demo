@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, BookOpenCheck, ListChecks, PencilLine } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./Header";
 import { getTranslation } from "@/src/i18n/translations";
 import type {
@@ -83,7 +83,8 @@ import {
   syncRoadmapCalendarTasks,
 } from "@/src/lib/calendar";
 import {
-  removeEngineeringRoadmapCalendarTasks,
+  removeEngineeringCalendarTasks,
+  syncEngineeringGuidedPlanCalendarTasks,
   syncEngineeringRoadmapCalendarTasks,
 } from "@/src/lib/engineering-calendar";
 import { toLocalDateKey } from "@/src/lib/date";
@@ -184,6 +185,12 @@ export function QuandaApp() {
   const viewedRoadmapIds = useRef(new Set<string>());
   const t = getTranslation(locale);
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
+  const guidedRouteEvaluation = useMemo(() => {
+    if (!engineeringGuidedPlan || !engineeringInterpretation) return null;
+    // Use the existing engineering estimate and route scorer so guided preparation
+    // shows the same evidence-backed evaluation as the project-plan route.
+    return generateEngineeringRoadmap(engineeringForm, engineeringInterpretation).routeEvaluation ?? null;
+  }, [engineeringForm, engineeringGuidedPlan, engineeringInterpretation]);
   const projectInputFingerprint = createProjectInputFingerprint(form);
   const completedStageIds = roadmap ? completion[roadmap.id] ?? [] : [];
   const creativeDnaIsStale = creativeDnaReview
@@ -236,15 +243,22 @@ export function QuandaApp() {
       setEngineeringGuidedPlan(savedEngineeringGuidedPlan);
       setEngineeringInterpretationConfirmed(Boolean(savedPreparationMethod || savedEngineeringGuidedPlan || savedEngineeringRoadmap));
       setEngineeringCompletion(savedEngineeringCompletion);
+      const engineeringDeadline = savedEngineeringDraft?.deadline ?? emptyEngineeringForm(restoredLocale).deadline;
       setEngineeringCalendarTasks(
         savedEngineeringRoadmap
           ? syncEngineeringRoadmapCalendarTasks(
               savedEngineeringCalendarTasks,
               savedEngineeringRoadmap,
-              savedEngineeringDraft?.deadline ?? emptyEngineeringForm(restoredLocale).deadline,
+              engineeringDeadline,
               savedEngineeringCompletion,
             )
-          : removeEngineeringRoadmapCalendarTasks(savedEngineeringCalendarTasks),
+          : savedEngineeringGuidedPlan
+            ? syncEngineeringGuidedPlanCalendarTasks(
+                savedEngineeringCalendarTasks,
+                savedEngineeringGuidedPlan,
+                engineeringDeadline,
+              )
+            : removeEngineeringCalendarTasks(savedEngineeringCalendarTasks),
       );
       setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
@@ -608,7 +622,7 @@ export function QuandaApp() {
     setEngineeringError(null);
     setEngineeringInterpretation(null);
     setEngineeringRoadmap(null);
-    setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+    setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
     setEngineeringGuidedPlan(null);
     setEngineeringInterpretationConfirmed(false);
     const local = interpretEngineeringProject(request);
@@ -683,13 +697,16 @@ export function QuandaApp() {
     setEngineeringRoadmap(null);
     setEngineeringGuidedPlan(null);
     setEngineeringCompletion([]);
-    setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+    setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
     clearPreparationState(window.localStorage);
     writePreparationMethod(window.localStorage, method);
     if (method === "guided_tutorials") {
       const plan = generateEngineeringGuidedPlan(engineeringForm, engineeringInterpretation);
       setEngineeringGuidedPlan(plan);
       writeEngineeringGuidedPlan(window.localStorage, plan);
+      setEngineeringCalendarTasks((current) =>
+        syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
+      );
       requestAnimationFrame(() => document.querySelector("#engineering-guided-plan")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       return;
     }
@@ -1197,7 +1214,7 @@ export function QuandaApp() {
               setEngineeringGuidedPlan(null);
               setEngineeringRoadmap(null);
               setEngineeringCompletion([]);
-              setEngineeringCalendarTasks((current) => removeEngineeringRoadmapCalendarTasks(current));
+              setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
               clearPreparationState(window.localStorage);
             }}
             onSubmit={(request) => void interpretEngineering(request)}
@@ -1349,10 +1366,35 @@ export function QuandaApp() {
         )}
 
         {projectPath === "agentic_engineering" && engineeringGuidedPlan && preparationMethod === "guided_tutorials" && (
-          <EngineeringGuidedPlan plan={engineeringGuidedPlan} t={t} onStartOver={() => {
-            if (!window.confirm(t.results.startOverConfirm)) return;
-            returnToBeginning();
-          }} />
+          <>
+            <EngineeringGuidedPlan
+              plan={engineeringGuidedPlan}
+              routeEvaluation={guidedRouteEvaluation}
+              t={t}
+              onStartOver={() => {
+                if (!window.confirm(t.results.startOverConfirm)) return;
+                returnToBeginning();
+              }}
+            />
+            <ProjectCalendar
+              locale={locale}
+              onAddTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
+              onDeleteTask={(taskId) =>
+                setEngineeringCalendarTasks((current) =>
+                  current.filter((task) => task.id !== taskId),
+                )
+              }
+              onNavigate={(direction) =>
+                trackEvent("calendar_navigation_used", {
+                  direction,
+                  path: "agentic_engineering_guided",
+                })
+              }
+              onToggleTask={toggleEngineeringCalendarTask}
+              t={t}
+              tasks={engineeringCalendarTasks}
+            />
+          </>
         )}
 
         {projectPath === "agentic_engineering" && engineeringRoadmap && preparationMethod === "agentic_project_plan" && (
