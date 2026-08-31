@@ -11,6 +11,9 @@ const REQUIRED_PATHS = [
   "src/config/environment.js",
   "src/db/pool.js",
   "src/routes/health-routes.js",
+  "public/admin/index.html",
+  "public/admin/styles.css",
+  "public/admin/app.js",
 ];
 
 const REQUIRED_DEPENDENCIES = [

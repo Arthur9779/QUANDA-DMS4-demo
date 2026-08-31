@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>QUANDA Live Analytics</title>
+    <link rel="stylesheet" href="/admin/styles.css" />
+    <script src="/admin/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/admin/" aria-label="QUANDA analytics home">
+        <span class="brand-mark" aria-hidden="true">Q</span>
+        <span>QUANDA</span>
+      </a>
+      <span class="environment-pill">LIVE BACKEND</span>
+    </header>
+
+    <main>
+      <section class="login-panel" id="login-panel" aria-labelledby="login-title">
+        <p class="eyebrow">Private team view</p>
+        <h1 id="login-title">Live analytics without the terminal.</h1>
+        <p class="login-copy">
+          Enter the backend admin token once per browser tab. It stays in this
+          session and is sent only as an authorization header to QUANDA.
+        </p>
+        <form id="login-form" autocomplete="off">
+          <label for="admin-token">Admin analytics token</label>
+          <div class="token-row">
+            <input
+              id="admin-token"
+              name="admin-token"
+              type="password"
+              required
+              minlength="32"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Paste ADMIN_API_TOKEN"
+            />
+            <button class="primary-button" type="submit">Open dashboard</button>
+          </div>
+          <p class="form-note">The token never appears in the page URL.</p>
+          <p class="error-message" id="login-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="dashboard" hidden aria-labelledby="dashboard-title">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">Team analytics</p>
+            <h1 id="dashboard-title">What is QUANDA doing?</h1>
+            <p class="updated-at" id="updated-at" aria-live="polite">Loading live data…</p>
+          </div>
+          <button class="secondary-button" id="sign-out" type="button">Lock dashboard</button>
+        </div>
+
+        <form class="filter-bar" id="filter-form">
+          <label>
+            <span>From</span>
+            <input id="start-date" type="date" required />
+          </label>
+          <label>
+            <span>Through</span>
+            <input id="end-date" type="date" required />
+          </label>
+          <button class="primary-button" id="refresh-button" type="submit">Refresh now</button>
+          <label class="auto-refresh">
+            <input id="auto-refresh" type="checkbox" checked />
+            <span>Refresh every minute</span>
+          </label>
+        </form>
+
+        <p class="dashboard-error" id="dashboard-error" role="alert" hidden></p>
+
+        <section aria-labelledby="activity-title">
+          <div class="section-heading">
+            <div><p class="section-kicker">01</p><h2 id="activity-title">Activity</h2></div>
+            <p>Real users only. Synthetic evaluation data is excluded.</p>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card metric-featured"><span>Active users</span><strong id="active-users">—</strong><small>in selected period</small></article>
+            <article class="metric-card"><span>Total sessions</span><strong id="total-sessions">—</strong><small id="sessions-per-user">— per active user</small></article>
+            <article class="metric-card"><span>Daily active</span><strong id="dau">—</strong><small id="wau-mau">— weekly · — monthly</small></article>
+            <article class="metric-card"><span>New users</span><strong id="new-users">—</strong><small id="returning-users">— returning</small></article>
+          </div>
+        </section>
+
+        <section aria-labelledby="product-title">
+          <div class="section-heading">
+            <div><p class="section-kicker">02</p><h2 id="product-title">Product pipeline</h2></div>
+            <p>Signals that show whether people reach a useful QUANDA result.</p>
+          </div>
+          <div class="metric-grid product-grid">
+            <article class="metric-card"><span>Briefs submitted</span><strong id="briefs">—</strong></article>
+            <article class="metric-card metric-featured"><span>Roadmaps generated</span><strong id="roadmaps">—</strong><small id="roadmap-conversion">— conversion</small></article>
+            <article class="metric-card"><span>Tutorial open rate</span><strong id="tutorial-rate">—</strong></article>
+            <article class="metric-card"><span>Calendar adoption</span><strong id="calendar-adoption">—</strong></article>
+            <article class="metric-card"><span>Stages completed</span><strong id="stages-completed">—</strong></article>
+            <article class="metric-card"><span>Projects completed</span><strong id="projects-completed">—</strong></article>
+          </div>
+        </section>
+
+        <section aria-labelledby="retention-title">
+          <div class="section-heading">
+            <div><p class="section-kicker">03</p><h2 id="retention-title">Retention</h2></div>
+            <p>Exact UTC return days; users too new for a period are excluded.</p>
+          </div>
+          <div class="retention-grid">
+            <article><span>Day 1</span><strong id="retention-d1">—</strong><small id="retention-d1-detail">—</small></article>
+            <article><span>Day 7</span><strong id="retention-d7">—</strong><small id="retention-d7-detail">—</small></article>
+            <article><span>Day 30</span><strong id="retention-d30">—</strong><small id="retention-d30-detail">—</small></article>
+          </div>
+        </section>
+
+        <section aria-labelledby="events-title">
+          <div class="section-heading">
+            <div><p class="section-kicker">04</p><h2 id="events-title">Recorded events</h2></div>
+            <p>Counts and unique users for every tracked product milestone.</p>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead><tr><th scope="col">Event</th><th scope="col">Count</th><th scope="col">Unique users</th></tr></thead>
+              <tbody id="events-body"></tbody>
+            </table>
+            <p class="empty-state" id="events-empty" hidden>No events were recorded in this period.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

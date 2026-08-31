@@ -85,6 +85,24 @@ describe("local API", () => {
     );
   });
 
+  test("serves a no-store analytics dashboard without embedding credentials", async () => {
+    const { baseUrl } = await start();
+    const response = await fetch(`${baseUrl}/admin/`);
+    const html = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("cache-control"), /no-store/);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    assert.match(html, /QUANDA Live Analytics/);
+    assert.match(html, /type="password"/);
+    assert.match(html, /\/admin\/app\.js/);
+    assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
+
+    const script = await fetch(`${baseUrl}/admin/app.js`);
+    assert.equal(script.status, 200);
+    assert.match(await script.text(), /Authorization: `Bearer/);
+  });
+
   test("CORS permits only configured browser origins", async () => {
     const { baseUrl } = await start();
     const allowed = await fetch(`${baseUrl}/health`, {
@@ -186,6 +204,7 @@ describe("local API", () => {
 
     const analytics = await fetch(`${baseUrl}/api/v1/admin/analytics/overview`);
     assert.equal(analytics.status, 403);
+    assert.match(analytics.headers.get("cache-control"), /no-store/);
     assert.equal((await json(analytics)).error, "admin_forbidden");
   });
 

@@ -61,6 +61,11 @@ use an expected version to prevent silent conflicting writes.
 
 Send `ADMIN_API_TOKEN` as a bearer token.
 
+For a simple team-facing view, open `GET /admin/`. The dashboard asks for the
+admin token in a password field, keeps it only in the current browser tab, and
+loads the three protected reports below. The token is never placed in the URL.
+Use **Lock dashboard** before leaving a shared computer.
+
 - `GET /api/v1/admin/analytics/overview`
 - `GET /api/v1/admin/analytics/retention`
 - `GET /api/v1/admin/analytics/events`

@@ -5,6 +5,10 @@ const { AnalyticsQuerySchema, analyticsWindow } = require("../validation/analyti
 
 function createAnalyticsRouter({ analyticsService, authenticateAdmin }) {
   const router = express.Router();
+  router.use((_request, response, next) => {
+    response.set("Cache-Control", "no-store");
+    next();
+  });
   router.use(authenticateAdmin);
 
   function endpoint(operation) {
