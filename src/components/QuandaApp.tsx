@@ -810,9 +810,12 @@ export function QuandaApp() {
       const parsed = ProjectAnalysisResponseSchema.safeParse(await response.json());
       if (!parsed.success) throw new Error("analysis_invalid");
 
-      const creativeDna = mergeApprovedReferenceFindings(mergeReviewOverrides(
-        creativeDnaReview?.analysis.creativeDna ?? null,
-        parsed.data.creativeDna,
+      const creativeDna = mergeApprovedReferenceFindings(
+        mergeReviewOverrides(
+          creativeDnaReview?.analysis.creativeDna ?? null,
+          parsed.data.creativeDna,
+        ),
+        approvedReferenceFindings,
       );
       const planningRequest =
         request.requiredApplications.length === 0 && parsed.data.applicationPaths
@@ -822,7 +825,6 @@ export function QuandaApp() {
                 parsed.data.applicationPaths.recommended.applicationIds,
             }
           : request;
-      ), approvedReferenceFindings);
       const review: CreativeDnaReviewRecord = {
         reviewVersion: CREATIVE_DNA_REVIEW_VERSION,
         inputFingerprint: createProjectInputFingerprint(planningRequest),
