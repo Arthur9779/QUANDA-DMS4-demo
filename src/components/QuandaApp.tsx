@@ -716,7 +716,7 @@ export function QuandaApp() {
       setEngineeringCalendarTasks((current) =>
         syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
       );
-      requestAnimationFrame(() => document.querySelector("#engineering-guided-plan")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      requestAnimationFrame(() => document.querySelector(".route-evaluation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       return;
     }
     requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
