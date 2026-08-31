@@ -38,7 +38,7 @@ function createAnalyticsService({ pool }) {
     const [sessionRows] = await pool.execute(
       `SELECT COUNT(*) AS total_sessions, COUNT(DISTINCT s.user_id) AS active_users
          FROM sessions s
-        WHERE s.started_at >= ? AND s.started_at < ? AND ${sessionScope.clause}`,
+        WHERE s.last_seen_at >= ? AND s.last_seen_at < ? AND ${sessionScope.clause}`,
       [...windowParameters, ...sessionScope.parameters],
     );
 
@@ -46,14 +46,16 @@ function createAnalyticsService({ pool }) {
       `SELECT COUNT(DISTINCT s.user_id) AS returning_users
          FROM sessions s
          JOIN users u ON u.id = s.user_id
-        WHERE s.started_at >= ? AND s.started_at < ?
+        WHERE s.last_seen_at >= ? AND s.last_seen_at < ?
           AND u.created_at < ? AND ${sessionScope.clause}`,
       [filter.start, filter.end, filter.start, ...sessionScope.parameters],
     );
 
-    const activityStart = new Date(filter.end.getTime() - 86_400_000);
-    const weekStart = new Date(filter.end.getTime() - 7 * 86_400_000);
-    const monthStart = new Date(filter.end.getTime() - 30 * 86_400_000);
+    const clippedActivityStart = (days) =>
+      new Date(Math.max(filter.start.getTime(), filter.end.getTime() - days * 86_400_000));
+    const activityStart = clippedActivityStart(1);
+    const weekStart = clippedActivityStart(7);
+    const monthStart = clippedActivityStart(30);
     const [activeRows] = await pool.execute(
       `SELECT
          COUNT(DISTINCT CASE WHEN s.last_seen_at >= ? THEN s.user_id END) AS dau,
@@ -87,6 +89,11 @@ function createAnalyticsService({ pool }) {
       window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
       source: filter.source,
       scenarioId: filter.scenarioId || null,
+      definitions: {
+        identity: "Anonymous browser identity; clearing storage or using another browser creates a new identity.",
+        active: "Distinct identities with session activity in the selected period.",
+        rollingActivity: "Rolling activity is clipped to the selected period and ends at its exclusive end.",
+      },
       users: {
         total: number(users.total_users),
         new: number(users.new_users),

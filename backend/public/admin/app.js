@@ -24,6 +24,9 @@
   };
 
   const numberFormatter = new Intl.NumberFormat("en");
+  const decimalFormatter = new Intl.NumberFormat("en", {
+    maximumFractionDigits: 2,
+  });
   const percentFormatter = new Intl.NumberFormat("en", {
     style: "percent",
     maximumFractionDigits: 1,
@@ -105,11 +108,17 @@
   function renderOverview(data) {
     text("active-users", count(data.users.active));
     text("total-sessions", count(data.sessions.total));
-    text("sessions-per-user", `${data.sessions.averagePerActiveUser || 0} per active user`);
+    text(
+      "sessions-per-user",
+      `${decimalFormatter.format(Number(data.sessions.averagePerActiveUser || 0))} per active identity`,
+    );
     text("dau", count(data.activity.dau));
-    text("wau-mau", `${count(data.activity.wau)} weekly · ${count(data.activity.mau)} monthly`);
+    text(
+      "wau-mau",
+      `${count(data.activity.wau)} last 7 days · ${count(data.activity.mau)} last 30 days`,
+    );
     text("new-users", count(data.users.new));
-    text("returning-users", `${count(data.users.returning)} returning`);
+    text("returning-users", `${count(data.users.returning)} returning identities`);
     text("briefs", count(data.product.briefsSubmitted));
     text("roadmaps", count(data.product.roadmapsGenerated));
     text("roadmap-conversion", `${percent(data.product.briefToRoadmapConversion)} conversion`);
