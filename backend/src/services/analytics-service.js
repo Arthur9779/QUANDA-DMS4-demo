@@ -23,6 +23,7 @@ function createAnalyticsService({ pool }) {
   async function overview(filter) {
     const userScope = syntheticScope("u", filter);
     const sessionScope = syntheticScope("s", filter);
+    const priorSessionScope = syntheticScope("previous", filter);
     const eventScope = syntheticScope("e", filter);
     const windowParameters = [filter.start, filter.end];
 
@@ -45,10 +46,21 @@ function createAnalyticsService({ pool }) {
     const [returningRows] = await pool.execute(
       `SELECT COUNT(DISTINCT s.user_id) AS returning_users
          FROM sessions s
-         JOIN users u ON u.id = s.user_id
         WHERE s.last_seen_at >= ? AND s.last_seen_at < ?
-          AND u.created_at < ? AND ${sessionScope.clause}`,
-      [filter.start, filter.end, filter.start, ...sessionScope.parameters],
+          AND ${sessionScope.clause}
+          AND EXISTS (
+            SELECT 1
+              FROM sessions previous
+             WHERE previous.user_id = s.user_id
+               AND previous.started_at < s.started_at
+               AND ${priorSessionScope.clause}
+          )`,
+      [
+        filter.start,
+        filter.end,
+        ...sessionScope.parameters,
+        ...priorSessionScope.parameters,
+      ],
     );
 
     const clippedActivityStart = (days) =>
@@ -92,6 +104,7 @@ function createAnalyticsService({ pool }) {
       definitions: {
         identity: "Anonymous browser identity; clearing storage or using another browser creates a new identity.",
         active: "Distinct identities with session activity in the selected period.",
+        returning: "Distinct active identities with an earlier session before another session active in the selected period.",
         rollingActivity: "Rolling activity is clipped to the selected period and ends at its exclusive end.",
       },
       users: {

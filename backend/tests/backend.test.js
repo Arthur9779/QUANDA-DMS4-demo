@@ -298,10 +298,14 @@ test("analytics activity uses one coherent last-seen window", async () => {
 
   assert.match(calls[1].sql, /s\.last_seen_at >= \? AND s\.last_seen_at < \?/);
   assert.match(calls[2].sql, /s\.last_seen_at >= \? AND s\.last_seen_at < \?/);
+  assert.match(calls[2].sql, /EXISTS \( SELECT 1 FROM sessions previous/);
+  assert.match(calls[2].sql, /previous\.started_at < s\.started_at/);
+  assert.equal(calls[2].parameters.length, 2);
   assert.equal(calls[3].parameters[0].toISOString(), "2026-08-31T00:00:00.000Z");
   assert.equal(calls[3].parameters[1].toISOString(), start.toISOString());
   assert.equal(calls[3].parameters[2].toISOString(), start.toISOString());
   assert.match(overview.definitions.identity, /browser identity/i);
+  assert.match(overview.definitions.returning, /earlier session/i);
   assert.equal(overview.sessions.averagePerActiveUser, 1.5);
 });
 

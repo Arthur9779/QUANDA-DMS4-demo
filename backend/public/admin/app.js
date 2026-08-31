@@ -118,7 +118,7 @@
       `${count(data.activity.wau)} last 7 days · ${count(data.activity.mau)} last 30 days`,
     );
     text("new-users", count(data.users.new));
-    text("returning-users", `${count(data.users.returning)} returning identities`);
+    text("returning-users", `${count(data.users.returning)} returned for another session`);
     text("briefs", count(data.product.briefsSubmitted));
     text("roadmaps", count(data.product.roadmapsGenerated));
     text("roadmap-conversion", `${percent(data.product.briefToRoadmapConversion)} conversion`);
