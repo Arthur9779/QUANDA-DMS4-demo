@@ -33,13 +33,15 @@
   });
 
   function dateInputValue(date) {
-    return date.toISOString().slice(0, 10);
+    return new Date(date.getTime() + 7 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
   }
 
   function setDefaultDates() {
     const end = new Date();
     const start = new Date(end);
-    start.setUTCDate(start.getUTCDate() - 29);
+    start.setUTCDate(start.getUTCDate() - 89);
     elements.startDate.value = dateInputValue(start);
     elements.endDate.value = dateInputValue(end);
   }
@@ -55,6 +57,10 @@
 
   function percent(value) {
     return percentFormatter.format(Number(value || 0));
+  }
+
+  function measuredPercent(value) {
+    return value === null || value === undefined ? "—" : percent(value);
   }
 
   function showError(element, message) {
@@ -120,7 +126,7 @@
     text("new-users", count(data.users.new));
     text("returning-users", `${count(data.users.returning)} returned for another session`);
     text("briefs", count(data.product.briefsSubmitted));
-    text("roadmaps", count(data.product.plansGenerated));
+    text("roadmaps", count(data.product.usablePlans));
     text(
       "roadmap-conversion",
       `${percent(data.product.briefToPlanConversion)} of briefs · ${percent(data.product.planStartToCompletionRate)} of starts`,
@@ -134,12 +140,17 @@
     text("tutorial-rate", percent(data.product.tutorialOpenRate));
     text("calendar-adoption", percent(data.product.calendarAdoption));
     text("stages-completed", count(data.product.workItemsCompleted));
-    text("projects-completed", count(data.product.projectsCompleted));
+    text("projects-progressed", count(data.product.projectsProgressed));
+    text("projects-completed", `${count(data.product.projectsCompleted)} fully completed`);
 
     text("design-briefs", count(data.branches.design.briefsSubmitted));
     text("design-analyses", count(data.branches.design.analysesCompleted));
+    text("design-confirmations", count(data.branches.design.directionsConfirmed));
     text("design-tutorials", count(data.branches.design.tutorialMatchesCompleted));
+    text("design-plan-requests", count(data.branches.design.planRequests));
     text("design-plans", count(data.branches.design.plansGenerated));
+    text("design-usable-plans", count(data.branches.design.usablePlans));
+    text("design-reliability", percent(data.branches.design.generationReliability));
     text("design-conversion", percent(data.branches.design.conversion));
 
     text("engineering-briefs", count(data.branches.engineering.briefsSubmitted));
@@ -154,8 +165,13 @@
   function renderRetention(data) {
     for (const day of [1, 7, 30]) {
       const value = data.retention[`d${day}`];
-      text(`retention-d${day}`, percent(value.rate));
-      text(`retention-d${day}-detail`, `${count(value.retained)} of ${count(value.eligible)} eligible users`);
+      text(`retention-d${day}`, measuredPercent(value.rate));
+      text(
+        `retention-d${day}-detail`,
+        value.eligible > 0
+          ? `${count(value.retained)} of ${count(value.eligible)} eligible identities`
+          : "Not enough eligible identities yet",
+      );
     }
   }
 

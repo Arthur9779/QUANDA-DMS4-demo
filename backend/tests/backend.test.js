@@ -4,6 +4,7 @@ const { createApplication } = require("../src/app");
 const { loadEnvironment } = require("../src/config/environment");
 const { hashToken } = require("../src/lib/tokens");
 const { createAnalyticsService } = require("../src/services/analytics-service");
+const { analyticsWindow } = require("../src/validation/analytics");
 const { EventNameSchema, canonicalEventName } = require("../src/validation/events");
 
 const servers = [];
@@ -101,6 +102,8 @@ describe("local API", () => {
     assert.match(html, /\/admin\/app\.js/);
     assert.match(html, /roadmap-generation-gap/);
     assert.match(html, /Workflow branches/);
+    assert.match(html, /Projects with progress/);
+    assert.match(html, /journey-to-usable-roadmap conversion/);
     assert.match(html, /engineering-plans/);
     assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
 
@@ -283,24 +286,28 @@ test("analytics activity uses one coherent last-seen window", async () => {
       }
       return [[{
         briefs: 8,
-        roadmaps: 4,
-        engineering_plans: 2,
+        plans_generated: 6,
+        usable_plans: 6,
         plan_starts: 7,
         plan_failures: 1,
+        projects_progressed: 4,
+        projects_completed: 1,
+        work_items_completed: 3,
         design_briefs: 6,
         design_analyses: 6,
+        design_confirmations: 5,
         design_tutorial_matches: 6,
+        design_plan_starts: 5,
+        design_roadmaps: 4,
+        design_usable_roadmaps: 4,
         engineering_briefs: 2,
         engineering_interpretations: 2,
         engineering_guided_plans: 1,
         engineering_agentic_plans: 1,
+        engineering_plans: 2,
         engineering_tasks_completed: 3,
-        viewed_projects: 0,
-        tutorial_projects: 0,
-        roadmap_users: 0,
-        calendar_users: 0,
-        stages_completed: 0,
-        projects_completed: 0,
+        tutorial_projects: 2,
+        calendar_projects: 3,
       }], []];
     },
   };
@@ -329,9 +336,55 @@ test("analytics activity uses one coherent last-seen window", async () => {
   assert.equal(overview.product.planGenerationFailures, 1);
   assert.equal(overview.product.planGenerationGap, 1);
   assert.equal(overview.product.workItemsCompleted, 3);
+  assert.equal(overview.product.projectsProgressed, 4);
+  assert.equal(overview.product.projectsCompleted, 1);
+  assert.equal(overview.product.tutorialOpenRate, 0.5);
+  assert.equal(overview.product.calendarAdoption, 0.5);
   assert.equal(overview.branches.design.conversion, 0.6667);
+  assert.equal(overview.branches.design.directionsConfirmed, 5);
+  assert.equal(overview.branches.design.planRequests, 5);
+  assert.equal(overview.branches.design.generationReliability, 0.8);
   assert.equal(overview.branches.engineering.conversion, 1);
   assert.equal(overview.branches.engineering.tasksCompleted, 3);
+});
+
+test("retention uses rolling Vietnam-local windows and marks immature cohorts unavailable", async () => {
+  const calls = [];
+  const responses = [
+    { eligible_users: 10, retained_users: 4 },
+    { eligible_users: 6, retained_users: 3 },
+    { eligible_users: 0, retained_users: 0 },
+  ];
+  const pool = {
+    async execute(sql, parameters) {
+      calls.push({ sql: sql.replace(/\s+/g, " ").trim(), parameters });
+      return [[responses[calls.length - 1]], []];
+    },
+  };
+  const result = await createAnalyticsService({ pool }).retention({
+    start: new Date("2026-05-31T17:00:00.000Z"),
+    end: new Date("2026-09-03T17:00:00.000Z"),
+    source: "real",
+  });
+
+  assert.match(calls[0].sql, /CONVERT_TZ\(s\.started_at, '\+00:00', '\+07:00'\)/);
+  assert.match(calls[0].sql, /BETWEEN \? AND \?/);
+  assert.deepEqual(calls.map((call) => call.parameters.slice(0, 2)), [[1, 1], [2, 7], [8, 30]]);
+  assert.equal(result.timeZone, "Asia/Ho_Chi_Minh");
+  assert.equal(result.retention.d1.rate, 0.4);
+  assert.equal(result.retention.d7.rate, 0.5);
+  assert.equal(result.retention.d30.rate, null);
+});
+
+test("analytics date filters use Vietnam-local calendar boundaries", () => {
+  const window = analyticsWindow({
+    start: "2026-09-01",
+    end: "2026-09-03",
+    source: "real",
+  });
+
+  assert.equal(window.start.toISOString(), "2026-08-31T17:00:00.000Z");
+  assert.equal(window.end.toISOString(), "2026-09-03T17:00:00.000Z");
 });
 
 test("legacy event names normalize to canonical analytics names", () => {
