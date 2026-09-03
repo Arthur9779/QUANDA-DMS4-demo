@@ -1,10 +1,8 @@
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import type { EngineeringGuidedPlan as EngineeringGuidedPlanValue } from "@/src/project-path/contracts";
-import type { RouteEvaluation } from "@/src/route-planning/contracts";
 import type { Translation } from "@/src/i18n/translations";
-import { RouteEvaluationCard } from "./RouteEvaluationCard";
 
-export function EngineeringGuidedPlan({ plan, routeEvaluation, t, onStartOver }: { plan: EngineeringGuidedPlanValue; routeEvaluation?: RouteEvaluation | null; t: Translation; onStartOver: () => void }) {
+export function EngineeringGuidedPlan({ plan, t, onStartOver }: { plan: EngineeringGuidedPlanValue; t: Translation; onStartOver: () => void }) {
   return (
     <section className="engineering-guided-plan" id="engineering-guided-plan" aria-labelledby="engineering-guided-title">
       <div className="section-heading"><p className="eyebrow">{t.preparation.guidedEyebrow}</p><h2 id="engineering-guided-title">{plan.title}</h2><p>{plan.summary}</p></div>
@@ -17,7 +15,6 @@ export function EngineeringGuidedPlan({ plan, routeEvaluation, t, onStartOver }:
         ))}
       </div>
       <div className="engineering-guided-footer"><p>{t.preparation.humanNote}</p><button className="button button-secondary" onClick={onStartOver} type="button"><CheckCircle2 aria-hidden="true" size={17} />{t.results.startOver}</button></div>
-      {routeEvaluation && <RouteEvaluationCard evaluation={routeEvaluation} t={t} />}
     </section>
   );
 }

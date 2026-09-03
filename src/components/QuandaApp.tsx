@@ -16,6 +16,7 @@ import { PathClarification } from "./PathClarification";
 import { EngineeringProjectForm } from "./EngineeringProjectForm";
 import { EngineeringRoadmapResults } from "./EngineeringRoadmapResults";
 import { EngineeringGuidedPlan } from "./EngineeringGuidedPlan";
+import { RouteEvaluationCard } from "./RouteEvaluationCard";
 import { PreparationMethodChoice } from "./PreparationMethodChoice";
 import { RoadmapResults } from "./RoadmapResults";
 import { ProjectCalendar } from "./ProjectCalendar";
@@ -772,7 +773,7 @@ export function QuandaApp() {
       setEngineeringCalendarTasks((current) =>
         syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
       );
-      requestAnimationFrame(() => document.querySelector("#engineering-guided-plan")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      requestAnimationFrame(() => document.querySelector(".route-evaluation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       return;
     }
     requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -1529,9 +1530,9 @@ export function QuandaApp() {
 
         {projectPath === "agentic_engineering" && engineeringGuidedPlan && preparationMethod === "guided_tutorials" && (
           <>
+            {guidedRouteEvaluation && <RouteEvaluationCard evaluation={guidedRouteEvaluation} t={t} />}
             <EngineeringGuidedPlan
               plan={engineeringGuidedPlan}
-              routeEvaluation={guidedRouteEvaluation}
               t={t}
               onStartOver={() => {
                 if (!window.confirm(t.results.startOverConfirm)) return;
