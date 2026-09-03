@@ -102,7 +102,9 @@ describe("local API", () => {
     assert.match(html, /\/admin\/app\.js/);
     assert.match(html, /roadmap-generation-gap/);
     assert.match(html, /Workflow branches/);
-    assert.match(html, /Projects with progress/);
+    assert.match(html, /Briefs submitted/);
+    assert.match(html, /Projects completed/);
+    assert.doesNotMatch(html, /projects-progressed/);
     assert.match(html, /journey-to-usable-roadmap conversion/);
     assert.match(html, /engineering-plans/);
     assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);

@@ -140,8 +140,7 @@
     text("tutorial-rate", percent(data.product.tutorialOpenRate));
     text("calendar-adoption", percent(data.product.calendarAdoption));
     text("stages-completed", count(data.product.workItemsCompleted));
-    text("projects-progressed", count(data.product.projectsProgressed));
-    text("projects-completed", `${count(data.product.projectsCompleted)} fully completed`);
+    text("projects-completed", count(data.product.projectsCompleted));
 
     text("design-briefs", count(data.branches.design.briefsSubmitted));
     text("design-analyses", count(data.branches.design.analysesCompleted));
