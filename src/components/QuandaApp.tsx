@@ -111,6 +111,7 @@ import { generateEngineeringGuidedPlan, generateEngineeringRoadmap, interpretEng
 import { WorkflowToast, type WorkflowStage } from "./WorkflowToast";
 import { createDesignRouteEvaluation, createEngineeringRouteEvaluation } from "@/src/route-planning/generate";
 import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
+import { createIntegratedFallback, createRoadmapInput } from "@/src/roadmap";
 const stepIcons = [PencilLine, ListChecks, BookOpenCheck] as const;
 
 function dateFromToday(days: number) {
@@ -189,6 +190,7 @@ export function QuandaApp() {
   const [workflowStage, setWorkflowStage] = useState<WorkflowStage | null>(null);
   const calendarViewTracked = useRef(false);
   const viewedRoadmapIds = useRef(new Set<string>());
+  const restoredRoadmapIds = useRef(new Set<string>());
   const t = getTranslation(locale);
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
   const guidedRouteEvaluation = useMemo(() => {
@@ -266,6 +268,7 @@ export function QuandaApp() {
               )
             : removeEngineeringCalendarTasks(savedEngineeringCalendarTasks),
       );
+      if (restoredRoadmap) restoredRoadmapIds.current.add(restoredRoadmap.id);
       setRoadmap(restoredRoadmap);
       setCreativeDnaReview(savedCreativeDnaReview);
       setLearningPlan(
@@ -314,6 +317,7 @@ export function QuandaApp() {
         setPathClassification(null);
         setLocale(snapshot.form.interfaceLanguage);
         setForm(snapshot.form);
+        if (snapshot.roadmap) restoredRoadmapIds.current.add(snapshot.roadmap.id);
         setRoadmap(snapshot.roadmap);
         setCreativeDnaReview(snapshot.creativeDnaReview);
         setLearningPlan(snapshot.learningPlan);
@@ -474,7 +478,7 @@ export function QuandaApp() {
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         calendarViewTracked.current = true;
-        trackEvent("calendar_opened");
+        trackEvent("calendar_opened", { workflow: "design" });
         observer.disconnect();
       },
       { threshold: 0.15 },
@@ -495,8 +499,10 @@ export function QuandaApp() {
     }
     viewedRoadmapIds.current.add(roadmap.id);
     trackEvent("roadmap_viewed", {
+      workflow: "design",
       source: roadmap.source ?? "ai",
       stageCount: roadmap.stages.length,
+      restored: restoredRoadmapIds.current.has(roadmap.id),
     });
   }, [isHydrated, projectInputFingerprint, projectPath, roadmap]);
 
@@ -633,6 +639,14 @@ export function QuandaApp() {
     setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
     setEngineeringGuidedPlan(null);
     setEngineeringInterpretationConfirmed(false);
+    trackEvent("brief_submitted", {
+      workflow: "agentic_engineering",
+      language: request.interfaceLanguage,
+    });
+    trackEvent("engineering_interpretation_started", {
+      workflow: "agentic_engineering",
+      language: request.interfaceLanguage,
+    });
     const local = interpretEngineeringProject(request);
     try {
       const response = await fetch("/api/engineering/interpret", {
@@ -640,14 +654,27 @@ export function QuandaApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),
       });
-      if (!response.ok) throw new Error("engineering_interpretation_failed");
+      if (!response.ok) throw new Error(`engineering_interpretation_${response.status}`);
       setEngineeringInterpretation(local);
       setEngineeringInterpretationConfirmed(true);
+      trackEvent("engineering_interpretation_completed", {
+        workflow: "agentic_engineering",
+        source: local.source,
+      });
       announceWorkflowStage("review");
-    } catch {
+    } catch (caughtError) {
       setEngineeringInterpretation({ ...local, source: "fallback" });
       setEngineeringInterpretationConfirmed(true);
       setEngineeringError(t.errors.networkFallback);
+      trackEvent("engineering_interpretation_failed", {
+        workflow: "agentic_engineering",
+        reason: caughtError instanceof Error ? caughtError.message : "unknown_error",
+        recoveredWithFallback: true,
+      });
+      trackEvent("engineering_interpretation_completed", {
+        workflow: "agentic_engineering",
+        source: "fallback",
+      });
     }
     requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
@@ -659,6 +686,10 @@ export function QuandaApp() {
   ) => {
     if (!interpretation || method !== "agentic_project_plan") return;
     setEngineeringError(null);
+    trackEvent("engineering_plan_generate_started", {
+      workflow: "agentic_engineering",
+      preparationMethod: method,
+    });
     let finalRoadmap: EngineeringRoadmap;
     try {
       const response = await fetch("/api/engineering/roadmap", {
@@ -666,13 +697,19 @@ export function QuandaApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ project, interpretation }),
       });
-      if (!response.ok) throw new Error("engineering_roadmap_failed");
+      if (!response.ok) throw new Error(`engineering_roadmap_${response.status}`);
       const parsed = EngineeringRoadmapSchema.parse(await response.json());
       finalRoadmap = parsed;
-    } catch {
+    } catch (caughtError) {
       finalRoadmap = generateEngineeringRoadmap(project, interpretation, {
         source: "fallback",
         notice: t.engineering.notice,
+      });
+      trackEvent("engineering_plan_generate_failed", {
+        workflow: "agentic_engineering",
+        preparationMethod: method,
+        reason: caughtError instanceof Error ? caughtError.message : "unknown_error",
+        recoveredWithFallback: true,
       });
     }
     const withEvaluation = finalRoadmap.routeEvaluation
@@ -686,6 +723,12 @@ export function QuandaApp() {
           ),
         };
     setEngineeringRoadmap(withEvaluation);
+    trackEvent("engineering_plan_generated", {
+      workflow: "agentic_engineering",
+      preparationMethod: method,
+      source: withEvaluation.source,
+      taskCount: withEvaluation.tasks.length,
+    });
     announceWorkflowStage("plan");
     setEngineeringCalendarTasks((current) =>
       syncEngineeringRoadmapCalendarTasks(
@@ -701,6 +744,10 @@ export function QuandaApp() {
   const choosePreparationMethod = (method: PreparationMethod) => {
     if (!engineeringInterpretation || !engineeringInterpretationConfirmed) return;
     setPreparationMethod(method);
+    trackEvent("engineering_preparation_selected", {
+      workflow: "agentic_engineering",
+      preparationMethod: method,
+    });
     announceWorkflowStage("prepare");
     setEngineeringRoadmap(null);
     setEngineeringGuidedPlan(null);
@@ -709,8 +756,18 @@ export function QuandaApp() {
     clearPreparationState(window.localStorage);
     writePreparationMethod(window.localStorage, method);
     if (method === "guided_tutorials") {
+      trackEvent("engineering_plan_generate_started", {
+        workflow: "agentic_engineering",
+        preparationMethod: method,
+      });
       const plan = generateEngineeringGuidedPlan(engineeringForm, engineeringInterpretation);
       setEngineeringGuidedPlan(plan);
+      trackEvent("engineering_plan_generated", {
+        workflow: "agentic_engineering",
+        preparationMethod: method,
+        source: "deterministic",
+        stepCount: plan.steps.length,
+      });
       writeEngineeringGuidedPlan(window.localStorage, plan);
       setEngineeringCalendarTasks((current) =>
         syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
@@ -782,10 +839,12 @@ export function QuandaApp() {
     setRoadmap(null);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     trackEvent("creative_dna_analysis_started", {
+      workflow: "design",
       language: request.interfaceLanguage,
       outputType: request.outputType,
     });
     trackEvent("brief_submitted", {
+      workflow: "design",
       language: request.interfaceLanguage,
       outputType: request.outputType,
       requiredApplicationCount: request.requiredApplications.length,
@@ -843,12 +902,16 @@ export function QuandaApp() {
       setCreativeDnaReview(confirmedReview);
       announceWorkflowStage("review");
       writeCreativeDnaReview(window.localStorage, confirmedReview);
-      trackEvent("creative_dna_review_viewed", { source: parsed.data.source });
+      trackEvent("creative_dna_review_viewed", {
+        workflow: "design",
+        source: parsed.data.source,
+      });
       trackEvent(
         parsed.data.source === "fallback"
           ? "creative_dna_analysis_fallback"
           : "creative_dna_analysis_succeeded",
         {
+          workflow: "design",
           source: parsed.data.source,
           conceptCount: creativeDna.concepts.length,
           unknownCount: creativeDna.unknownConcepts.length,
@@ -871,6 +934,7 @@ export function QuandaApp() {
     setMatchingError(null);
     setRoadmap(null);
     trackEvent("tutorial_matching_started", {
+      workflow: "design",
       language: project.tutorialLanguage,
     });
     requestAnimationFrame(() => {
@@ -895,6 +959,7 @@ export function QuandaApp() {
       setLearningPlan(next);
       announceWorkflowStage("prepare");
       trackEvent("tutorial_matching_succeeded", {
+        workflow: "design",
         gapCount: next.skillGaps.length,
         matchedCount: next.tutorialMatches.filter(
           (match) => Boolean(match.selectedTutorialId),
@@ -929,6 +994,7 @@ export function QuandaApp() {
     setRoadmap(null);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     trackEvent("roadmap_generate_started", {
+      workflow: "design",
       language: request.interfaceLanguage,
       outputType: request.outputType,
     });
@@ -943,6 +1009,31 @@ export function QuandaApp() {
     const timeout = window.setTimeout(() => controller.abort(), 30_000);
     let generatedRoadmap: RoadmapResponse | null = null;
     const requestTranslation = getTranslation(request.interfaceLanguage);
+    const confirmedReview = creativeDnaReview;
+    const confirmedLearningPlan = learningPlan;
+    const createFailureFallback = (
+      notice: string,
+      reason: "rate_limit" | "http_error" | "invalid_response" | "timeout" | "network_error",
+      httpStatus?: number,
+    ): RoadmapResponse => {
+      trackEvent("roadmap_generate_failed", {
+        workflow: "design",
+        reason,
+        ...(httpStatus ? { httpStatus } : {}),
+        recoveredWithFallback: true,
+      });
+      return {
+        ...createIntegratedFallback(
+          createRoadmapInput({
+            project: request,
+            review: confirmedReview,
+            learningPlan: confirmedLearningPlan,
+          }),
+        ),
+        source: "fallback",
+        notice,
+      };
+    };
     try {
       const apiResponse = await fetch("/api/roadmap", {
         method: "POST",
@@ -955,33 +1046,35 @@ export function QuandaApp() {
         signal: controller.signal,
       });
       if (apiResponse.status === 429) {
-        setError(requestTranslation.errors.rateLimit);
-        return;
-      }
-      if (!apiResponse.ok) {
-        setError(requestTranslation.errors.api);
-        return;
-      }
-
-      const parsed = RoadmapResponseSchema.safeParse(await apiResponse.json());
-      if (!parsed.success) {
-        generatedRoadmap = {
-          ...createSampleRoadmap(request),
-          source: "fallback",
-          notice: requestTranslation.errors.malformedFallback,
-        };
+        generatedRoadmap = createFailureFallback(
+          requestTranslation.errors.rateLimitFallback,
+          "rate_limit",
+          apiResponse.status,
+        );
+      } else if (!apiResponse.ok) {
+        generatedRoadmap = createFailureFallback(
+          requestTranslation.errors.apiFallback,
+          "http_error",
+          apiResponse.status,
+        );
       } else {
-        generatedRoadmap = parsed.data;
+        const parsed = RoadmapResponseSchema.safeParse(await apiResponse.json());
+        generatedRoadmap = parsed.success
+          ? parsed.data
+          : createFailureFallback(
+              requestTranslation.errors.malformedFallback,
+              "invalid_response",
+            );
       }
     } catch (caughtError) {
-      generatedRoadmap = {
-        ...createSampleRoadmap(request),
-        source: "fallback",
-        notice:
-          caughtError instanceof DOMException && caughtError.name === "AbortError"
-            ? requestTranslation.errors.timeoutFallback
-            : requestTranslation.errors.networkFallback,
-      };
+      const timedOut =
+        caughtError instanceof DOMException && caughtError.name === "AbortError";
+      generatedRoadmap = createFailureFallback(
+        timedOut
+          ? requestTranslation.errors.timeoutFallback
+          : requestTranslation.errors.networkFallback,
+        timedOut ? "timeout" : "network_error",
+      );
     } finally {
       window.clearTimeout(timeout);
       setIsLoading(false);
@@ -992,6 +1085,7 @@ export function QuandaApp() {
               ...generatedRoadmap,
               routeEvaluation: createDesignRouteEvaluation(request, generatedRoadmap.totalEstimatedMinutes),
             };
+        restoredRoadmapIds.current.delete(finalRoadmap.id);
         setRoadmap(finalRoadmap);
         announceWorkflowStage("plan");
         setCompletion((current) => ({
@@ -1006,6 +1100,7 @@ export function QuandaApp() {
             ? "roadmap_generate_fallback"
             : "roadmap_generate_succeeded",
           {
+            workflow: "design",
             source: finalRoadmap.source ?? "ai",
             stageCount: finalRoadmap.stages.length,
           },
@@ -1026,7 +1121,11 @@ export function QuandaApp() {
     setCompletion((current) => {
       const roadmapCompletion = current[roadmap.id] ?? [];
       if (isCompleting) {
-        trackEvent("stage_completed", { roadmapId: roadmap.id, stageId });
+        trackEvent("stage_completed", {
+          workflow: "design",
+          roadmapId: roadmap.id,
+          stageId,
+        });
       }
       const nextStageIds = isCompleting
         ? [...new Set([...roadmapCompletion, stageId])]
@@ -1079,6 +1178,7 @@ export function QuandaApp() {
           ? "roadmap_stage_completed"
           : "calendar_item_completed",
         {
+          workflow: "design",
           taskSource: task.source,
           ...(task.stageId ? { stageId: task.stageId } : {}),
         },
@@ -1089,6 +1189,13 @@ export function QuandaApp() {
   const toggleEngineeringRoadmapTask = (taskId: string) => {
     if (!engineeringRoadmap) return;
     const isCompleting = !engineeringCompletion.includes(taskId);
+    if (isCompleting) {
+      trackEvent("engineering_task_completed", {
+        workflow: "agentic_engineering",
+        preparationMethod: "agentic_project_plan",
+        taskId,
+      });
+    }
     setEngineeringCompletion((current) =>
       isCompleting
         ? [...new Set([...current, taskId])]
@@ -1120,6 +1227,19 @@ export function QuandaApp() {
           ? [...new Set([...current, task.stageId!])]
           : current.filter((id) => id !== task.stageId),
       );
+    }
+    if (nextDone) {
+      trackEvent("engineering_task_completed", {
+        workflow: "agentic_engineering",
+        preparationMethod: preparationMethod ?? "guided_tutorials",
+        taskSource: task.source,
+        ...(task.stageId ? { taskId: task.stageId } : {}),
+      });
+      trackEvent("calendar_item_completed", {
+        workflow: "agentic_engineering",
+        preparationMethod: preparationMethod ?? "guided_tutorials",
+        taskSource: task.source,
+      });
     }
   };
 
@@ -1382,6 +1502,7 @@ export function QuandaApp() {
           onAddTask={(task) => {
             setCalendarTasks((current) => [...current, task]);
             trackEvent("calendar_item_created", {
+              workflow: "design",
               taskSource: task.source,
               category: task.category,
             });
@@ -1393,7 +1514,10 @@ export function QuandaApp() {
           }
           onToggleTask={toggleCalendarTask}
           onNavigate={(direction) =>
-            trackEvent("calendar_navigation_used", { direction })
+            trackEvent("calendar_navigation_used", {
+              workflow: "design",
+              direction,
+            })
           }
           t={t}
           tasks={calendarTasks}
@@ -1416,7 +1540,14 @@ export function QuandaApp() {
             />
             <ProjectCalendar
               locale={locale}
-              onAddTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
+              onAddTask={(task) => {
+                setEngineeringCalendarTasks((current) => [...current, task]);
+                trackEvent("calendar_item_created", {
+                  workflow: "agentic_engineering",
+                  preparationMethod: "guided_tutorials",
+                  taskSource: task.source,
+                });
+              }}
               onDeleteTask={(taskId) =>
                 setEngineeringCalendarTasks((current) =>
                   current.filter((task) => task.id !== taskId),
@@ -1424,6 +1555,7 @@ export function QuandaApp() {
               }
               onNavigate={(direction) =>
                 trackEvent("calendar_navigation_used", {
+                  workflow: "agentic_engineering",
                   direction,
                   path: "agentic_engineering_guided",
                 })
@@ -1449,7 +1581,14 @@ export function QuandaApp() {
             />
             <ProjectCalendar
               locale={locale}
-              onAddTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
+              onAddTask={(task) => {
+                setEngineeringCalendarTasks((current) => [...current, task]);
+                trackEvent("calendar_item_created", {
+                  workflow: "agentic_engineering",
+                  preparationMethod: "agentic_project_plan",
+                  taskSource: task.source,
+                });
+              }}
               onDeleteTask={(taskId) =>
                 setEngineeringCalendarTasks((current) =>
                   current.filter((task) => task.id !== taskId),
@@ -1457,6 +1596,7 @@ export function QuandaApp() {
               }
               onNavigate={(direction) =>
                 trackEvent("calendar_navigation_used", {
+                  workflow: "agentic_engineering",
                   direction,
                   path: "agentic_engineering",
                 })

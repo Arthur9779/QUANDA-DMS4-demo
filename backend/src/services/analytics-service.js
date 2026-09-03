@@ -82,9 +82,32 @@ function createAnalyticsService({ pool }) {
       `SELECT
          SUM(e.event_name = 'brief_submitted') AS briefs,
          SUM(e.event_name = 'roadmap_generated') AS roadmaps,
+         SUM(e.event_name = 'engineering_plan_generated') AS engineering_plans,
+         SUM(e.event_name IN ('roadmap_generate_started', 'engineering_plan_generate_started')) AS plan_starts,
+         SUM(e.event_name IN ('roadmap_generate_failed', 'engineering_plan_generate_failed')) AS plan_failures,
+         SUM(
+           e.event_name = 'brief_submitted'
+           AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')), 'design') = 'design'
+         ) AS design_briefs,
+         SUM(e.event_name = 'creative_dna_analysis_completed') AS design_analyses,
+         SUM(e.event_name = 'tutorial_matching_completed') AS design_tutorial_matches,
+         SUM(
+           e.event_name = 'brief_submitted'
+           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')) = 'agentic_engineering'
+         ) AS engineering_briefs,
+         SUM(e.event_name = 'engineering_interpretation_completed') AS engineering_interpretations,
+         SUM(
+           e.event_name = 'engineering_plan_generated'
+           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'guided_tutorials'
+         ) AS engineering_guided_plans,
+         SUM(
+           e.event_name = 'engineering_plan_generated'
+           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'agentic_project_plan'
+         ) AS engineering_agentic_plans,
+         SUM(e.event_name = 'engineering_task_completed') AS engineering_tasks_completed,
          COUNT(DISTINCT CASE WHEN e.event_name = 'roadmap_viewed' THEN e.project_id END) AS viewed_projects,
          COUNT(DISTINCT CASE WHEN e.event_name = 'tutorial_opened' THEN e.project_id END) AS tutorial_projects,
-         COUNT(DISTINCT CASE WHEN e.event_name = 'roadmap_generated' THEN e.user_id END) AS roadmap_users,
+         COUNT(DISTINCT CASE WHEN e.event_name IN ('roadmap_generated', 'engineering_plan_generated') THEN e.user_id END) AS roadmap_users,
          COUNT(DISTINCT CASE WHEN e.event_name IN ('calendar_item_created', 'calendar_item_completed') THEN e.user_id END) AS calendar_users,
          COUNT(DISTINCT CASE WHEN e.event_name = 'roadmap_stage_completed' THEN CONCAT(e.project_id, ':', JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.stageId'))) END) AS stages_completed,
          COUNT(DISTINCT CASE WHEN e.event_name = 'project_completed' THEN e.project_id END) AS projects_completed
@@ -97,6 +120,8 @@ function createAnalyticsService({ pool }) {
     const sessions = sessionRows[0];
     const active = activeRows[0];
     const events = eventRows[0];
+    const plansGenerated = number(events.roadmaps) + number(events.engineering_plans);
+    const planStarts = number(events.plan_starts);
     return {
       window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
       source: filter.source,
@@ -121,11 +146,40 @@ function createAnalyticsService({ pool }) {
       product: {
         briefsSubmitted: number(events.briefs),
         roadmapsGenerated: number(events.roadmaps),
-        briefToRoadmapConversion: ratio(number(events.roadmaps), number(events.briefs)),
+        briefToRoadmapConversion: ratio(
+          number(events.roadmaps),
+          number(events.design_briefs),
+        ),
+        plansGenerated,
+        briefToPlanConversion: ratio(plansGenerated, number(events.briefs)),
+        planGenerationStarted: planStarts,
+        planGenerationFailures: number(events.plan_failures),
+        planStartToCompletionRate: ratio(plansGenerated, planStarts),
+        planGenerationGap: Math.max(planStarts - plansGenerated, 0),
         tutorialOpenRate: ratio(number(events.tutorial_projects), number(events.viewed_projects)),
         calendarAdoption: ratio(number(events.calendar_users), number(events.roadmap_users)),
         stagesCompleted: number(events.stages_completed),
+        workItemsCompleted:
+          number(events.stages_completed) + number(events.engineering_tasks_completed),
         projectsCompleted: number(events.projects_completed),
+      },
+      branches: {
+        design: {
+          briefsSubmitted: number(events.design_briefs),
+          analysesCompleted: number(events.design_analyses),
+          tutorialMatchesCompleted: number(events.design_tutorial_matches),
+          plansGenerated: number(events.roadmaps),
+          conversion: ratio(number(events.roadmaps), number(events.design_briefs)),
+        },
+        engineering: {
+          briefsSubmitted: number(events.engineering_briefs),
+          interpretationsCompleted: number(events.engineering_interpretations),
+          guidedPlansGenerated: number(events.engineering_guided_plans),
+          agenticPlansGenerated: number(events.engineering_agentic_plans),
+          plansGenerated: number(events.engineering_plans),
+          conversion: ratio(number(events.engineering_plans), number(events.engineering_briefs)),
+          tasksCompleted: number(events.engineering_tasks_completed),
+        },
       },
     };
   }

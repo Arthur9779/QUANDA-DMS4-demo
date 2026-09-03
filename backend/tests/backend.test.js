@@ -4,7 +4,7 @@ const { createApplication } = require("../src/app");
 const { loadEnvironment } = require("../src/config/environment");
 const { hashToken } = require("../src/lib/tokens");
 const { createAnalyticsService } = require("../src/services/analytics-service");
-const { canonicalEventName } = require("../src/validation/events");
+const { EventNameSchema, canonicalEventName } = require("../src/validation/events");
 
 const servers = [];
 
@@ -99,11 +99,16 @@ describe("local API", () => {
     assert.match(html, /internal testing may still appear/);
     assert.match(html, /type="password"/);
     assert.match(html, /\/admin\/app\.js/);
+    assert.match(html, /roadmap-generation-gap/);
+    assert.match(html, /Workflow branches/);
+    assert.match(html, /engineering-plans/);
     assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
 
     const script = await fetch(`${baseUrl}/admin/app.js`);
     assert.equal(script.status, 200);
-    assert.match(await script.text(), /Authorization: `Bearer/);
+    const scriptBody = await script.text();
+    assert.match(scriptBody, /Authorization: `Bearer/);
+    assert.match(scriptBody, /planStartToCompletionRate/);
   });
 
   test("CORS permits only configured browser origins", async () => {
@@ -277,8 +282,19 @@ test("analytics activity uses one coherent last-seen window", async () => {
         return [[{ dau: 2, wau: 2, mau: 2 }], []];
       }
       return [[{
-        briefs: 0,
-        roadmaps: 0,
+        briefs: 8,
+        roadmaps: 4,
+        engineering_plans: 2,
+        plan_starts: 7,
+        plan_failures: 1,
+        design_briefs: 6,
+        design_analyses: 6,
+        design_tutorial_matches: 6,
+        engineering_briefs: 2,
+        engineering_interpretations: 2,
+        engineering_guided_plans: 1,
+        engineering_agentic_plans: 1,
+        engineering_tasks_completed: 3,
         viewed_projects: 0,
         tutorial_projects: 0,
         roadmap_users: 0,
@@ -307,10 +323,23 @@ test("analytics activity uses one coherent last-seen window", async () => {
   assert.match(overview.definitions.identity, /browser identity/i);
   assert.match(overview.definitions.returning, /earlier session/i);
   assert.equal(overview.sessions.averagePerActiveUser, 1.5);
+  assert.equal(overview.product.plansGenerated, 6);
+  assert.equal(overview.product.briefToPlanConversion, 0.75);
+  assert.equal(overview.product.planStartToCompletionRate, 0.8571);
+  assert.equal(overview.product.planGenerationFailures, 1);
+  assert.equal(overview.product.planGenerationGap, 1);
+  assert.equal(overview.product.workItemsCompleted, 3);
+  assert.equal(overview.branches.design.conversion, 0.6667);
+  assert.equal(overview.branches.engineering.conversion, 1);
+  assert.equal(overview.branches.engineering.tasksCompleted, 3);
 });
 
 test("legacy event names normalize to canonical analytics names", () => {
   assert.equal(canonicalEventName("roadmap_generate_fallback"), "roadmap_generated");
+  assert.equal(canonicalEventName("roadmap_generate_failed"), "roadmap_generate_failed");
+  assert.equal(canonicalEventName("engineering_plan_generated"), "engineering_plan_generated");
+  assert.equal(EventNameSchema.safeParse("engineering_interpretation_started").success, true);
+  assert.equal(EventNameSchema.safeParse("engineering_plan_generate_failed").success, true);
   assert.equal(canonicalEventName("stage_completed"), "roadmap_stage_completed");
   assert.equal(canonicalEventName("tutorial_opened"), "tutorial_opened");
 });

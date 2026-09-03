@@ -90,6 +90,21 @@ h2 { font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1; margin: 0; }
 .metric-card span, .retention-grid span { color: var(--muted); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; }
 .metric-card strong { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.5rem, 5vw, 4.3rem); font-weight: 600; line-height: 1; margin: auto 0 8px; }
 .metric-card small, .retention-grid small { color: var(--muted); }
+.metric-card small + small { margin-top: 4px; }
+
+.branch-grid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.branch-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
+.branch-panel header { display: grid; grid-template-columns: 1fr auto; padding: 22px; }
+.branch-panel header span { align-self: center; font-size: 1.15rem; font-weight: 850; }
+.branch-panel header strong { font-family: Georgia, "Times New Roman", serif; font-size: 2.8rem; font-weight: 600; grid-row: span 2; }
+.branch-panel header small { color: var(--muted); }
+.branch-design header { background: var(--green-soft); }
+.branch-engineering header { background: var(--amber-soft); }
+.branch-panel dl { margin: 0; padding: 8px 22px 18px; }
+.branch-panel dl div { align-items: center; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; padding: 13px 0; }
+.branch-panel dl div:last-child { border-bottom: 0; }
+.branch-panel dt { color: var(--muted); }
+.branch-panel dd { font-size: 1.2rem; font-weight: 850; margin: 0; }
 
 .retention-grid { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .retention-grid article { background: var(--amber-soft); border: 1px solid #ddbf8e; border-radius: 20px; display: grid; gap: 8px; padding: 22px; }
@@ -105,7 +120,7 @@ td:first-child { font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 .empty-state { color: var(--muted); margin: 0; padding: 30px; text-align: center; }
 
 @media (max-width: 900px) {
-  .metric-grid, .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric-grid, .product-grid, .branch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filter-bar { grid-template-columns: 1fr 1fr; }
   .filter-bar .auto-refresh { justify-self: start; }
 }
@@ -114,7 +129,7 @@ td:first-child { font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   .site-header, main { padding-left: 16px; padding-right: 16px; }
   main { padding-top: 36px; }
   h1 { font-size: clamp(2.7rem, 15vw, 4.4rem); }
-  .token-row, .filter-bar, .metric-grid, .product-grid, .retention-grid { grid-template-columns: 1fr; }
+  .token-row, .filter-bar, .metric-grid, .product-grid, .branch-grid, .retention-grid { grid-template-columns: 1fr; }
   .dashboard-heading, .section-heading { align-items: flex-start; flex-direction: column; }
   .dashboard-heading .secondary-button, .token-row .primary-button, .filter-bar .primary-button { width: 100%; }
   .section-heading > p { text-align: left; }

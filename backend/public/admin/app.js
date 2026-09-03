@@ -120,12 +120,35 @@
     text("new-users", count(data.users.new));
     text("returning-users", `${count(data.users.returning)} returned for another session`);
     text("briefs", count(data.product.briefsSubmitted));
-    text("roadmaps", count(data.product.roadmapsGenerated));
-    text("roadmap-conversion", `${percent(data.product.briefToRoadmapConversion)} conversion`);
+    text("roadmaps", count(data.product.plansGenerated));
+    text(
+      "roadmap-conversion",
+      `${percent(data.product.briefToPlanConversion)} of briefs · ${percent(data.product.planStartToCompletionRate)} of starts`,
+    );
+    text(
+      "roadmap-generation-gap",
+      data.product.planGenerationGap === 0
+        ? `${count(data.product.planGenerationFailures)} recovered failures recorded`
+        : `${count(data.product.planGenerationGap)} plan starts did not complete`,
+    );
     text("tutorial-rate", percent(data.product.tutorialOpenRate));
     text("calendar-adoption", percent(data.product.calendarAdoption));
-    text("stages-completed", count(data.product.stagesCompleted));
+    text("stages-completed", count(data.product.workItemsCompleted));
     text("projects-completed", count(data.product.projectsCompleted));
+
+    text("design-briefs", count(data.branches.design.briefsSubmitted));
+    text("design-analyses", count(data.branches.design.analysesCompleted));
+    text("design-tutorials", count(data.branches.design.tutorialMatchesCompleted));
+    text("design-plans", count(data.branches.design.plansGenerated));
+    text("design-conversion", percent(data.branches.design.conversion));
+
+    text("engineering-briefs", count(data.branches.engineering.briefsSubmitted));
+    text("engineering-interpretations", count(data.branches.engineering.interpretationsCompleted));
+    text("engineering-guided", count(data.branches.engineering.guidedPlansGenerated));
+    text("engineering-agentic", count(data.branches.engineering.agenticPlansGenerated));
+    text("engineering-plans", count(data.branches.engineering.plansGenerated));
+    text("engineering-conversion", percent(data.branches.engineering.conversion));
+    text("engineering-tasks", count(data.branches.engineering.tasksCompleted));
   }
 
   function renderRetention(data) {
