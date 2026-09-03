@@ -109,11 +109,20 @@ viewing, stage completion, calendar adoption, project creation/update/
 completion, language changes, sessions, and returning visits. UI-only clicks
 are intentionally excluded.
 
+Product-funnel milestones are deduplicated by `workflowRunId`, so retries and
+repeated actions inside one brief-to-result journey do not inflate conversion.
+Legacy events without that property are grouped conservatively by workflow and
+session. The dashboard treats opening a tutorial or completing a work item as
+project progress; strict project completion remains a separate all-items-done
+signal.
+
 ## Retention definition
 
-D1, D7, and D30 are exact UTC calendar-day return metrics. A retained user has
-a session on the specified day after their first-use date. Cohorts too young to
-reach the measured day are excluded from its denominator.
+Retention uses non-overlapping Vietnam-local windows: Day 1, Days 2–7, and Days
+8–30. A retained identity has at least one session in the relevant window after
+its first-use date. Cohorts too young to reach the end of a measured window are
+excluded from its denominator, and an empty eligible cohort is reported as not
+enough data rather than 0%.
 
 ## Synthetic data
 

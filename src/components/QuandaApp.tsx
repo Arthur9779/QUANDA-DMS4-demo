@@ -67,7 +67,7 @@ import {
   writeEngineeringGuidedPlan,
 } from "@/src/lib/storage";
 import { RoadmapResponseSchema } from "@/src/schemas/roadmapResponse";
-import { trackEvent } from "@/src/lib/analytics";
+import { beginAnalyticsJourney, trackEvent } from "@/src/lib/analytics";
 import {
   archiveCurrentQuandaProject,
   initializeQuandaApi,
@@ -633,6 +633,7 @@ export function QuandaApp() {
   };
 
   const interpretEngineering = async (request: EngineeringProject) => {
+    beginAnalyticsJourney("agentic_engineering", request, { newJourney: true });
     setEngineeringForm(request);
     setEngineeringError(null);
     setEngineeringInterpretation(null);
@@ -686,6 +687,7 @@ export function QuandaApp() {
     interpretation: EngineeringInterpretationValue | null = engineeringInterpretation,
   ) => {
     if (!interpretation || method !== "agentic_project_plan") return;
+    beginAnalyticsJourney("agentic_engineering", project);
     setEngineeringError(null);
     trackEvent("engineering_plan_generate_started", {
       workflow: "agentic_engineering",
@@ -744,6 +746,7 @@ export function QuandaApp() {
 
   const choosePreparationMethod = (method: PreparationMethod) => {
     if (!engineeringInterpretation || !engineeringInterpretationConfirmed) return;
+    beginAnalyticsJourney("agentic_engineering", engineeringForm);
     setPreparationMethod(method);
     trackEvent("engineering_preparation_selected", {
       workflow: "agentic_engineering",
@@ -832,7 +835,11 @@ export function QuandaApp() {
     });
   };
 
-  const analyzeProject = async (request: RoadmapRequest) => {
+  const analyzeProject = async (
+    request: RoadmapRequest,
+    options: { newJourney?: boolean } = { newJourney: true },
+  ) => {
+    beginAnalyticsJourney("design", request, options);
     setForm(request);
     setIsAnalyzing(true);
     setAnalysisError(null);
@@ -982,18 +989,22 @@ export function QuandaApp() {
 
   const generateRoadmap = async (request: RoadmapRequest) => {
     if (!creativeDnaReview?.confirmed) {
-      void analyzeProject(request);
+      void analyzeProject(request, { newJourney: false });
       return;
     }
     if (!learningPlan || learningPlan.inputFingerprint !== createProjectInputFingerprint(request)) {
       void matchTutorials(creativeDnaReview);
       return;
     }
+    beginAnalyticsJourney("design", request);
     setForm(request);
     setIsLoading(true);
     setError(null);
     setRoadmap(null);
     setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
+    trackEvent("creative_dna_confirmed", {
+      workflow: "design",
+    });
     trackEvent("roadmap_generate_started", {
       workflow: "design",
       language: request.interfaceLanguage,
@@ -1118,6 +1129,7 @@ export function QuandaApp() {
 
   const toggleStage = (stageId: string) => {
     if (!roadmap) return;
+    beginAnalyticsJourney("design", form);
     const isCompleting = !completedStageIds.includes(stageId);
     setCompletion((current) => {
       const roadmapCompletion = current[roadmap.id] ?? [];
@@ -1131,6 +1143,16 @@ export function QuandaApp() {
       const nextStageIds = isCompleting
         ? [...new Set([...roadmapCompletion, stageId])]
         : roadmapCompletion.filter((id) => id !== stageId);
+      if (
+        isCompleting &&
+        roadmap.stages.length > 0 &&
+        roadmap.stages.every((stage) => nextStageIds.includes(stage.id))
+      ) {
+        trackEvent("project_completed", {
+          workflow: "design",
+          completionMethod: "all_roadmap_stages",
+        });
+      }
       return {
         ...current,
         [roadmap.id]: nextStageIds,
@@ -1150,12 +1172,12 @@ export function QuandaApp() {
   const toggleCalendarTask = (taskId: string) => {
     const task = calendarTasks.find((candidate) => candidate.id === taskId);
     if (!task) return;
+    beginAnalyticsJourney("design", form);
     const nextDone = !task.done;
-    setCalendarTasks((current) =>
-      current.map((candidate) =>
-        candidate.id === taskId ? { ...candidate, done: nextDone } : candidate,
-      ),
+    const nextCalendarTasks = calendarTasks.map((candidate) =>
+      candidate.id === taskId ? { ...candidate, done: nextDone } : candidate,
     );
+    setCalendarTasks(nextCalendarTasks);
 
     if (
       task.source === "roadmap" &&
@@ -1182,13 +1204,26 @@ export function QuandaApp() {
           workflow: "design",
           taskSource: task.source,
           ...(task.stageId ? { stageId: task.stageId } : {}),
+          calendarItemId: task.id,
         },
       );
+      const roadmapTasks = nextCalendarTasks.filter(
+        (candidate) =>
+          candidate.source === "roadmap" &&
+          candidate.roadmapId === roadmap?.id,
+      );
+      if (roadmapTasks.length > 0 && roadmapTasks.every((candidate) => candidate.done)) {
+        trackEvent("project_completed", {
+          workflow: "design",
+          completionMethod: "all_calendar_stages",
+        });
+      }
     }
   };
 
   const toggleEngineeringRoadmapTask = (taskId: string) => {
     if (!engineeringRoadmap) return;
+    beginAnalyticsJourney("agentic_engineering", engineeringForm);
     const isCompleting = !engineeringCompletion.includes(taskId);
     if (isCompleting) {
       trackEvent("engineering_task_completed", {
@@ -1197,11 +1232,20 @@ export function QuandaApp() {
         taskId,
       });
     }
-    setEngineeringCompletion((current) =>
-      isCompleting
-        ? [...new Set([...current, taskId])]
-        : current.filter((id) => id !== taskId),
-    );
+    const nextCompletion = isCompleting
+      ? [...new Set([...engineeringCompletion, taskId])]
+      : engineeringCompletion.filter((id) => id !== taskId);
+    setEngineeringCompletion(nextCompletion);
+    if (
+      isCompleting &&
+      engineeringRoadmap.tasks.length > 0 &&
+      engineeringRoadmap.tasks.every((task) => nextCompletion.includes(task.id))
+    ) {
+      trackEvent("project_completed", {
+        workflow: "agentic_engineering",
+        completionMethod: "all_engineering_tasks",
+      });
+    }
     setEngineeringCalendarTasks((current) =>
       current.map((task) =>
         task.source === "roadmap" &&
@@ -1216,12 +1260,12 @@ export function QuandaApp() {
   const toggleEngineeringCalendarTask = (taskId: string) => {
     const task = engineeringCalendarTasks.find((candidate) => candidate.id === taskId);
     if (!task) return;
+    beginAnalyticsJourney("agentic_engineering", engineeringForm);
     const nextDone = !task.done;
-    setEngineeringCalendarTasks((current) =>
-      current.map((candidate) =>
-        candidate.id === taskId ? { ...candidate, done: nextDone } : candidate,
-      ),
+    const nextEngineeringTasks = engineeringCalendarTasks.map((candidate) =>
+      candidate.id === taskId ? { ...candidate, done: nextDone } : candidate,
     );
+    setEngineeringCalendarTasks(nextEngineeringTasks);
     if (task.source === "roadmap" && task.stageId && engineeringRoadmap) {
       setEngineeringCompletion((current) =>
         nextDone
@@ -1235,12 +1279,24 @@ export function QuandaApp() {
         preparationMethod: preparationMethod ?? "guided_tutorials",
         taskSource: task.source,
         ...(task.stageId ? { taskId: task.stageId } : {}),
+        calendarItemId: task.id,
       });
       trackEvent("calendar_item_completed", {
         workflow: "agentic_engineering",
         preparationMethod: preparationMethod ?? "guided_tutorials",
         taskSource: task.source,
+        ...(task.stageId ? { taskId: task.stageId } : {}),
+        calendarItemId: task.id,
       });
+      const roadmapTasks = nextEngineeringTasks.filter(
+        (candidate) => candidate.source === "roadmap",
+      );
+      if (roadmapTasks.length > 0 && roadmapTasks.every((candidate) => candidate.done)) {
+        trackEvent("project_completed", {
+          workflow: "agentic_engineering",
+          completionMethod: "all_engineering_calendar_tasks",
+        });
+      }
     }
   };
 
@@ -1384,7 +1440,7 @@ export function QuandaApp() {
                 <button
                   className="button button-primary"
                   disabled={isAnalyzing}
-                  onClick={() => void analyzeProject(form)}
+                  onClick={() => void analyzeProject(form, { newJourney: false })}
                   type="button"
                 >
                   {t.review.retry}
@@ -1483,7 +1539,7 @@ export function QuandaApp() {
               } else if (creativeDnaReview?.confirmed && !creativeDnaIsStale) {
                 void matchTutorials(creativeDnaReview);
               } else {
-                void analyzeProject(form);
+                void analyzeProject(form, { newJourney: false });
               }
             }}
             onStartOver={() => {

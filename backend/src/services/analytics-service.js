@@ -78,41 +78,82 @@ function createAnalyticsService({ pool }) {
       [activityStart, weekStart, monthStart, filter.end, ...sessionScope.parameters],
     );
 
+    const workflowExpression =
+      "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')), 'design')";
+    const journeyExpression =
+      `COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflowRunId')), ''), ` +
+      `CONCAT('legacy:', ${workflowExpression}, ':', e.session_id))`;
     const [eventRows] = await pool.execute(
       `SELECT
-         SUM(e.event_name = 'brief_submitted') AS briefs,
-         SUM(e.event_name = 'roadmap_generated') AS roadmaps,
-         SUM(e.event_name = 'engineering_plan_generated') AS engineering_plans,
-         SUM(e.event_name IN ('roadmap_generate_started', 'engineering_plan_generate_started')) AS plan_starts,
-         SUM(e.event_name IN ('roadmap_generate_failed', 'engineering_plan_generate_failed')) AS plan_failures,
-         SUM(
-           e.event_name = 'brief_submitted'
-           AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')), 'design') = 'design'
-         ) AS design_briefs,
-         SUM(e.event_name = 'creative_dna_analysis_completed') AS design_analyses,
-         SUM(e.event_name = 'tutorial_matching_completed') AS design_tutorial_matches,
-         SUM(
-           e.event_name = 'brief_submitted'
-           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')) = 'agentic_engineering'
-         ) AS engineering_briefs,
-         SUM(e.event_name = 'engineering_interpretation_completed') AS engineering_interpretations,
-         SUM(
-           e.event_name = 'engineering_plan_generated'
-           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'guided_tutorials'
-         ) AS engineering_guided_plans,
-         SUM(
-           e.event_name = 'engineering_plan_generated'
-           AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'agentic_project_plan'
-         ) AS engineering_agentic_plans,
-         SUM(e.event_name = 'engineering_task_completed') AS engineering_tasks_completed,
-         COUNT(DISTINCT CASE WHEN e.event_name = 'roadmap_viewed' THEN e.project_id END) AS viewed_projects,
-         COUNT(DISTINCT CASE WHEN e.event_name = 'tutorial_opened' THEN e.project_id END) AS tutorial_projects,
-         COUNT(DISTINCT CASE WHEN e.event_name IN ('roadmap_generated', 'engineering_plan_generated') THEN e.user_id END) AS roadmap_users,
-         COUNT(DISTINCT CASE WHEN e.event_name IN ('calendar_item_created', 'calendar_item_completed') THEN e.user_id END) AS calendar_users,
-         COUNT(DISTINCT CASE WHEN e.event_name = 'roadmap_stage_completed' THEN CONCAT(e.project_id, ':', JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.stageId'))) END) AS stages_completed,
-         COUNT(DISTINCT CASE WHEN e.event_name = 'project_completed' THEN e.project_id END) AS projects_completed
-       FROM events e
-       WHERE e.event_time >= ? AND e.event_time < ? AND ${eventScope.clause}`,
+         SUM(j.has_brief) AS briefs,
+         SUM(j.has_brief AND j.has_plan_generated) AS plans_generated,
+         SUM(j.has_brief AND j.has_usable_plan) AS usable_plans,
+         SUM(j.has_brief AND j.has_plan_started) AS plan_starts,
+         SUM(j.has_brief AND j.has_plan_failed) AS plan_failures,
+         SUM(j.has_progress) AS projects_progressed,
+         SUM(j.has_project_completed) AS projects_completed,
+         SUM(j.work_items_completed) AS work_items_completed,
+         SUM(j.workflow = 'design' AND j.has_brief) AS design_briefs,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_analysis) AS design_analyses,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_direction_confirmed) AS design_confirmations,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_tutorial_match) AS design_tutorial_matches,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_plan_started) AS design_plan_starts,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_plan_generated) AS design_roadmaps,
+         SUM(j.workflow = 'design' AND j.has_brief AND j.has_usable_plan) AS design_usable_roadmaps,
+         SUM(j.workflow = 'agentic_engineering' AND j.has_brief) AS engineering_briefs,
+         SUM(j.workflow = 'agentic_engineering' AND j.has_brief AND j.has_interpretation) AS engineering_interpretations,
+         SUM(j.workflow = 'agentic_engineering' AND j.has_brief AND j.has_guided_plan) AS engineering_guided_plans,
+         SUM(j.workflow = 'agentic_engineering' AND j.has_brief AND j.has_agentic_plan) AS engineering_agentic_plans,
+         SUM(j.workflow = 'agentic_engineering' AND j.has_brief AND j.has_plan_generated) AS engineering_plans,
+         SUM(IF(j.workflow = 'agentic_engineering', j.work_items_completed, 0)) AS engineering_tasks_completed,
+         SUM(j.workflow = 'design' AND j.has_usable_plan AND j.has_tutorial_opened) AS tutorial_projects,
+         SUM(j.has_usable_plan AND j.has_calendar_use) AS calendar_projects
+       FROM (
+         SELECT
+           ${journeyExpression} AS journey_id,
+           ${workflowExpression} AS workflow,
+           MAX(e.event_name = 'brief_submitted') AS has_brief,
+           MAX(e.event_name = 'creative_dna_analysis_completed') AS has_analysis,
+           MAX(e.event_name = 'creative_dna_confirmed') AS has_direction_confirmed,
+           MAX(e.event_name = 'tutorial_matching_completed') AS has_tutorial_match,
+           MAX(e.event_name IN ('roadmap_generate_started', 'engineering_plan_generate_started')) AS has_plan_started,
+           MAX(e.event_name IN ('roadmap_generated', 'engineering_plan_generated')) AS has_plan_generated,
+           MAX(e.event_name IN ('roadmap_viewed', 'engineering_plan_generated')) AS has_usable_plan,
+           MAX(e.event_name IN ('roadmap_generate_failed', 'engineering_plan_generate_failed')) AS has_plan_failed,
+           MAX(e.event_name = 'engineering_interpretation_completed') AS has_interpretation,
+           MAX(
+             e.event_name = 'engineering_plan_generated'
+             AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'guided_tutorials'
+           ) AS has_guided_plan,
+           MAX(
+             e.event_name = 'engineering_plan_generated'
+             AND JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.preparationMethod')) = 'agentic_project_plan'
+           ) AS has_agentic_plan,
+           MAX(e.event_name = 'tutorial_opened') AS has_tutorial_opened,
+           MAX(e.event_name IN ('calendar_item_created', 'calendar_item_completed')) AS has_calendar_use,
+           MAX(e.event_name IN ('tutorial_opened', 'roadmap_stage_completed', 'engineering_task_completed', 'calendar_item_completed')) AS has_progress,
+           MAX(e.event_name = 'project_completed') AS has_project_completed,
+           COUNT(DISTINCT CASE
+             WHEN e.event_name IN ('roadmap_stage_completed', 'engineering_task_completed')
+               OR (
+                 e.event_name = 'calendar_item_completed'
+                 AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.taskSource')), '') <> 'roadmap'
+               )
+             THEN CONCAT(
+               ${workflowExpression},
+               ':',
+               COALESCE(
+                 JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.stageId')),
+                 JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.taskId')),
+                 JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.calendarItemId')),
+                 e.client_event_id
+               )
+             )
+           END) AS work_items_completed
+         FROM events e
+         WHERE e.event_time >= ? AND e.event_time < ? AND ${eventScope.clause}
+         GROUP BY journey_id, workflow
+       ) j`,
       [...windowParameters, ...eventScope.parameters],
     );
 
@@ -120,7 +161,8 @@ function createAnalyticsService({ pool }) {
     const sessions = sessionRows[0];
     const active = activeRows[0];
     const events = eventRows[0];
-    const plansGenerated = number(events.roadmaps) + number(events.engineering_plans);
+    const plansGenerated = number(events.plans_generated);
+    const usablePlans = number(events.usable_plans);
     const planStarts = number(events.plan_starts);
     return {
       window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
@@ -131,6 +173,9 @@ function createAnalyticsService({ pool }) {
         active: "Distinct identities with session activity in the selected period.",
         returning: "Distinct active identities with an earlier session before another session active in the selected period.",
         rollingActivity: "Rolling activity is clipped to the selected period and ends at its exclusive end.",
+        journey: "One distinct brief-to-result workflow. Repeated events inside the same journey are counted once.",
+        projectProgress: "A journey with a tutorial opened or at least one roadmap, engineering, or calendar item completed.",
+        projectCompletion: "A journey where every item in its generated plan was explicitly completed.",
       },
       users: {
         total: number(users.total_users),
@@ -145,31 +190,44 @@ function createAnalyticsService({ pool }) {
       activity: { dau: number(active.dau), wau: number(active.wau), mau: number(active.mau) },
       product: {
         briefsSubmitted: number(events.briefs),
-        roadmapsGenerated: number(events.roadmaps),
+        roadmapsGenerated: number(events.design_roadmaps),
+        usablePlans,
         briefToRoadmapConversion: ratio(
-          number(events.roadmaps),
+          number(events.design_usable_roadmaps),
           number(events.design_briefs),
         ),
         plansGenerated,
-        briefToPlanConversion: ratio(plansGenerated, number(events.briefs)),
+        briefToPlanConversion: ratio(usablePlans, number(events.briefs)),
         planGenerationStarted: planStarts,
         planGenerationFailures: number(events.plan_failures),
         planStartToCompletionRate: ratio(plansGenerated, planStarts),
         planGenerationGap: Math.max(planStarts - plansGenerated, 0),
-        tutorialOpenRate: ratio(number(events.tutorial_projects), number(events.viewed_projects)),
-        calendarAdoption: ratio(number(events.calendar_users), number(events.roadmap_users)),
-        stagesCompleted: number(events.stages_completed),
-        workItemsCompleted:
-          number(events.stages_completed) + number(events.engineering_tasks_completed),
+        tutorialOpenRate: ratio(
+          number(events.tutorial_projects),
+          number(events.design_usable_roadmaps),
+        ),
+        calendarAdoption: ratio(number(events.calendar_projects), usablePlans),
+        workItemsCompleted: number(events.work_items_completed),
+        projectsProgressed: number(events.projects_progressed),
         projectsCompleted: number(events.projects_completed),
       },
       branches: {
         design: {
           briefsSubmitted: number(events.design_briefs),
           analysesCompleted: number(events.design_analyses),
+          directionsConfirmed: number(events.design_confirmations),
           tutorialMatchesCompleted: number(events.design_tutorial_matches),
-          plansGenerated: number(events.roadmaps),
-          conversion: ratio(number(events.roadmaps), number(events.design_briefs)),
+          planRequests: number(events.design_plan_starts),
+          plansGenerated: number(events.design_roadmaps),
+          usablePlans: number(events.design_usable_roadmaps),
+          conversion: ratio(
+            number(events.design_usable_roadmaps),
+            number(events.design_briefs),
+          ),
+          generationReliability: ratio(
+            number(events.design_roadmaps),
+            number(events.design_plan_starts),
+          ),
         },
         engineering: {
           briefsSubmitted: number(events.engineering_briefs),
@@ -188,14 +246,22 @@ function createAnalyticsService({ pool }) {
     const userScope = syntheticScope("u", filter);
     const sessionScope = syntheticScope("s", filter);
     const results = {};
-    for (const day of [1, 7, 30]) {
+    const windows = [
+      { key: "d1", label: "Day 1", fromDay: 1, toDay: 1 },
+      { key: "d7", label: "Days 2–7", fromDay: 2, toDay: 7 },
+      { key: "d30", label: "Days 8–30", fromDay: 8, toDay: 30 },
+    ];
+    for (const window of windows) {
       const [rows] = await pool.execute(
         `SELECT
            COUNT(*) AS eligible_users,
            SUM(EXISTS(
              SELECT 1 FROM sessions s
               WHERE s.user_id = u.id
-                AND DATEDIFF(DATE(s.started_at), DATE(u.created_at)) = ?
+                AND DATEDIFF(
+                  DATE(CONVERT_TZ(s.started_at, '+00:00', '+07:00')),
+                  DATE(CONVERT_TZ(u.created_at, '+00:00', '+07:00'))
+                ) BETWEEN ? AND ?
                 AND ${sessionScope.clause}
            )) AS retained_users
          FROM users u
@@ -204,23 +270,32 @@ function createAnalyticsService({ pool }) {
            AND u.deleted_at IS NULL
            AND ${userScope.clause}`,
         [
-          day,
+          window.fromDay,
+          window.toDay,
           ...sessionScope.parameters,
           filter.start,
           filter.end,
-          day,
+          window.toDay,
           ...userScope.parameters,
         ],
       );
       const eligible = number(rows[0].eligible_users);
       const retained = number(rows[0].retained_users);
-      results[`d${day}`] = { eligible, retained, rate: ratio(retained, eligible) };
+      results[window.key] = {
+        label: window.label,
+        fromDay: window.fromDay,
+        toDay: window.toDay,
+        eligible,
+        retained,
+        rate: eligible > 0 ? ratio(retained, eligible) : null,
+      };
     }
     return {
       window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
       source: filter.source,
       scenarioId: filter.scenarioId || null,
-      definition: "Exact UTC calendar-day return; immature cohorts are excluded.",
+      definition: "Rolling Vietnam-local return windows; immature cohorts are excluded.",
+      timeZone: "Asia/Ho_Chi_Minh",
       retention: results,
     };
   }
