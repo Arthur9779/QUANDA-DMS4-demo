@@ -3,7 +3,8 @@ const { afterEach, describe, test } = require("node:test");
 const { createApplication } = require("../src/app");
 const { loadEnvironment } = require("../src/config/environment");
 const { hashToken } = require("../src/lib/tokens");
-const { canonicalEventName } = require("../src/validation/events");
+const { createAnalyticsService } = require("../src/services/analytics-service");
+const { EventNameSchema, canonicalEventName } = require("../src/validation/events");
 
 const servers = [];
 
@@ -83,6 +84,31 @@ describe("local API", () => {
       ),
       { status: "ok", service: "quanda-api", database: "ok" },
     );
+  });
+
+  test("serves a no-store analytics dashboard without embedding credentials", async () => {
+    const { baseUrl } = await start();
+    const response = await fetch(`${baseUrl}/admin/`);
+    const html = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("cache-control"), /no-store/);
+    assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
+    assert.match(html, /QUANDA Live Analytics/);
+    assert.match(html, /Anonymous browser identities/);
+    assert.match(html, /internal testing may still appear/);
+    assert.match(html, /type="password"/);
+    assert.match(html, /\/admin\/app\.js/);
+    assert.match(html, /roadmap-generation-gap/);
+    assert.match(html, /Workflow branches/);
+    assert.match(html, /engineering-plans/);
+    assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
+
+    const script = await fetch(`${baseUrl}/admin/app.js`);
+    assert.equal(script.status, 200);
+    const scriptBody = await script.text();
+    assert.match(scriptBody, /Authorization: `Bearer/);
+    assert.match(scriptBody, /planStartToCompletionRate/);
   });
 
   test("CORS permits only configured browser origins", async () => {
@@ -186,6 +212,7 @@ describe("local API", () => {
 
     const analytics = await fetch(`${baseUrl}/api/v1/admin/analytics/overview`);
     assert.equal(analytics.status, 403);
+    assert.match(analytics.headers.get("cache-control"), /no-store/);
     assert.equal((await json(analytics)).error, "admin_forbidden");
   });
 
@@ -237,8 +264,82 @@ describe("local API", () => {
   });
 });
 
+test("analytics activity uses one coherent last-seen window", async () => {
+  const calls = [];
+  const pool = {
+    async execute(sql, parameters) {
+      calls.push({ sql: sql.replace(/\s+/g, " ").trim(), parameters });
+      if (sql.includes("COUNT(*) AS total_users")) {
+        return [[{ total_users: 2, new_users: 1 }], []];
+      }
+      if (sql.includes("COUNT(*) AS total_sessions")) {
+        return [[{ total_sessions: 3, active_users: 2 }], []];
+      }
+      if (sql.includes("returning_users")) {
+        return [[{ returning_users: 1 }], []];
+      }
+      if (sql.includes("AS dau")) {
+        return [[{ dau: 2, wau: 2, mau: 2 }], []];
+      }
+      return [[{
+        briefs: 8,
+        roadmaps: 4,
+        engineering_plans: 2,
+        plan_starts: 7,
+        plan_failures: 1,
+        design_briefs: 6,
+        design_analyses: 6,
+        design_tutorial_matches: 6,
+        engineering_briefs: 2,
+        engineering_interpretations: 2,
+        engineering_guided_plans: 1,
+        engineering_agentic_plans: 1,
+        engineering_tasks_completed: 3,
+        viewed_projects: 0,
+        tutorial_projects: 0,
+        roadmap_users: 0,
+        calendar_users: 0,
+        stages_completed: 0,
+        projects_completed: 0,
+      }], []];
+    },
+  };
+  const start = new Date("2026-08-30T00:00:00.000Z");
+  const end = new Date("2026-09-01T00:00:00.000Z");
+  const overview = await createAnalyticsService({ pool }).overview({
+    start,
+    end,
+    source: "real",
+  });
+
+  assert.match(calls[1].sql, /s\.last_seen_at >= \? AND s\.last_seen_at < \?/);
+  assert.match(calls[2].sql, /s\.last_seen_at >= \? AND s\.last_seen_at < \?/);
+  assert.match(calls[2].sql, /EXISTS \( SELECT 1 FROM sessions previous/);
+  assert.match(calls[2].sql, /previous\.started_at < s\.started_at/);
+  assert.equal(calls[2].parameters.length, 2);
+  assert.equal(calls[3].parameters[0].toISOString(), "2026-08-31T00:00:00.000Z");
+  assert.equal(calls[3].parameters[1].toISOString(), start.toISOString());
+  assert.equal(calls[3].parameters[2].toISOString(), start.toISOString());
+  assert.match(overview.definitions.identity, /browser identity/i);
+  assert.match(overview.definitions.returning, /earlier session/i);
+  assert.equal(overview.sessions.averagePerActiveUser, 1.5);
+  assert.equal(overview.product.plansGenerated, 6);
+  assert.equal(overview.product.briefToPlanConversion, 0.75);
+  assert.equal(overview.product.planStartToCompletionRate, 0.8571);
+  assert.equal(overview.product.planGenerationFailures, 1);
+  assert.equal(overview.product.planGenerationGap, 1);
+  assert.equal(overview.product.workItemsCompleted, 3);
+  assert.equal(overview.branches.design.conversion, 0.6667);
+  assert.equal(overview.branches.engineering.conversion, 1);
+  assert.equal(overview.branches.engineering.tasksCompleted, 3);
+});
+
 test("legacy event names normalize to canonical analytics names", () => {
   assert.equal(canonicalEventName("roadmap_generate_fallback"), "roadmap_generated");
+  assert.equal(canonicalEventName("roadmap_generate_failed"), "roadmap_generate_failed");
+  assert.equal(canonicalEventName("engineering_plan_generated"), "engineering_plan_generated");
+  assert.equal(EventNameSchema.safeParse("engineering_interpretation_started").success, true);
+  assert.equal(EventNameSchema.safeParse("engineering_plan_generate_failed").success, true);
   assert.equal(canonicalEventName("stage_completed"), "roadmap_stage_completed");
   assert.equal(canonicalEventName("tutorial_opened"), "tutorial_opened");
 });

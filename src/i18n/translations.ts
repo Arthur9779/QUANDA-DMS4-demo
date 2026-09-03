@@ -437,6 +437,8 @@ export interface Translation {
   };
   errors: {
     rateLimit: string;
+    rateLimitFallback: string;
+    apiFallback: string;
     networkFallback: string;
     timeoutFallback: string;
     malformedFallback: string;
@@ -951,6 +953,10 @@ const en: Translation = {
   },
   errors: {
     rateLimit: "Too many requests. Please wait a moment and try again.",
+    rateLimitFallback:
+      "The AI service is receiving too many requests, so QUANDA generated a reliable fallback roadmap instead.",
+    apiFallback:
+      "The AI service could not complete the request, so QUANDA generated a reliable fallback roadmap instead.",
     networkFallback:
       "QUANDA could not reach the service, so a reliable demo roadmap has been generated instead.",
     timeoutFallback:
@@ -1468,6 +1474,10 @@ const vi: Translation = {
   },
   errors: {
     rateLimit: "Có quá nhiều yêu cầu. Vui lòng chờ một chút rồi thử lại.",
+    rateLimitFallback:
+      "Dịch vụ AI đang nhận quá nhiều yêu cầu, nên QUANDA đã tạo một lộ trình dự phòng đáng tin cậy.",
+    apiFallback:
+      "Dịch vụ AI không thể hoàn tất yêu cầu, nên QUANDA đã tạo một lộ trình dự phòng đáng tin cậy.",
     networkFallback:
       "QUANDA không thể kết nối với dịch vụ, nên hệ thống đã tạo một lộ trình mẫu đáng tin cậy để thay thế.",
     timeoutFallback:

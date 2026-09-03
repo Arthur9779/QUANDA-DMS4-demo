@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const path = require("node:path");
 const { rateLimit } = require("express-rate-limit");
 const { forbidden } = require("./lib/errors");
 const { requestContext } = require("./middleware/request-context");
@@ -49,6 +50,16 @@ function createApplication({ pool, config }) {
   );
   app.use(limiter(15 * 60_000, 500));
   app.use(express.json({ limit: "600kb", strict: true }));
+  app.use(
+    "/admin",
+    express.static(path.resolve(__dirname, "../public/admin"), {
+      index: "index.html",
+      setHeaders(response) {
+        response.set("Cache-Control", "no-store");
+        response.set("X-Robots-Tag", "noindex, nofollow");
+      },
+    }),
+  );
 
   const authenticateSession = createSessionAuthenticator({ pool, config });
   const authenticateAdmin = createAdminAuthenticator(config);

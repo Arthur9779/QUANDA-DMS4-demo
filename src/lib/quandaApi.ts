@@ -77,9 +77,18 @@ export type BackendEventName =
   | "tutorial_matching_started"
   | "tutorial_matching_succeeded"
   | "roadmap_generate_started"
+  | "roadmap_generate_failed"
   | "roadmap_generate_succeeded"
   | "roadmap_generate_fallback"
   | "roadmap_regenerated"
+  | "engineering_interpretation_started"
+  | "engineering_interpretation_completed"
+  | "engineering_interpretation_failed"
+  | "engineering_preparation_selected"
+  | "engineering_plan_generate_started"
+  | "engineering_plan_generate_failed"
+  | "engineering_plan_generated"
+  | "engineering_task_completed"
   | "stage_completed";
 
 export type EventProperties = Record<

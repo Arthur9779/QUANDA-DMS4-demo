@@ -56,6 +56,7 @@ Copy the contents of `backend/` into `/home/dmsoghwg/quanda-api-app`:
 - `src/`
 - `database/`
 - `scripts/`
+- `public/`
 
 Do not upload `.env`, `node_modules/`, `tests/`, `.DS_Store`, logs, or local
 coverage files. Inspect the existing target before replacing any file and keep
@@ -73,8 +74,8 @@ a recoverable backup of material existing content.
    `npm run migrate` once.
 8. Run `npm run migrate:status` again and then `npm run deployment:preflight`.
 9. Restart only `quanda-api.dms.onl`.
-10. Verify `/health`, session creation, project save/restore, event batching,
-    CORS, and protected analytics authorization.
+10. Verify `/health`, `/admin/`, session creation, project save/restore, event
+    batching, CORS, and protected analytics authorization.
 
 The migration runner is additive and checksum-verified. Never modify a
 migration already recorded in `schema_migrations`, and never run destructive
