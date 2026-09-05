@@ -118,11 +118,16 @@ signal.
 
 ## Retention definition
 
-Retention uses non-overlapping Vietnam-local windows: Day 1, Days 2–7, and Days
-8–30. A retained identity has at least one session in the relevant window after
-its first-use date. Cohorts too young to reach the end of a measured window are
-excluded from its denominator, and an empty eligible cohort is reported as not
-enough data rather than 0%.
+Retention uses first-event cohorts and non-overlapping Vietnam-local windows:
+Day 1, Days 2–7, and Days 8–30. Visit retention starts at an identity's first
+recorded visit and requires another session on a later day. Product-value
+retention starts when an identity first reaches a usable roadmap or engineering
+plan and requires later-day plan, tutorial, task, or calendar activity. Cohorts
+too young to reach the end of a measured window are excluded, identities are
+deduplicated within every numerator and denominator, and each rate includes its
+eligible/retained counts and a 95% Wilson interval. The API also reports the
+percentage returning at any point in Days 1–30. Anonymous browser identities
+still cannot be joined across cleared storage, browsers, or devices.
 
 ## Synthetic data
 
