@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>QUANDA Live Analytics</title>
     <link rel="stylesheet" href="/admin/styles.css" />
-    <script src="/admin/app.js?v=completion-card-v1" defer></script>
+    <script src="/admin/app.js?v=retention-v2" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -137,13 +137,29 @@
         <section aria-labelledby="retention-title">
           <div class="section-heading">
             <div><p class="section-kicker">04</p><h2 id="retention-title">Retention</h2></div>
-            <p>Rolling Vietnam-local return windows; identities too new for a period are excluded.</p>
+            <p>First-event cohorts in Vietnam time. Same-day activity and identities too new for a window are excluded.</p>
           </div>
-          <div class="retention-grid">
-            <article><span>Day 1</span><strong id="retention-d1">—</strong><small id="retention-d1-detail">—</small></article>
-            <article><span>Days 2–7</span><strong id="retention-d7">—</strong><small id="retention-d7-detail">—</small></article>
-            <article><span>Days 8–30</span><strong id="retention-d30">—</strong><small id="retention-d30-detail">—</small></article>
+          <div class="retention-summary">
+            <article class="metric-card metric-featured"><span>Visit return within 30 days</span><strong id="visit-return-30">—</strong><small id="visit-return-30-detail">—</small></article>
+            <article class="metric-card"><span>Value return within 30 days</span><strong id="value-return-30">—</strong><small id="value-return-30-detail">—</small></article>
           </div>
+          <div class="retention-panel">
+            <header><div><h3>Visit retention</h3><p>Did a new browser identity start another session on a later day?</p></div><span>Return event: another session</span></header>
+            <div class="retention-grid">
+              <article><span>Day 1</span><strong id="visit-retention-d1">—</strong><small id="visit-retention-d1-detail">—</small></article>
+              <article><span>Days 2–7</span><strong id="visit-retention-d7">—</strong><small id="visit-retention-d7-detail">—</small></article>
+              <article><span>Days 8–30</span><strong id="visit-retention-d30">—</strong><small id="visit-retention-d30-detail">—</small></article>
+            </div>
+          </div>
+          <div class="retention-panel value-retention-panel">
+            <header><div><h3>Product-value retention</h3><p>After reaching a usable plan, did the identity return on a later day and use QUANDA meaningfully?</p></div><span>Return event: plan, tutorial, task, or calendar use</span></header>
+            <div class="retention-grid">
+              <article><span>Day 1</span><strong id="value-retention-d1">—</strong><small id="value-retention-d1-detail">—</small></article>
+              <article><span>Days 2–7</span><strong id="value-retention-d7">—</strong><small id="value-retention-d7-detail">—</small></article>
+              <article><span>Days 8–30</span><strong id="value-retention-d30">—</strong><small id="value-retention-d30-detail">—</small></article>
+            </div>
+          </div>
+          <p class="retention-note"><strong>Interpret carefully:</strong> percentages are paired with eligible and retained counts plus a 95% interval. Anonymous identities split when storage is cleared or another browser or device is used.</p>
         </section>
 
         <section aria-labelledby="events-title">

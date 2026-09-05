@@ -63,6 +63,13 @@
     return value === null || value === undefined ? "—" : percent(value);
   }
 
+  function retentionDetail(value) {
+    if (!value || value.eligible === 0) return "No mature identities in this window";
+    const sample = `${count(value.retained)} of ${count(value.eligible)} eligible`;
+    if (!value.interval95) return sample;
+    return `${sample} · 95% interval ${percent(value.interval95.low)}–${percent(value.interval95.high)}`;
+  }
+
   function showError(element, message) {
     element.textContent = message;
     element.hidden = !message;
@@ -162,16 +169,22 @@
   }
 
   function renderRetention(data) {
+    const visit = data.visitRetention || data.retention || {};
+    const value = data.valueRetention || {};
     for (const day of [1, 7, 30]) {
-      const value = data.retention[`d${day}`];
-      text(`retention-d${day}`, measuredPercent(value.rate));
-      text(
-        `retention-d${day}-detail`,
-        value.eligible > 0
-          ? `${count(value.retained)} of ${count(value.eligible)} eligible identities`
-          : "Not enough eligible identities yet",
-      );
+      const visitPoint = visit[`d${day}`];
+      const valuePoint = value[`d${day}`];
+      text(`visit-retention-d${day}`, measuredPercent(visitPoint?.rate));
+      text(`visit-retention-d${day}-detail`, retentionDetail(visitPoint));
+      text(`value-retention-d${day}`, measuredPercent(valuePoint?.rate));
+      text(`value-retention-d${day}-detail`, retentionDetail(valuePoint));
     }
+    const visit30 = data.summary?.visitReturn30Day || visit.any30;
+    const value30 = data.summary?.valueReturn30Day || value.any30;
+    text("visit-return-30", measuredPercent(visit30?.rate));
+    text("visit-return-30-detail", retentionDetail(visit30));
+    text("value-return-30", measuredPercent(value30?.rate));
+    text("value-return-30-detail", retentionDetail(value30));
   }
 
   function renderEvents(data) {

@@ -3,7 +3,7 @@ const { afterEach, describe, test } = require("node:test");
 const { createApplication } = require("../src/app");
 const { loadEnvironment } = require("../src/config/environment");
 const { hashToken } = require("../src/lib/tokens");
-const { createAnalyticsService } = require("../src/services/analytics-service");
+const { createAnalyticsService, wilsonInterval } = require("../src/services/analytics-service");
 const { analyticsWindow } = require("../src/validation/analytics");
 const { EventNameSchema, canonicalEventName } = require("../src/validation/events");
 
@@ -105,6 +105,9 @@ describe("local API", () => {
     assert.match(html, /Briefs submitted/);
     assert.match(html, /Projects completed/);
     assert.doesNotMatch(html, /projects-progressed/);
+    assert.match(html, /Product-value retention/);
+    assert.match(html, /visit-return-30/);
+    assert.match(html, /value-return-30/);
     assert.match(html, /journey-to-usable-roadmap conversion/);
     assert.match(html, /engineering-plans/);
     assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
@@ -350,12 +353,17 @@ test("analytics activity uses one coherent last-seen window", async () => {
   assert.equal(overview.branches.engineering.tasksCompleted, 3);
 });
 
-test("retention uses rolling Vietnam-local windows and marks immature cohorts unavailable", async () => {
+test("retention separates visit and product-value returns and marks immature cohorts unavailable", async () => {
   const calls = [];
   const responses = [
     { eligible_users: 10, retained_users: 4 },
+    { eligible_users: 4, retained_users: 1 },
     { eligible_users: 6, retained_users: 3 },
+    { eligible_users: 3, retained_users: 1 },
     { eligible_users: 0, retained_users: 0 },
+    { eligible_users: 0, retained_users: 0 },
+    { eligible_users: 5, retained_users: 3 },
+    { eligible_users: 2, retained_users: 1 },
   ];
   const pool = {
     async execute(sql, parameters) {
@@ -369,13 +377,32 @@ test("retention uses rolling Vietnam-local windows and marks immature cohorts un
     source: "real",
   });
 
+  assert.equal(calls.length, 8);
   assert.match(calls[0].sql, /CONVERT_TZ\(s\.started_at, '\+00:00', '\+07:00'\)/);
   assert.match(calls[0].sql, /BETWEEN \? AND \?/);
-  assert.deepEqual(calls.map((call) => call.parameters.slice(0, 2)), [[1, 1], [2, 7], [8, 30]]);
+  assert.match(calls[1].sql, /MIN\(start_event\.event_time\) AS first_value_at/);
+  assert.match(calls[1].sql, /return_event\.event_name IN/);
+  assert.deepEqual(calls.map((call) => call.parameters.slice(0, 2)), [
+    [1, 1], [1, 1], [2, 7], [2, 7], [8, 30], [8, 30], [1, 30], [1, 30],
+  ]);
   assert.equal(result.timeZone, "Asia/Ho_Chi_Minh");
-  assert.equal(result.retention.d1.rate, 0.4);
-  assert.equal(result.retention.d7.rate, 0.5);
-  assert.equal(result.retention.d30.rate, null);
+  assert.equal(result.visitRetention.d1.rate, 0.4);
+  assert.deepEqual(result.visitRetention.d1.interval95, { low: 0.1682, high: 0.6873 });
+  assert.equal(result.visitRetention.d7.rate, 0.5);
+  assert.equal(result.visitRetention.d30.rate, null);
+  assert.equal(result.valueRetention.d1.rate, 0.25);
+  assert.equal(result.valueRetention.d7.rate, 0.3333);
+  assert.equal(result.valueRetention.d30.rate, null);
+  assert.equal(result.summary.visitReturn30Day.rate, 0.6);
+  assert.equal(result.summary.valueReturn30Day.rate, 0.5);
+  assert.equal(result.retention, result.visitRetention);
+  assert.match(result.methodology.identityLimit, /browsers/i);
+});
+
+test("Wilson intervals expose uncertainty without inventing a rate for an empty cohort", () => {
+  assert.equal(wilsonInterval(0, 0), null);
+  assert.deepEqual(wilsonInterval(4, 10), { low: 0.1682, high: 0.6873 });
+  assert.deepEqual(wilsonInterval(10, 10), { low: 0.7225, high: 1 });
 });
 
 test("analytics date filters use Vietnam-local calendar boundaries", () => {

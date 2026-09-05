@@ -19,6 +19,33 @@ function ratio(numerator, denominator) {
   return denominator > 0 ? Number((numerator / denominator).toFixed(4)) : 0;
 }
 
+function wilsonInterval(successes, total, z = 1.96) {
+  if (total <= 0) return null;
+  const proportion = successes / total;
+  const zSquared = z * z;
+  const denominator = 1 + zSquared / total;
+  const centre = proportion + zSquared / (2 * total);
+  const margin = z * Math.sqrt(
+    (proportion * (1 - proportion) + zSquared / (4 * total)) / total,
+  );
+  return {
+    low: Number(Math.max(0, (centre - margin) / denominator).toFixed(4)),
+    high: Number(Math.min(1, (centre + margin) / denominator).toFixed(4)),
+  };
+}
+
+function retentionPoint(window, eligible, retained) {
+  return {
+    label: window.label,
+    fromDay: window.fromDay,
+    toDay: window.toDay,
+    eligible,
+    retained,
+    rate: eligible > 0 ? ratio(retained, eligible) : null,
+    interval95: wilsonInterval(retained, eligible),
+  };
+}
+
 function createAnalyticsService({ pool }) {
   async function overview(filter) {
     const userScope = syntheticScope("u", filter);
@@ -245,11 +272,15 @@ function createAnalyticsService({ pool }) {
   async function retention(filter) {
     const userScope = syntheticScope("u", filter);
     const sessionScope = syntheticScope("s", filter);
-    const results = {};
+    const startEventScope = syntheticScope("start_event", filter);
+    const returnEventScope = syntheticScope("return_event", filter);
+    const visitRetention = {};
+    const valueRetention = {};
     const windows = [
       { key: "d1", label: "Day 1", fromDay: 1, toDay: 1 },
       { key: "d7", label: "Days 2–7", fromDay: 2, toDay: 7 },
       { key: "d30", label: "Days 8–30", fromDay: 8, toDay: 30 },
+      { key: "any30", label: "Any return in days 1–30", fromDay: 1, toDay: 30 },
     ];
     for (const window of windows) {
       const [rows] = await pool.execute(
@@ -281,22 +312,73 @@ function createAnalyticsService({ pool }) {
       );
       const eligible = number(rows[0].eligible_users);
       const retained = number(rows[0].retained_users);
-      results[window.key] = {
-        label: window.label,
-        fromDay: window.fromDay,
-        toDay: window.toDay,
-        eligible,
-        retained,
-        rate: eligible > 0 ? ratio(retained, eligible) : null,
-      };
+      visitRetention[window.key] = retentionPoint(window, eligible, retained);
+
+      const [valueRows] = await pool.execute(
+        `SELECT
+           COUNT(*) AS eligible_users,
+           SUM(EXISTS(
+             SELECT 1 FROM events return_event
+              WHERE return_event.user_id = cohort.user_id
+                AND return_event.event_time > cohort.first_value_at
+                AND return_event.event_name IN (
+                  'roadmap_viewed',
+                  'engineering_plan_generated',
+                  'tutorial_opened',
+                  'roadmap_stage_completed',
+                  'engineering_task_completed',
+                  'calendar_item_completed'
+                )
+                AND DATEDIFF(
+                  DATE(CONVERT_TZ(return_event.event_time, '+00:00', '+07:00')),
+                  DATE(CONVERT_TZ(cohort.first_value_at, '+00:00', '+07:00'))
+                ) BETWEEN ? AND ?
+                AND ${returnEventScope.clause}
+           )) AS retained_users
+         FROM (
+           SELECT start_event.user_id, MIN(start_event.event_time) AS first_value_at
+             FROM events start_event
+            WHERE start_event.event_name IN ('roadmap_viewed', 'engineering_plan_generated')
+              AND ${startEventScope.clause}
+            GROUP BY start_event.user_id
+         ) cohort
+        WHERE cohort.first_value_at >= ?
+          AND cohort.first_value_at < DATE_SUB(?, INTERVAL ? DAY)`,
+        [
+          window.fromDay,
+          window.toDay,
+          ...returnEventScope.parameters,
+          ...startEventScope.parameters,
+          filter.start,
+          filter.end,
+          window.toDay,
+        ],
+      );
+      const valueEligible = number(valueRows[0].eligible_users);
+      const valueRetained = number(valueRows[0].retained_users);
+      valueRetention[window.key] = retentionPoint(window, valueEligible, valueRetained);
     }
     return {
       window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
       source: filter.source,
       scenarioId: filter.scenarioId || null,
-      definition: "Rolling Vietnam-local return windows; immature cohorts are excluded.",
+      definition: "Vietnam-local first-event cohorts; immature cohorts and same-day activity are excluded.",
       timeZone: "Asia/Ho_Chi_Minh",
-      retention: results,
+      methodology: {
+        visitStart: "The identity's first recorded visit.",
+        visitReturn: "A new session on a later Vietnam-local calendar day.",
+        valueStart: "The identity's first usable design roadmap view or generated engineering plan.",
+        valueReturn: "A later-day plan view, tutorial open, plan generation, task completion, or calendar completion.",
+        identityLimit: "Anonymous browser identities cannot be joined across cleared storage, browsers, or devices.",
+        interval: "Rates include a 95% Wilson interval so small samples are visibly uncertain.",
+      },
+      summary: {
+        visitReturn30Day: visitRetention.any30,
+        valueReturn30Day: valueRetention.any30,
+      },
+      visitRetention,
+      valueRetention,
+      retention: visitRetention,
     };
   }
 
@@ -326,4 +408,4 @@ function createAnalyticsService({ pool }) {
   return { eventCounts, overview, retention };
 }
 
-module.exports = { createAnalyticsService, syntheticScope };
+module.exports = { createAnalyticsService, syntheticScope, wilsonInterval };

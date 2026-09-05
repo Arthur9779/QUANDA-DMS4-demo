@@ -57,6 +57,7 @@ main { margin: 0 auto; max-width: 1240px; padding: 58px 24px 100px; position: re
 h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 600; letter-spacing: -0.045em; }
 h1 { font-size: clamp(3rem, 7vw, 6rem); line-height: 0.9; margin: 0; max-width: 850px; }
 h2 { font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1; margin: 0; }
+h3 { font-family: Georgia, "Times New Roman", serif; font-size: 1.55rem; margin: 0; }
 
 .login-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 32px; max-width: 980px; padding: clamp(28px, 6vw, 70px); }
 .login-copy { color: var(--muted); font-size: 1.08rem; line-height: 1.7; margin: 28px 0 34px; max-width: 670px; }
@@ -106,9 +107,18 @@ h2 { font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1; margin: 0; }
 .branch-panel dt { color: var(--muted); }
 .branch-panel dd { font-size: 1.2rem; font-weight: 850; margin: 0; }
 
-.retention-grid { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.retention-summary { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 18px; }
+.retention-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 20px; }
+.retention-panel + .retention-panel { margin-top: 14px; }
+.retention-panel > header { align-items: end; display: flex; gap: 20px; justify-content: space-between; margin-bottom: 16px; }
+.retention-panel > header p { color: var(--muted); margin: 5px 0 0; }
+.retention-panel > header > span { color: var(--green); font-size: 0.72rem; font-weight: 850; max-width: 240px; text-align: right; text-transform: uppercase; }
+.retention-grid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .retention-grid article { background: var(--amber-soft); border: 1px solid #ddbf8e; border-radius: 20px; display: grid; gap: 8px; padding: 22px; }
 .retention-grid strong { font-family: Georgia, "Times New Roman", serif; font-size: 3rem; }
+.retention-grid small { line-height: 1.45; }
+.value-retention-panel .retention-grid article { background: var(--green-soft); border-color: #a8b98a; }
+.retention-note { background: #ebe9de; border-radius: 14px; color: var(--muted); font-size: 0.86rem; line-height: 1.5; margin: 14px 0 0; padding: 14px 16px; }
 
 .table-shell { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
 table { border-collapse: collapse; width: 100%; }
@@ -129,8 +139,10 @@ td:first-child { font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   .site-header, main { padding-left: 16px; padding-right: 16px; }
   main { padding-top: 36px; }
   h1 { font-size: clamp(2.7rem, 15vw, 4.4rem); }
-  .token-row, .filter-bar, .metric-grid, .product-grid, .branch-grid, .retention-grid { grid-template-columns: 1fr; }
+  .token-row, .filter-bar, .metric-grid, .product-grid, .branch-grid, .retention-grid, .retention-summary { grid-template-columns: 1fr; }
   .dashboard-heading, .section-heading { align-items: flex-start; flex-direction: column; }
+  .retention-panel > header { align-items: flex-start; flex-direction: column; }
+  .retention-panel > header > span { text-align: left; }
   .dashboard-heading .secondary-button, .token-row .primary-button, .filter-bar .primary-button { width: 100%; }
   .section-heading > p { text-align: left; }
   .filter-bar .auto-refresh { padding: 4px 0; }
