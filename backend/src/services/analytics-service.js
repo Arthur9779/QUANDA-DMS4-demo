@@ -279,10 +279,13 @@ function createAnalyticsService({ pool }) {
     const windows = [
       { key: "d1", label: "Day 1", fromDay: 1, toDay: 1 },
       { key: "d7", label: "Days 2–7", fromDay: 2, toDay: 7 },
-      { key: "d30", label: "Days 8–30", fromDay: 8, toDay: 30 },
-      { key: "any30", label: "Any return in days 1–30", fromDay: 1, toDay: 30 },
+      { key: "d8plus", label: "Day 8+", fromDay: 8, toDay: null },
     ];
     for (const window of windows) {
+      const returnDayClause = window.toDay === null ? ">= ?" : "BETWEEN ? AND ?";
+      const returnDayParameters = window.toDay === null
+        ? [window.fromDay]
+        : [window.fromDay, window.toDay];
       const [rows] = await pool.execute(
         `SELECT
            COUNT(*) AS eligible_users,
@@ -292,21 +295,20 @@ function createAnalyticsService({ pool }) {
                 AND DATEDIFF(
                   DATE(CONVERT_TZ(s.started_at, '+00:00', '+07:00')),
                   DATE(CONVERT_TZ(u.created_at, '+00:00', '+07:00'))
-                ) BETWEEN ? AND ?
+                ) ${returnDayClause}
                 AND ${sessionScope.clause}
            )) AS retained_users
          FROM users u
-         WHERE u.created_at >= ?
+           WHERE u.created_at >= ?
            AND u.created_at < DATE_SUB(?, INTERVAL ? DAY)
            AND u.deleted_at IS NULL
            AND ${userScope.clause}`,
         [
-          window.fromDay,
-          window.toDay,
+          ...returnDayParameters,
           ...sessionScope.parameters,
           filter.start,
           filter.end,
-          window.toDay,
+          window.fromDay,
           ...userScope.parameters,
         ],
       );
@@ -332,7 +334,7 @@ function createAnalyticsService({ pool }) {
                 AND DATEDIFF(
                   DATE(CONVERT_TZ(return_event.event_time, '+00:00', '+07:00')),
                   DATE(CONVERT_TZ(cohort.first_value_at, '+00:00', '+07:00'))
-                ) BETWEEN ? AND ?
+                ) ${returnDayClause}
                 AND ${returnEventScope.clause}
            )) AS retained_users
          FROM (
@@ -345,13 +347,12 @@ function createAnalyticsService({ pool }) {
         WHERE cohort.first_value_at >= ?
           AND cohort.first_value_at < DATE_SUB(?, INTERVAL ? DAY)`,
         [
-          window.fromDay,
-          window.toDay,
+          ...returnDayParameters,
           ...returnEventScope.parameters,
           ...startEventScope.parameters,
           filter.start,
           filter.end,
-          window.toDay,
+          window.fromDay,
         ],
       );
       const valueEligible = number(valueRows[0].eligible_users);
@@ -371,10 +372,6 @@ function createAnalyticsService({ pool }) {
         valueReturn: "A later-day plan view, tutorial open, plan generation, task completion, or calendar completion.",
         identityLimit: "Anonymous browser identities cannot be joined across cleared storage, browsers, or devices.",
         interval: "Rates include a 95% Wilson interval so small samples are visibly uncertain.",
-      },
-      summary: {
-        visitReturn30Day: visitRetention.any30,
-        valueReturn30Day: valueRetention.any30,
       },
       visitRetention,
       valueRetention,
@@ -405,7 +402,47 @@ function createAnalyticsService({ pool }) {
     };
   }
 
-  return { eventCounts, overview, retention };
+  async function projectActivity(filter) {
+    const eventScope = syntheticScope("e", filter);
+    const [rows] = await pool.execute(
+      `SELECT
+         e.event_name,
+         e.event_time,
+         e.user_id,
+         COALESCE(JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflow')), 'design') AS workflow,
+         JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.workflowRunId')) AS workflow_run_id,
+         JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.briefExcerpt')) AS brief_excerpt,
+         JSON_UNQUOTE(JSON_EXTRACT(e.properties_json, '$.briefWasTruncated')) AS brief_was_truncated,
+         p.title AS project_title,
+         p.status AS project_status
+       FROM events e
+       LEFT JOIN projects p
+         ON p.id = e.project_id AND p.deleted_at IS NULL
+       WHERE e.event_time >= ? AND e.event_time < ? AND ${eventScope.clause}
+       ORDER BY e.event_time DESC, e.id DESC
+       LIMIT 80`,
+      [filter.start, filter.end, ...eventScope.parameters],
+    );
+    return {
+      window: { start: filter.start.toISOString(), endExclusive: filter.end.toISOString() },
+      source: filter.source,
+      scenarioId: filter.scenarioId || null,
+      privacy: "Private research view. Identities are anonymous browser identifiers; submitted brief excerpts are available only when captured at submission.",
+      events: rows.map((row) => ({
+        occurredAt: new Date(row.event_time).toISOString(),
+        identity: `Research ID ${String(row.user_id || "unknown").slice(0, 8)}`,
+        workflow: row.workflow === "agentic_engineering" ? "Agentic engineering" : "Design",
+        event: row.event_name,
+        journey: row.workflow_run_id ? String(row.workflow_run_id).slice(0, 24) : null,
+        project: row.project_title || null,
+        projectStatus: row.project_status || null,
+        briefExcerpt: row.brief_excerpt || null,
+        briefWasTruncated: String(row.brief_was_truncated || "") === "true",
+      })),
+    };
+  }
+
+  return { eventCounts, overview, projectActivity, retention };
 }
 
 module.exports = { createAnalyticsService, syntheticScope, wilsonInterval };

@@ -69,6 +69,7 @@ Use **Lock dashboard** before leaving a shared computer.
 - `GET /api/v1/admin/analytics/overview`
 - `GET /api/v1/admin/analytics/retention`
 - `GET /api/v1/admin/analytics/events`
+- `GET /api/v1/admin/analytics/activity`
 
 Query parameters:
 
@@ -100,8 +101,9 @@ Synthetic data is excluded by default.
 }
 ```
 
-Properties are limited to small primitive values. Briefs and full project
-snapshots belong in project storage, not analytics properties.
+Properties are limited to small primitive values. Full project snapshots belong
+in project storage. The client may attach a capped 500-character brief excerpt
+to a submission event for the protected, internal research activity log.
 
 Tracked product milestones include brief submission, Creative DNA completion
 and confirmation, tutorial matching/open/replacement, roadmap generation and
@@ -119,15 +121,15 @@ signal.
 ## Retention definition
 
 Retention uses first-event cohorts and non-overlapping Vietnam-local windows:
-Day 1, Days 2–7, and Days 8–30. Visit retention starts at an identity's first
+Day 1, Days 2–7, and Day 8+. Visit retention starts at an identity's first
 recorded visit and requires another session on a later day. Product-value
 retention starts when an identity first reaches a usable roadmap or engineering
 plan and requires later-day plan, tutorial, task, or calendar activity. Cohorts
 too young to reach the end of a measured window are excluded, identities are
 deduplicated within every numerator and denominator, and each rate includes its
-eligible/retained counts and a 95% Wilson interval. The API also reports the
-percentage returning at any point in Days 1–30. Anonymous browser identities
-still cannot be joined across cleared storage, browsers, or devices.
+eligible/retained counts and a 95% Wilson interval. The Day 8+ window remains
+open-ended, so it does not require a premature 30-day cohort. Anonymous browser
+identities still cannot be joined across cleared storage, browsers, or devices.
 
 ## Synthetic data
 

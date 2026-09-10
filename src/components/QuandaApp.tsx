@@ -644,6 +644,8 @@ export function QuandaApp() {
     trackEvent("brief_submitted", {
       workflow: "agentic_engineering",
       language: request.interfaceLanguage,
+      briefExcerpt: request.technicalBrief.trim().slice(0, 500),
+      briefWasTruncated: request.technicalBrief.trim().length > 500,
     });
     trackEvent("engineering_interpretation_started", {
       workflow: "agentic_engineering",
@@ -856,6 +858,8 @@ export function QuandaApp() {
       language: request.interfaceLanguage,
       outputType: request.outputType,
       requiredApplicationCount: request.requiredApplications.length,
+      briefExcerpt: request.projectBrief.trim().slice(0, 500),
+      briefWasTruncated: request.projectBrief.trim().length > 500,
     });
     requestAnimationFrame(() => {
       document.querySelector("#analysis-loading")?.scrollIntoView({

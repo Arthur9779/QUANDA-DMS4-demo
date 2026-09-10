@@ -21,6 +21,8 @@
     updatedAt: document.querySelector("#updated-at"),
     eventsBody: document.querySelector("#events-body"),
     eventsEmpty: document.querySelector("#events-empty"),
+    activityBody: document.querySelector("#activity-body"),
+    activityEmpty: document.querySelector("#activity-empty"),
   };
 
   const numberFormatter = new Intl.NumberFormat("en");
@@ -30,6 +32,11 @@
   const percentFormatter = new Intl.NumberFormat("en", {
     style: "percent",
     maximumFractionDigits: 1,
+  });
+  const vietnamTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "medium",
+    timeZone: "Asia/Ho_Chi_Minh",
   });
 
   function dateInputValue(date) {
@@ -171,20 +178,14 @@
   function renderRetention(data) {
     const visit = data.visitRetention || data.retention || {};
     const value = data.valueRetention || {};
-    for (const day of [1, 7, 30]) {
-      const visitPoint = visit[`d${day}`];
-      const valuePoint = value[`d${day}`];
-      text(`visit-retention-d${day}`, measuredPercent(visitPoint?.rate));
-      text(`visit-retention-d${day}-detail`, retentionDetail(visitPoint));
-      text(`value-retention-d${day}`, measuredPercent(valuePoint?.rate));
-      text(`value-retention-d${day}-detail`, retentionDetail(valuePoint));
+    for (const key of ["d1", "d7", "d8plus"]) {
+      const visitPoint = visit[key];
+      const valuePoint = value[key];
+      text(`visit-retention-${key}`, measuredPercent(visitPoint?.rate));
+      text(`visit-retention-${key}-detail`, retentionDetail(visitPoint));
+      text(`value-retention-${key}`, measuredPercent(valuePoint?.rate));
+      text(`value-retention-${key}-detail`, retentionDetail(valuePoint));
     }
-    const visit30 = data.summary?.visitReturn30Day || visit.any30;
-    const value30 = data.summary?.valueReturn30Day || value.any30;
-    text("visit-return-30", measuredPercent(visit30?.rate));
-    text("visit-return-30-detail", retentionDetail(visit30));
-    text("value-return-30", measuredPercent(value30?.rate));
-    text("value-return-30-detail", retentionDetail(value30));
   }
 
   function renderEvents(data) {
@@ -201,6 +202,58 @@
     }
   }
 
+  function activityLabel(name) {
+    return String(name || "activity")
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  function activityCell(value, className = "") {
+    const cell = document.createElement("td");
+    if (className) cell.className = className;
+    cell.textContent = value;
+    return cell;
+  }
+
+  function briefCell(activity) {
+    const cell = document.createElement("td");
+    cell.className = "activity-brief";
+    if (!activity.briefExcerpt) {
+      cell.textContent = "No brief excerpt stored for this event";
+      return cell;
+    }
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    summary.textContent = activity.briefWasTruncated
+      ? "View first 500 characters"
+      : "View submitted brief";
+    const excerpt = document.createElement("p");
+    excerpt.textContent = activity.briefExcerpt;
+    details.append(summary, excerpt);
+    cell.appendChild(details);
+    return cell;
+  }
+
+  function renderActivity(data) {
+    elements.activityBody.replaceChildren();
+    const activities = data.events || [];
+    elements.activityEmpty.hidden = activities.length > 0;
+    for (const activity of activities) {
+      const row = document.createElement("tr");
+      const projectActivity = activity.project
+        ? `${activityLabel(activity.event)} · ${activity.project}`
+        : activityLabel(activity.event);
+      row.append(
+        activityCell(vietnamTimeFormatter.format(new Date(activity.occurredAt)), "activity-time"),
+        activityCell(activity.identity, "activity-identity"),
+        activityCell(activity.workflow),
+        activityCell(projectActivity, "activity-event"),
+        briefCell(activity),
+      );
+      elements.activityBody.appendChild(row);
+    }
+  }
+
   function updateAutoRefresh() {
     if (refreshTimer) window.clearInterval(refreshTimer);
     refreshTimer = null;
@@ -214,14 +267,16 @@
     elements.refreshButton.textContent = "Refreshing…";
     showError(elements.dashboardError, "");
     try {
-      const [overview, retention, events] = await Promise.all([
+      const [overview, retention, events, activity] = await Promise.all([
         fetchAnalytics("overview"),
         fetchAnalytics("retention"),
         fetchAnalytics("events"),
+        fetchAnalytics("activity"),
       ]);
       renderOverview(overview);
       renderRetention(retention);
       renderEvents(events);
+      renderActivity(activity);
       elements.updatedAt.textContent = `Live data updated ${new Date().toLocaleString()}`;
       openDashboard();
       updateAutoRefresh();
