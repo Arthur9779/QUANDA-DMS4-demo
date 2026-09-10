@@ -25,6 +25,7 @@ function createAnalyticsRouter({ analyticsService, authenticateAdmin }) {
   router.get("/overview", endpoint(analyticsService.overview));
   router.get("/retention", endpoint(analyticsService.retention));
   router.get("/events", endpoint(analyticsService.eventCounts));
+  router.get("/activity", endpoint(analyticsService.projectActivity));
   return router;
 }
 

@@ -106,8 +106,10 @@ describe("local API", () => {
     assert.match(html, /Projects completed/);
     assert.doesNotMatch(html, /projects-progressed/);
     assert.match(html, /Product-value retention/);
-    assert.match(html, /visit-return-30/);
-    assert.match(html, /value-return-30/);
+    assert.match(html, /Day 8\+/);
+    assert.doesNotMatch(html, /return within 30 days/i);
+    assert.match(html, /Project activity log/);
+    assert.match(html, /activity-body/);
     assert.match(html, /journey-to-usable-roadmap conversion/);
     assert.match(html, /engineering-plans/);
     assert.doesNotMatch(html, /test-admin-token-with-at-least-32-characters/);
@@ -222,6 +224,10 @@ describe("local API", () => {
     assert.equal(analytics.status, 403);
     assert.match(analytics.headers.get("cache-control"), /no-store/);
     assert.equal((await json(analytics)).error, "admin_forbidden");
+
+    const activity = await fetch(`${baseUrl}/api/v1/admin/analytics/activity`);
+    assert.equal(activity.status, 403);
+    assert.equal((await json(activity)).error, "admin_forbidden");
   });
 
   test("creates, reads, lists, and softly removes an owned project", async () => {
@@ -362,8 +368,6 @@ test("retention separates visit and product-value returns and marks immature coh
     { eligible_users: 3, retained_users: 1 },
     { eligible_users: 0, retained_users: 0 },
     { eligible_users: 0, retained_users: 0 },
-    { eligible_users: 5, retained_users: 3 },
-    { eligible_users: 2, retained_users: 1 },
   ];
   const pool = {
     async execute(sql, parameters) {
@@ -377,26 +381,69 @@ test("retention separates visit and product-value returns and marks immature coh
     source: "real",
   });
 
-  assert.equal(calls.length, 8);
+  assert.equal(calls.length, 6);
   assert.match(calls[0].sql, /CONVERT_TZ\(s\.started_at, '\+00:00', '\+07:00'\)/);
   assert.match(calls[0].sql, /BETWEEN \? AND \?/);
   assert.match(calls[1].sql, /MIN\(start_event\.event_time\) AS first_value_at/);
   assert.match(calls[1].sql, /return_event\.event_name IN/);
-  assert.deepEqual(calls.map((call) => call.parameters.slice(0, 2)), [
-    [1, 1], [1, 1], [2, 7], [2, 7], [8, 30], [8, 30], [1, 30], [1, 30],
+  assert.deepEqual(calls.slice(0, 4).map((call) => call.parameters.slice(0, 2)), [
+    [1, 1], [1, 1], [2, 7], [2, 7],
   ]);
+  assert.match(calls[4].sql, /\) >= \?/);
+  assert.match(calls[5].sql, /\) >= \?/);
+  assert.equal(calls[4].parameters[0], 8);
+  assert.equal(calls[5].parameters[0], 8);
   assert.equal(result.timeZone, "Asia/Ho_Chi_Minh");
   assert.equal(result.visitRetention.d1.rate, 0.4);
   assert.deepEqual(result.visitRetention.d1.interval95, { low: 0.1682, high: 0.6873 });
   assert.equal(result.visitRetention.d7.rate, 0.5);
-  assert.equal(result.visitRetention.d30.rate, null);
+  assert.equal(result.visitRetention.d8plus.rate, null);
   assert.equal(result.valueRetention.d1.rate, 0.25);
   assert.equal(result.valueRetention.d7.rate, 0.3333);
-  assert.equal(result.valueRetention.d30.rate, null);
-  assert.equal(result.summary.visitReturn30Day.rate, 0.6);
-  assert.equal(result.summary.valueReturn30Day.rate, 0.5);
+  assert.equal(result.valueRetention.d8plus.rate, null);
+  assert.equal("summary" in result, false);
   assert.equal(result.retention, result.visitRetention);
   assert.match(result.methodology.identityLimit, /browsers/i);
+});
+
+test("project activity returns timestamped anonymous project events and captured brief excerpts", async () => {
+  const calls = [];
+  const pool = {
+    async execute(sql, parameters) {
+      calls.push({ sql: sql.replace(/\s+/g, " ").trim(), parameters });
+      return [[{
+        event_name: "brief_submitted",
+        event_time: "2026-09-10T04:30:00.000Z",
+        user_id: "12345678-1234-1234-1234-123456789abc",
+        workflow: "design",
+        workflow_run_id: "design:abc123",
+        brief_excerpt: "Create a small interactive poster.",
+        brief_was_truncated: "false",
+        project_title: "Interactive poster",
+        project_status: "planning",
+      }], []];
+    },
+  };
+  const result = await createAnalyticsService({ pool }).projectActivity({
+    start: new Date("2026-09-01T00:00:00.000Z"),
+    end: new Date("2026-09-11T00:00:00.000Z"),
+    source: "real",
+  });
+
+  assert.match(calls[0].sql, /FROM events e LEFT JOIN projects p/);
+  assert.match(calls[0].sql, /LIMIT 80/);
+  assert.equal(result.events.length, 1);
+  assert.deepEqual(result.events[0], {
+    occurredAt: "2026-09-10T04:30:00.000Z",
+    identity: "Research ID 12345678",
+    workflow: "Design",
+    event: "brief_submitted",
+    journey: "design:abc123",
+    project: "Interactive poster",
+    projectStatus: "planning",
+    briefExcerpt: "Create a small interactive poster.",
+    briefWasTruncated: false,
+  });
 });
 
 test("Wilson intervals expose uncertainty without inventing a rate for an empty cohort", () => {

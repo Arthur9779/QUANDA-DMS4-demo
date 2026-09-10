@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
     <title>QUANDA Live Analytics</title>
-    <link rel="stylesheet" href="/admin/styles.css" />
-    <script src="/admin/app.js?v=retention-v2" defer></script>
+    <link rel="stylesheet" href="/admin/styles.css?v=retention-day8-activity-v1" />
+    <script src="/admin/app.js?v=retention-day8-activity-v1" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -139,16 +139,12 @@
             <div><p class="section-kicker">04</p><h2 id="retention-title">Retention</h2></div>
             <p>First-event cohorts in Vietnam time. Same-day activity and identities too new for a window are excluded.</p>
           </div>
-          <div class="retention-summary">
-            <article class="metric-card metric-featured"><span>Visit return within 30 days</span><strong id="visit-return-30">—</strong><small id="visit-return-30-detail">—</small></article>
-            <article class="metric-card"><span>Value return within 30 days</span><strong id="value-return-30">—</strong><small id="value-return-30-detail">—</small></article>
-          </div>
           <div class="retention-panel">
             <header><div><h3>Visit retention</h3><p>Did a new browser identity start another session on a later day?</p></div><span>Return event: another session</span></header>
             <div class="retention-grid">
               <article><span>Day 1</span><strong id="visit-retention-d1">—</strong><small id="visit-retention-d1-detail">—</small></article>
               <article><span>Days 2–7</span><strong id="visit-retention-d7">—</strong><small id="visit-retention-d7-detail">—</small></article>
-              <article><span>Days 8–30</span><strong id="visit-retention-d30">—</strong><small id="visit-retention-d30-detail">—</small></article>
+              <article><span>Day 8+</span><strong id="visit-retention-d8plus">—</strong><small id="visit-retention-d8plus-detail">—</small></article>
             </div>
           </div>
           <div class="retention-panel value-retention-panel">
@@ -156,7 +152,7 @@
             <div class="retention-grid">
               <article><span>Day 1</span><strong id="value-retention-d1">—</strong><small id="value-retention-d1-detail">—</small></article>
               <article><span>Days 2–7</span><strong id="value-retention-d7">—</strong><small id="value-retention-d7-detail">—</small></article>
-              <article><span>Days 8–30</span><strong id="value-retention-d30">—</strong><small id="value-retention-d30-detail">—</small></article>
+              <article><span>Day 8+</span><strong id="value-retention-d8plus">—</strong><small id="value-retention-d8plus-detail">—</small></article>
             </div>
           </div>
           <p class="retention-note"><strong>Interpret carefully:</strong> percentages are paired with eligible and retained counts plus a 95% interval. Anonymous identities split when storage is cleared or another browser or device is used.</p>
@@ -174,6 +170,21 @@
             </table>
             <p class="empty-state" id="events-empty" hidden>No events were recorded in this period.</p>
           </div>
+        </section>
+
+        <section aria-labelledby="activity-title">
+          <div class="section-heading">
+            <div><p class="section-kicker">06</p><h2 id="activity-title">Project activity log</h2></div>
+            <p>Private research view: timestamped anonymous activity, including a submitted brief excerpt where available.</p>
+          </div>
+          <div class="table-shell activity-table-shell">
+            <table>
+              <thead><tr><th scope="col">Vietnam time</th><th scope="col">Research identity</th><th scope="col">Workflow</th><th scope="col">Project activity</th><th scope="col">Submitted brief</th></tr></thead>
+              <tbody id="activity-body"></tbody>
+            </table>
+            <p class="empty-state" id="activity-empty" hidden>No project activity was recorded in this period.</p>
+          </div>
+          <p class="research-note"><strong>Research note:</strong> identities are anonymous browser IDs, not names. Brief excerpts are capped at 500 characters and are available only for submissions made after this update.</p>
         </section>
       </section>
     </main>
