@@ -4,6 +4,7 @@ test("scores viable application routes and uses the winner for tutorial planning
   page,
 }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "Create a 20-second animated Bauhaus social poster with typography moving in time to music and export a final MP4. I have never used Blender.",
   );

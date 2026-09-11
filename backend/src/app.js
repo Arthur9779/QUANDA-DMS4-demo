@@ -8,17 +8,21 @@ const { requestContext } = require("./middleware/request-context");
 const { errorHandler, notFoundHandler } = require("./middleware/error-handler");
 const {
   createAdminAuthenticator,
+  createAccountAuthenticator,
+  createProjectAuthenticator,
   createSessionAuthenticator,
 } = require("./middleware/authenticate");
 const { createSessionService } = require("./services/session-service");
 const { createEventService } = require("./services/event-service");
 const { createProjectService } = require("./services/project-service");
 const { createAnalyticsService } = require("./services/analytics-service");
+const { createAuthService } = require("./services/auth-service");
 const { createHealthRouter } = require("./routes/health-routes");
 const { createSessionRouter } = require("./routes/session-routes");
 const { createEventRouter } = require("./routes/event-routes");
 const { createProjectRouter } = require("./routes/project-routes");
 const { createAnalyticsRouter } = require("./routes/analytics-routes");
+const { createAuthRouter } = require("./routes/auth-routes");
 
 function limiter(windowMs, limit) {
   return rateLimit({
@@ -62,13 +66,21 @@ function createApplication({ pool, config }) {
   );
 
   const authenticateSession = createSessionAuthenticator({ pool, config });
+  const authenticateAccount = createAccountAuthenticator({ pool, config });
+  const authenticateProject = createProjectAuthenticator({ pool, config });
   const authenticateAdmin = createAdminAuthenticator(config);
   const sessionService = createSessionService({ pool, config });
   const eventService = createEventService({ pool });
   const projectService = createProjectService({ pool });
   const analyticsService = createAnalyticsService({ pool });
+  const authService = createAuthService({ pool, config });
 
   app.use("/health", createHealthRouter({ pool }));
+  app.use(
+    "/api/v1/auth",
+    limiter(10 * 60_000, 20),
+    createAuthRouter({ authService, authenticateAccount }),
+  );
   app.use(
     "/api/v1/session",
     limiter(10 * 60_000, 30),
@@ -86,7 +98,7 @@ function createApplication({ pool, config }) {
   app.use(
     "/api/v1/projects",
     limiter(60_000, 90),
-    createProjectRouter({ projectService, authenticateSession }),
+    createProjectRouter({ projectService, authenticateSession: authenticateProject }),
   );
   app.use(
     "/api/v1/admin/analytics",

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 async function fillY2kProject(page: import("@playwright/test").Page) {
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "I need a glossy Y2K product animation with chrome materials and a fisheye camera. The assignment requires Blender.",
   );

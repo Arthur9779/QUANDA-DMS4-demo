@@ -54,6 +54,7 @@ function createSessionService({ pool, config }) {
              JOIN users u ON u.id = c.user_id
             WHERE c.token_hash = ?
               AND c.revoked_at IS NULL
+              AND u.account_type = 'anonymous'
               AND u.deleted_at IS NULL
             LIMIT 1
             FOR UPDATE`,

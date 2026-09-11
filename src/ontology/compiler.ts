@@ -617,7 +617,7 @@ export function compileOntologySource(
     ontologySchemaVersion: KNOWLEDGE_CONTRACT_VERSIONS.ontology,
     source: {
       path: options.sourcePath ?? "knowledge/quanda.skills",
-      sha256: hash(source),
+      sha256: hash(source.replace(/\r\n?/gu, "\n")),
       version: parsed.version,
       title: parsed.title,
       metadata: parsed.metadata,

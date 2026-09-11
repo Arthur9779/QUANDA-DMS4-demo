@@ -13,6 +13,34 @@ export interface Translation {
     primaryLabel: string;
     homeLabel: string;
   };
+  auth: {
+    login: string;
+    createAccount: string;
+    continueGuest: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    displayName: string;
+    profile: string;
+    myProjects: string;
+    logout: string;
+    savedLocally: string;
+    syncing: string;
+    synced: string;
+    invalidCredentials: string;
+    accountExists: string;
+    invalidDetails: string;
+    unavailable: string;
+    crossDevice: string;
+    needAccount: string;
+    haveAccount: string;
+    saveProfile: string;
+    noProjects: string;
+    openProject: string;
+    working: string;
+    close: string;
+    passwordMismatch: string;
+  };
   hero: {
     eyebrow: string;
     titleLead: string;
@@ -454,6 +482,34 @@ const en: Translation = {
     primaryLabel: "Primary navigation",
     homeLabel: "QUANDA home",
   },
+  auth: {
+    login: "Log in",
+    createAccount: "Create account",
+    continueGuest: "Continue without account",
+    email: "Email",
+    password: "Password",
+    confirmPassword: "Confirm password",
+    displayName: "Display name",
+    profile: "Profile",
+    myProjects: "My projects",
+    logout: "Log out",
+    savedLocally: "Saved locally",
+    syncing: "Syncing…",
+    synced: "Synced",
+    invalidCredentials: "Email or password is incorrect.",
+    accountExists: "An account already exists for this email.",
+    invalidDetails: "Check your details. Passwords need 10 characters, upper/lowercase letters, and a number.",
+    unavailable: "Account service is temporarily unavailable. Your local work is safe.",
+    crossDevice: "An account lets you recover and sync your QUANDA projects across devices.",
+    needAccount: "Don’t have an account? Create one",
+    haveAccount: "Already have an account? Log in",
+    saveProfile: "Save profile",
+    noProjects: "No synced projects yet.",
+    openProject: "Open project",
+    working: "Working…",
+    close: "Close",
+    passwordMismatch: "Passwords do not match.",
+  },
   hero: {
     eyebrow: "A practical co-pilot for creative projects",
     titleLead: "Agentic planner find the most optimal path",
@@ -462,7 +518,7 @@ const en: Translation = {
     description:
       "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
     start: "Plan my project",
-    note: "No account needed · Your work stays on this device",
+    note: "No account required · Your work is saved on this device. Create an account anytime to sync across devices.",
   },
   path: {
     initialEyebrow: "Start with your project",
@@ -975,6 +1031,34 @@ const vi: Translation = {
     primaryLabel: "Điều hướng chính",
     homeLabel: "Trang chủ QUANDA",
   },
+  auth: {
+    login: "Đăng nhập",
+    createAccount: "Tạo tài khoản",
+    continueGuest: "Tiếp tục không cần tài khoản",
+    email: "Email",
+    password: "Mật khẩu",
+    confirmPassword: "Xác nhận mật khẩu",
+    displayName: "Tên hiển thị",
+    profile: "Hồ sơ",
+    myProjects: "Dự án của tôi",
+    logout: "Đăng xuất",
+    savedLocally: "Đã lưu trên thiết bị",
+    syncing: "Đang đồng bộ…",
+    synced: "Đã đồng bộ",
+    invalidCredentials: "Email hoặc mật khẩu không đúng.",
+    accountExists: "Email này đã có tài khoản.",
+    invalidDetails: "Kiểm tra lại thông tin. Mật khẩu cần ít nhất 10 ký tự, chữ hoa, chữ thường và số.",
+    unavailable: "Dịch vụ tài khoản đang tạm gián đoạn. Dữ liệu trên thiết bị của bạn vẫn an toàn.",
+    crossDevice: "Tài khoản giúp bạn khôi phục và đồng bộ dự án QUANDA giữa các thiết bị.",
+    needAccount: "Chưa có tài khoản? Tạo tài khoản",
+    haveAccount: "Đã có tài khoản? Đăng nhập",
+    saveProfile: "Lưu hồ sơ",
+    noProjects: "Chưa có dự án nào được đồng bộ.",
+    openProject: "Mở dự án",
+    working: "Đang xử lý…",
+    close: "Đóng",
+    passwordMismatch: "Mật khẩu xác nhận không khớp.",
+  },
   hero: {
     eyebrow: "Trợ lý thực tế cho dự án sáng tạo",
     titleLead: "Trợ lý lập kế hoạch chủ động",
@@ -983,7 +1067,7 @@ const vi: Translation = {
     description:
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
     start: "Lập kế hoạch dự án",
-    note: "Không cần tài khoản · Dữ liệu được lưu trên thiết bị này",
+    note: "Không cần tài khoản · Công việc được lưu trên thiết bị này. Bạn có thể tạo tài khoản bất cứ lúc nào để đồng bộ giữa các thiết bị.",
   },
   path: {
     initialEyebrow: "Bắt đầu từ dự án của bạn",

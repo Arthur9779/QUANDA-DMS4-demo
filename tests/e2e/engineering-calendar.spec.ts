@@ -5,6 +5,7 @@ const lastNightBrief =
 
 test("renders and persists the isolated engineering calendar for Last Night", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(lastNightBrief);
   await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByLabel("Definition of done").fill(

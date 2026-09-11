@@ -20,6 +20,7 @@ function createSessionAuthenticator({ pool, config }) {
            JOIN users u ON u.id = s.user_id
           WHERE s.token_hash = ?
             AND s.ended_at IS NULL
+            AND u.account_type = 'anonymous'
             AND u.deleted_at IS NULL
           LIMIT 1`,
         [tokenHash],
@@ -56,6 +57,43 @@ function createSessionAuthenticator({ pool, config }) {
   };
 }
 
+function createAccountAuthenticator({ pool, config }) {
+  return async function authenticateAccount(request, _response, next) {
+    try {
+      const token = bearerToken(request);
+      if (!token || !token.startsWith("qua_")) throw unauthorized();
+      const [rows] = await pool.execute(
+        `SELECT s.id AS session_id, s.user_id
+           FROM authenticated_sessions s
+           JOIN users u ON u.id = s.user_id
+           JOIN accounts a ON a.user_id = s.user_id
+          WHERE s.token_hash = ? AND s.revoked_at IS NULL
+            AND s.expires_at > UTC_TIMESTAMP(3)
+            AND u.account_type = 'registered' AND u.deleted_at IS NULL
+          LIMIT 1`,
+        [hashToken(token, config.sessionSecret)],
+      );
+      const session = rows[0];
+      if (!session) throw unauthorized("invalid_account_session", "The account session is invalid or expired.");
+      await pool.execute(
+        "UPDATE authenticated_sessions SET last_seen_at = UTC_TIMESTAMP(3) WHERE id = ?",
+        [session.session_id],
+      );
+      request.auth = { userId: session.user_id, sessionId: session.session_id, accountType: "registered" };
+      next();
+    } catch (error) { next(error); }
+  };
+}
+
+function createProjectAuthenticator({ pool, config }) {
+  const anonymous = createSessionAuthenticator({ pool, config });
+  const account = createAccountAuthenticator({ pool, config });
+  return (request, response, next) => {
+    const token = bearerToken(request);
+    return token?.startsWith("qua_") ? account(request, response, next) : anonymous(request, response, next);
+  };
+}
+
 function createAdminAuthenticator(config) {
   return function authenticateAdmin(request, _response, next) {
     const token = bearerToken(request);
@@ -68,6 +106,8 @@ function createAdminAuthenticator(config) {
 
 module.exports = {
   bearerToken,
+  createAccountAuthenticator,
   createAdminAuthenticator,
+  createProjectAuthenticator,
   createSessionAuthenticator,
 };

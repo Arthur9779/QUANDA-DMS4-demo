@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("corrects and persists the focused learning path", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "I am new to Blender and need to make a toon-shaded product animation with a simple camera move.",
   );
@@ -59,6 +60,7 @@ test("carries every selected Figma tutorial into the roadmap and clears it after
   page,
 }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "Design a mobile museum guide in Figma with a reusable component system, responsive auto layout, and an interactive prototype for usability testing.",
   );

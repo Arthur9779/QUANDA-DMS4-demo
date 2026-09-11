@@ -1,7 +1,8 @@
 # QUANDA API
 
-Lightweight Node.js 20 backend for persistent anonymous users, sessions,
-project snapshots, product events, analytics, and synthetic development data.
+Lightweight Node.js 20 backend for persistent anonymous users, optional
+registered accounts, revocable sessions, project snapshots, product events,
+analytics, and synthetic development data.
 
 The existing QUANDA frontend and AI endpoints remain on Vercel. This service is
 an optional persistence layer: an unavailable analytics backend must never stop
@@ -14,9 +15,11 @@ immediate offline-safe copy.
 
 ## Local status
 
-Phase 5 adds the reviewed persistence schema and a checksum-protected,
-forward-only migration runner. The schema and runner are verified locally; no
-production database migration has been executed.
+The checksum-protected, forward-only migration runner includes the original
+anonymous persistence schema and `002_optional_accounts.sql`. The latter adds
+account credentials and authenticated sessions without changing or deleting
+anonymous identities or projects. No production database migration is run by
+the application or by a frontend deployment.
 
 ## Local setup
 
@@ -56,6 +59,28 @@ Send the session token as `Authorization: Bearer <token>`.
 Event requests are batches with client-generated UUIDs. Duplicate client event
 IDs are ignored safely. Project deletion is a soft deletion; project updates
 use an expected version to prevent silent conflicting writes.
+
+### Optional accounts
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
+- `PATCH /api/v1/auth/profile`
+- `POST /api/v1/auth/claim-anonymous-data`
+- `POST /api/v1/auth/logout`
+
+Registration accepts an optional active anonymous session token and upgrades
+that owner in place. Login may be followed by the claim endpoint, which checks
+both the authenticated account session and the supplied anonymous session
+server-side before moving projects. Client-supplied user IDs are never accepted
+as ownership proof. The regular project endpoints accept either an anonymous
+`qus_` session or a registered `qua_` session and always filter by the resolved
+server-side owner.
+
+Emails are normalized and unique. Passwords are stored only as bcrypt hashes.
+Account session tokens are random, stored only as hashes in MySQL, expire after
+`AUTH_SESSION_DAYS`, and are revoked on logout. Signup and login share a strict
+authentication-specific rate limit in addition to the existing API limit.
 
 ### Administrative
 

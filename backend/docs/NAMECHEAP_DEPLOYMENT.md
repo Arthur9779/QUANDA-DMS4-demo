@@ -35,6 +35,8 @@ or paste them into chat.
 | `ADMIN_API_TOKEN` | A different new random value with at least 32 bytes of entropy | Yes |
 | `ALLOWED_ORIGINS` | `https://quanda-dms4-demo-jet.vercel.app` | No |
 | `SESSION_IDLE_MINUTES` | `30` | No |
+| `AUTH_SESSION_DAYS` | `30` | No |
+| `PASSWORD_HASH_ROUNDS` | `12` | No |
 | `EVENT_BATCH_LIMIT` | `50` | No |
 | `LOG_LEVEL` | `info` | No |
 
@@ -70,12 +72,14 @@ a recoverable backup of material existing content.
 4. Add the cPanel environment variables above and save them.
 5. Run **Run NPM Install** for this application only.
 6. Enter the displayed QUANDA virtual environment and run `npm run deployment:check`.
-7. Run `npm run migrate:status`, review the pending migration, then run
-   `npm run migrate` once.
+7. Run `npm run migrate:status`, review every pending migration (including
+   `002_optional_accounts.sql`), then run `npm run migrate` once.
 8. Run `npm run migrate:status` again and then `npm run deployment:preflight`.
 9. Restart only `quanda-api.dms.onl`.
-10. Verify `/health`, `/admin/`, session creation, project save/restore, event
-    batching, CORS, and protected analytics authorization.
+10. Verify `/health`, `/admin/`, anonymous session creation, registration,
+    login/logout, guest-project migration, cross-account ownership isolation,
+    project save/restore, event batching, CORS, and protected analytics
+    authorization.
 
 The migration runner is additive and checksum-verified. Never modify a
 migration already recorded in `schema_migrations`, and never run destructive

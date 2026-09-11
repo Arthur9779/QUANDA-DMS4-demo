@@ -15,7 +15,7 @@ The app is designed for students and early-career creatives who need to learn un
 
 ## 2. MVP scope
 
-This repository contains the proposal-ready MVP only: one responsive planning flow, the server-side roadmap endpoint, local tutorial data, validation, persistence, accessibility states, and deployment configuration. QUANDA is not a chatbot, account system, collaboration tool, or learning-management platform.
+This repository contains the proposal-ready MVP: responsive design and agentic planning flows, server-side AI endpoints, local tutorial data, validation, local-first persistence, optional accounts, accessibility states, and deployment configuration. QUANDA is not a chatbot, collaboration tool, or learning-management platform, and an account is never required to use it.
 
 ## 3. Screenshots
 
@@ -59,12 +59,12 @@ Creative DNA uses a compact, OpenAPI-compatible Gemini structured-output schema,
 
 Never prefix the Gemini key with `NEXT_PUBLIC_` and never place it in client-side code. `.env.local` is ignored by Git.
 
-## 6. Anonymous persistence and analytics
+## 6. Local-first persistence, optional accounts, and analytics
 
 When `NEXT_PUBLIC_QUANDA_API_URL` is configured, the browser creates a random
 anonymous identity and session through the QUANDA backend. It stores only the
-opaque identity and session tokens needed to resume that browser; there is no
-email login and no device fingerprinting.
+opaque identity and session tokens needed to resume that browser. No email or
+account is required, and QUANDA does not use device fingerprinting.
 
 The frontend keeps local storage as its immediate offline-safe copy, then
 debounces complete project snapshots to the backend. If the browser has no
@@ -75,6 +75,21 @@ Meaningful product events are queued through one client module and sent in
 batches. Failures are swallowed by design: analytics, session renewal, and
 project synchronization must never interrupt Creative DNA analysis, tutorial
 matching, roadmap generation, or the calendar.
+
+Guests may optionally create an email/password account. Registration upgrades
+the currently authenticated anonymous owner in place, so its existing server
+project IDs and snapshots remain intact. Logging in from another browser lists
+that account's projects and restores the selected versioned snapshot. The same
+snapshot format covers design and agentic projects, and version-one design
+snapshots are migrated when read. Local storage remains the immediate cache and
+offline-safe copy before and after registration.
+
+Account sessions and anonymous sessions are intentionally separate. Passwords
+are bcrypt-hashed by the backend, raw account tokens are returned only at login
+or registration and stored as opaque browser credentials, and all project
+queries enforce ownership from the authenticated session rather than a client-
+supplied user ID. Logging out revokes the account session and removes the local
+account credential without deleting cached project work.
 
 ## 7. Google AI Studio setup
 
@@ -121,6 +136,7 @@ pnpm run typecheck
 pnpm run test
 pnpm run test:e2e
 pnpm run build
+pnpm --dir backend test
 ```
 
 Run the complete check sequence with:
@@ -154,9 +170,10 @@ The compiled runtime ontology and update workflow are documented in [`docs/ontol
 2. Import the repository into Vercel and keep the detected Next.js framework preset.
 3. Add `GEMINI_API_KEY` as a server environment variable. Optionally add `YOUTUBE_API_KEY` for live YouTube discovery; the verified local catalogue remains the first source tier.
 4. Run `pnpm ontology:index` locally with the same API key, then add the printed `GEMINI_FILE_SEARCH_STORE` and `GEMINI_FILE_SEARCH_ONTOLOGY_HASH` values to Vercel. Skip this step to use deterministic local ontology retrieval.
-5. After the backend deployment phase, add `NEXT_PUBLIC_QUANDA_API_URL=https://quanda-api.dms.onl` to enable persistence and analytics. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
-6. Deploy and test the public URL in English and Vietnamese.
-7. Temporarily test without the API key, with a stale index hash, or with the upstream service unavailable, to confirm demo and retrieval fallback behaviour.
+5. Deploy the matching backend release and review/apply its pending migrations before enabling account creation. Add the documented `AUTH_SESSION_DAYS` and `PASSWORD_HASH_ROUNDS` backend values; keep `SESSION_SECRET` server-side.
+6. Add `NEXT_PUBLIC_QUANDA_API_URL=https://quanda-api.dms.onl` to enable persistence, optional accounts, and analytics. Optionally add `GEMINI_MODEL=gemini-3.1-flash-lite`, `GEMINI_RETRIEVAL_TIMEOUT_MS`, and `NEXT_PUBLIC_APP_URL` with the public origin.
+7. Deploy and test the public URL in English and Vietnamese, including guest, registration, login, project restore, and logout flows.
+8. Temporarily test without the API key, with a stale index hash, or with the upstream service unavailable, to confirm demo and retrieval fallback behaviour.
 
 On a Vercel Hobby project, merge production changes through the GitHub account that owns the Vercel project. Hobby deployments can block a production commit whose Git author is not a project member, even when that commit is already on the production branch.
 
@@ -164,8 +181,8 @@ The server endpoint uses bounded request sizes, a short in-memory rate limit, an
 
 ## 13. Known limitations
 
-- Anonymous recovery follows the opaque identity stored in the same browser;
-  cross-device account sync is intentionally not implemented.
+- Anonymous recovery still follows the opaque identity stored in the same browser;
+  cross-device recovery requires the user to opt into an account.
 - The in-memory rate limit is best-effort and is not shared across server instances.
 - The catalogue is intentionally small and covers the applications required by this MVP.
 - AI output quality depends on the selected Gemini model and account availability.
@@ -174,7 +191,6 @@ The server endpoint uses bounded request sizes, a short in-memory rate limit, an
 
 ## 14. Future features
 
-- Optional account upgrades and cross-device project sync
 - Instructor feedback and shared roadmaps
 - A larger, periodically re-verified tutorial catalogue
 - A protected visual analytics dashboard

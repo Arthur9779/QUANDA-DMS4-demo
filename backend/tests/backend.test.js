@@ -26,6 +26,8 @@ function testConfig() {
     adminApiToken: "test-admin-token-with-at-least-32-characters",
     allowedOrigins: ["https://quanda.example"],
     sessionIdleMinutes: 30,
+    authSessionDays: 30,
+    passwordHashRounds: 10,
     eventBatchLimit: 50,
     logLevel: "error",
   };

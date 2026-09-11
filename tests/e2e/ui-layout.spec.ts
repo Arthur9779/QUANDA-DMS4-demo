@@ -5,6 +5,7 @@ const lastNightBrief =
 
 test("keeps the design route status above the project form", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "Create a 20-second product animation in Blender for a university assignment. Deliver a 1080p MP4 with simple sound and a polished presentation.",
   );
@@ -29,6 +30,7 @@ test("keeps the design route status above the project form", async ({ page }) =>
 
 test("routes the Last Night brief into the software workflow", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(lastNightBrief);
   await page.getByRole("button", { name: "Choose my workflow" }).click();
 

@@ -210,6 +210,55 @@ describe("QUANDA backend client", () => {
     expect(await client.restoreLatestProject()).toBeNull();
     expect(listRequests).toBe(0);
   });
+
+  it("uses the account session without an anonymous bootstrap and adopts the latest remote version on conflict", async () => {
+    const storage = new MemoryStorage();
+    storage.setItem("quanda:v1:account-session-token", "qua_account-session");
+    storage.setItem(
+      "quanda:v1:backend-project",
+      JSON.stringify({
+        clientProjectId: CLIENT_PROJECT_ID,
+        serverProjectId: SERVER_PROJECT_ID,
+        version: 1,
+        status: "draft",
+      }),
+    );
+    const remoteSnapshot = createProjectSnapshot({
+      ...snapshot,
+      form: { ...form, projectBrief: "Create the remotely updated interactive sound and light installation." },
+    });
+    let patchCount = 0;
+    const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      expect(init?.headers).toMatchObject({ Authorization: "Bearer qua_account-session" });
+      if (url.endsWith(`/api/v1/projects/${SERVER_PROJECT_ID}`) && init?.method === "PATCH") {
+        patchCount += 1;
+        return jsonResponse({ error: "project_version_conflict" }, 409);
+      }
+      if (url.endsWith(`/api/v1/projects/${SERVER_PROJECT_ID}`)) {
+        return jsonResponse({ ...projectRecord(2, "planning"), data: remoteSnapshot });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    };
+    const client = new QuandaApiClient({
+      apiBaseUrl: "https://quanda-api.example",
+      storage,
+      fetchImpl: fetchImpl as typeof fetch,
+    });
+    let conflictData: unknown = null;
+
+    const resolved = await client.saveProject({
+      title: "Local project",
+      status: "planning",
+      inputFingerprint: "local-change",
+      data: snapshot,
+      onConflict: (remote) => { conflictData = remote.data; },
+    });
+
+    expect(patchCount).toBe(1);
+    expect(resolved?.version).toBe(2);
+    expect(conflictData).toEqual(remoteSnapshot);
+  });
 });
 
 function projectRecord(version: number, status: "draft" | "planning") {
