@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { LogIn, UserRound, X } from "lucide-react";
 import type { Translation } from "@/src/i18n/translations";
 import { AuthApiError } from "@/src/lib/auth";
@@ -61,12 +62,72 @@ export function AccountControls({ t, onOpenProject }: { t: Translation; onOpenPr
 }
 
 function Modal({ title, onClose, closeLabel, children }: { title: string; onClose: () => void; closeLabel: string; children: React.ReactNode }) {
-  return <div className="auth-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-    <section aria-modal="true" className="auth-modal" role="dialog" aria-labelledby="auth-dialog-title">
-      <div className="auth-modal-heading"><h2 id="auth-dialog-title">{title}</h2><button aria-label={closeLabel} className="icon-button" onClick={onClose} type="button"><X size={20} /></button></div>
-      {children}
-    </section>
-  </div>;
+  const dialogRef = useRef<HTMLElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      const currentPadding = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      if (dialogRef.current?.contains(document.activeElement)) return;
+      const preferredTarget = dialogRef.current?.querySelector<HTMLElement>("[autofocus]");
+      const fallbackTarget = dialogRef.current?.querySelector<HTMLElement>("button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
+      (preferredTarget ?? fallbackTarget)?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+      previouslyFocused?.focus();
+    };
+  }, []);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      return;
+    }
+    if (event.key !== "Tab") return;
+
+    const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+      "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [tabindex]:not([tabindex='-1'])",
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div className="auth-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section ref={dialogRef} aria-modal="true" className="auth-modal" role="dialog" aria-labelledby={titleId} onKeyDown={handleKeyDown}>
+        <div className="auth-modal-heading"><h2 id={titleId}>{title}</h2><button aria-label={closeLabel} className="icon-button" onClick={onClose} type="button"><X size={20} /></button></div>
+        {children}
+      </section>
+    </div>,
+    document.body,
+  );
 }
 
 function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit }: { mode: "login" | "register"; t: Translation; error: string; onClose: () => void; onSwitch: (mode: Dialog) => void; onSubmit: (input: { displayName?: string; email: string; password: string }) => Promise<void> }) {
