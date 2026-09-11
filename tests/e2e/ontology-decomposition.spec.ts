@@ -4,6 +4,7 @@ test("uses quanda.skills to build a tutorial-backed Figma workflow", async ({
   page,
 }) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "I know basic Figma. I need to design and prototype a responsive mobile banking app with reusable components and a tested user flow for a university assignment.",
   );

@@ -36,6 +36,58 @@ describe("remote project snapshots", () => {
     expect(parseProjectSnapshot({ ...snapshot, form: { projectBrief: "missing" } })).toBeNull();
   });
 
+  it("migrates version-one design snapshots without losing local project data", () => {
+    const legacy = {
+      dataVersion: 1 as const,
+      form,
+      creativeDnaReview: null,
+      learningPlan: null,
+      roadmap: null,
+      completion: {},
+      calendarTasks: [],
+    };
+    expect(parseProjectSnapshot(legacy)).toMatchObject({
+      dataVersion: 2,
+      projectPath: "design",
+      form,
+      engineeringForm: null,
+      engineeringCompletion: [],
+    });
+  });
+
+  it("round-trips an agentic project so it can be opened on another device", () => {
+    const agentic = createProjectSnapshot({
+      form,
+      creativeDnaReview: null,
+      learningPlan: null,
+      roadmap: null,
+      completion: {},
+      calendarTasks: [],
+      projectPath: "agentic_engineering",
+      engineeringForm: {
+        path: "agentic_engineering",
+        interfaceLanguage: "vi",
+        technicalBrief: "Xây dựng một ứng dụng web theo dõi tiến độ học tập cho sinh viên.",
+        startingPoint: "new_project",
+        projectLocation: "",
+        definitionOfDone: "Ứng dụng chạy ổn định và lưu được nhiệm vụ.",
+        targetPlatform: "web_application",
+        technologies: "Next.js",
+        currentExperience: "Mới bắt đầu với Next.js",
+        deploymentTarget: "Vercel",
+        deadline: "2099-09-30",
+        hoursPerDay: 2,
+        daysPerWeek: 4,
+        constraints: "",
+        existingErrors: "",
+      },
+      engineeringCompletion: ["task-1"],
+    });
+    expect(parseProjectSnapshot(agentic)).toEqual(agentic);
+    expect(projectStatus(agentic)).toBe("draft");
+    expect(projectTitle(agentic)).toBe("Xây dựng một ứng dụng web theo dõi tiến độ học tập cho sinh viên");
+  });
+
   it("derives draft, active, and completed persistence states", () => {
     const draft = createProjectSnapshot({
       form,

@@ -15,6 +15,8 @@ const EnvironmentSchema = DatabaseEnvironmentSchema.extend({
   ADMIN_API_TOKEN: z.string().min(32),
   ALLOWED_ORIGINS: z.string().trim().min(1),
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
+  AUTH_SESSION_DAYS: z.coerce.number().int().min(1).max(90).default(30),
+  PASSWORD_HASH_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
   EVENT_BATCH_LIMIT: z.coerce.number().int().min(1).max(100).default(50),
   LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
 });
@@ -69,6 +71,8 @@ function loadEnvironment(source = process.env) {
     adminApiToken: parsed.data.ADMIN_API_TOKEN,
     allowedOrigins,
     sessionIdleMinutes: parsed.data.SESSION_IDLE_MINUTES,
+    authSessionDays: parsed.data.AUTH_SESSION_DAYS,
+    passwordHashRounds: parsed.data.PASSWORD_HASH_ROUNDS,
     eventBatchLimit: parsed.data.EVENT_BATCH_LIMIT,
     logLevel: parsed.data.LOG_LEVEL,
   };

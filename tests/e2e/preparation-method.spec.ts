@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function openEngineeringReview(page: Page) {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill("Build a Next.js portfolio website with a searchable project gallery and a Vercel preview.");
   await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByLabel("Definition of done").fill("The gallery works on mobile and desktop, is keyboard accessible, and the production build passes.");

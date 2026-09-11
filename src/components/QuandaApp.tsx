@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, BookOpenCheck, ListChecks, PencilLine } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./Header";
 import { getTranslation } from "@/src/i18n/translations";
 import type {
@@ -72,6 +72,7 @@ import {
   archiveCurrentQuandaProject,
   initializeQuandaApi,
   persistQuandaProject,
+  openQuandaProject,
   restoreLatestQuandaProject,
 } from "@/src/lib/quandaApi";
 import {
@@ -79,6 +80,7 @@ import {
   parseProjectSnapshot,
   projectStatus,
   projectTitle,
+  type QuandaProjectSnapshot,
 } from "@/src/lib/projectSnapshot";
 import {
   removeRoadmapCalendarTasks,
@@ -208,6 +210,37 @@ export function QuandaApp() {
   const learningPlanIsStale = learningPlan
     ? learningPlan.inputFingerprint !== projectInputFingerprint
     : false;
+  const applyProjectSnapshot = useCallback((snapshot: QuandaProjectSnapshot) => {
+    const restoredLocale = snapshot.projectPath === "agentic_engineering"
+      ? snapshot.engineeringForm?.interfaceLanguage ?? snapshot.form.interfaceLanguage
+      : snapshot.form.interfaceLanguage;
+    setProjectPath(snapshot.projectPath);
+    setPathClassification(null);
+    setLocale(restoredLocale);
+    setForm(snapshot.form);
+    setRoadmap(snapshot.roadmap);
+    setCreativeDnaReview(snapshot.creativeDnaReview);
+    setLearningPlan(snapshot.learningPlan);
+    setCompletion(snapshot.completion);
+    if (snapshot.roadmap) restoredRoadmapIds.current.add(snapshot.roadmap.id);
+    setCalendarTasks(snapshot.roadmap
+      ? syncRoadmapCalendarTasks(snapshot.calendarTasks, snapshot.roadmap, snapshot.form.deadline, snapshot.completion[snapshot.roadmap.id] ?? [])
+      : removeRoadmapCalendarTasks(snapshot.calendarTasks));
+    setEngineeringForm(snapshot.engineeringForm ?? emptyEngineeringForm(restoredLocale, snapshot.form.projectBrief));
+    setEngineeringInterpretation(snapshot.engineeringInterpretation);
+    setEngineeringRoadmap(snapshot.engineeringRoadmap);
+    setPreparationMethod(snapshot.preparationMethod);
+    setEngineeringGuidedPlan(snapshot.engineeringGuidedPlan);
+    setEngineeringInterpretationConfirmed(Boolean(snapshot.preparationMethod || snapshot.engineeringGuidedPlan || snapshot.engineeringRoadmap));
+    setEngineeringCompletion(snapshot.engineeringCompletion);
+    const deadline = snapshot.engineeringForm?.deadline ?? emptyEngineeringForm(restoredLocale).deadline;
+    setEngineeringCalendarTasks(snapshot.engineeringRoadmap
+      ? syncEngineeringRoadmapCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringRoadmap, deadline, snapshot.engineeringCompletion)
+      : snapshot.engineeringGuidedPlan
+        ? syncEngineeringGuidedPlanCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringGuidedPlan, deadline)
+        : removeEngineeringCalendarTasks(snapshot.engineeringCalendarTasks));
+  }, []);
+
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       const savedLocale = readLanguage(window.localStorage);
@@ -314,30 +347,12 @@ export function QuandaApp() {
         const remoteProject = await restoreLatestQuandaProject();
         const snapshot = parseProjectSnapshot(remoteProject?.data);
         if (!snapshot) return;
-        setProjectPath("design");
-        setPathClassification(null);
-        setLocale(snapshot.form.interfaceLanguage);
-        setForm(snapshot.form);
-        if (snapshot.roadmap) restoredRoadmapIds.current.add(snapshot.roadmap.id);
-        setRoadmap(snapshot.roadmap);
-        setCreativeDnaReview(snapshot.creativeDnaReview);
-        setLearningPlan(snapshot.learningPlan);
-        setCompletion(snapshot.completion);
-        setCalendarTasks(
-          snapshot.roadmap
-            ? syncRoadmapCalendarTasks(
-                snapshot.calendarTasks,
-                snapshot.roadmap,
-                snapshot.form.deadline,
-                snapshot.completion[snapshot.roadmap.id] ?? [],
-              )
-            : removeRoadmapCalendarTasks(snapshot.calendarTasks),
-        );
+        applyProjectSnapshot(snapshot);
       });
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, []);
+  }, [applyProjectSnapshot]);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -438,6 +453,7 @@ export function QuandaApp() {
       return;
     }
     const snapshot = createProjectSnapshot({
+      projectPath: "design",
       form,
       creativeDnaReview,
       learningPlan,
@@ -451,6 +467,10 @@ export function QuandaApp() {
         status: projectStatus(snapshot),
         inputFingerprint: createProjectInputFingerprint(form),
         data: snapshot,
+        onConflict: (remote) => {
+          const latest = parseProjectSnapshot(remote.data);
+          if (latest) applyProjectSnapshot(latest);
+        },
       });
     }, 1_200);
     return () => window.clearTimeout(timeout);
@@ -463,7 +483,41 @@ export function QuandaApp() {
     learningPlan,
     projectPath,
     roadmap,
+    applyProjectSnapshot,
   ]);
+
+  useEffect(() => {
+    if (!isHydrated || projectPath !== "agentic_engineering" || engineeringForm.technicalBrief.trim().length < 30) return;
+    const snapshot = createProjectSnapshot({
+      projectPath: "agentic_engineering",
+      form,
+      creativeDnaReview,
+      learningPlan,
+      roadmap,
+      completion,
+      calendarTasks,
+      engineeringForm,
+      engineeringInterpretation,
+      engineeringRoadmap,
+      preparationMethod,
+      engineeringGuidedPlan,
+      engineeringCompletion,
+      engineeringCalendarTasks,
+    });
+    const timeout = window.setTimeout(() => {
+      void persistQuandaProject({
+        title: projectTitle(snapshot),
+        status: projectStatus(snapshot),
+        inputFingerprint: `engineering:${engineeringForm.technicalBrief.trim().slice(0, 180)}`,
+        data: snapshot,
+        onConflict: (remote) => {
+          const latest = parseProjectSnapshot(remote.data);
+          if (latest) applyProjectSnapshot(latest);
+        },
+      });
+    }, 1_200);
+    return () => window.clearTimeout(timeout);
+  }, [applyProjectSnapshot, calendarTasks, completion, creativeDnaReview, engineeringCalendarTasks, engineeringCompletion, engineeringForm, engineeringGuidedPlan, engineeringInterpretation, engineeringRoadmap, form, isHydrated, learningPlan, preparationMethod, projectPath, roadmap]);
 
   useEffect(() => {
     if (
@@ -557,6 +611,14 @@ export function QuandaApp() {
       setRoadmap(null);
       setCalendarTasks((current) => removeRoadmapCalendarTasks(current));
     }
+  };
+
+  const openRemoteProject = async (projectId: string) => {
+    const remoteProject = await openQuandaProject(projectId);
+    const snapshot = parseProjectSnapshot(remoteProject?.data);
+    if (!snapshot) return;
+    applyProjectSnapshot(snapshot);
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   };
 
   const scrollToForm = () => {
@@ -1312,6 +1374,7 @@ export function QuandaApp() {
         t={t}
         onLanguageChange={changeLanguage}
         onLoadExample={loadExample}
+        onOpenProject={openRemoteProject}
       />
       <div className="page-shell">
         {workflowStage && <WorkflowToast onDismiss={() => setWorkflowStage(null)} stage={workflowStage} t={t} />}

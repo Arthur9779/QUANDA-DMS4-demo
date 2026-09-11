@@ -8,9 +8,13 @@ test("keeps manual tasks and synchronises roadmap milestones", async ({ page }) 
   await expect.poll(() => header.evaluate((element) => element.getBoundingClientRect().top))
     .toBe(0);
 
-  await page.getByRole("button", { name: "Load example" }).click();
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
+  await page.getByLabel("Project brief").fill(
+    "Create a 20-second product animation in Blender for a university assignment. Deliver a 1080p MP4 with simple sound and a polished presentation.",
+  );
   await expect(page.getByLabel("Project brief")).toHaveValue(/20-second product animation/);
   await page.getByRole("button", { name: "Choose my workflow" }).click();
+  await page.getByLabel("Current experience").fill("Photoshop intermediate; completely new to Blender.");
 
   const calendar = page.getByTestId("project-calendar");
   await expect(calendar).toBeVisible();

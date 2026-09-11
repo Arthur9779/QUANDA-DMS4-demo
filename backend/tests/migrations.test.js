@@ -15,15 +15,16 @@ const migrationsDirectory = path.join(__dirname, "..", "database", "migrations")
 describe("migration source", () => {
   test("loads the versioned initial schema with a stable checksum", async () => {
     const migrations = await loadMigrations(migrationsDirectory);
-    assert.equal(migrations.length, 1);
+    assert.equal(migrations.length, 2);
     assert.equal(migrations[0].version, "001_initial_schema");
+    assert.equal(migrations[1].version, "002_optional_accounts");
     assert.match(migrations[0].checksum, /^[a-f0-9]{64}$/);
     assert.equal(migrations[0].statements.length, 6);
   });
 
   test("defines every table and relationship required by the backend queries", async () => {
-    const [migration] = await loadMigrations(migrationsDirectory);
-    const sql = migration.statements.join(";\n");
+    const migrations = await loadMigrations(migrationsDirectory);
+    const sql = migrations.flatMap((migration) => migration.statements).join(";\n");
 
     for (const table of [
       "synthetic_scenarios",
@@ -32,6 +33,8 @@ describe("migration source", () => {
       "sessions",
       "projects",
       "events",
+      "accounts",
+      "authenticated_sessions",
     ]) {
       assert.match(sql, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`));
     }
@@ -46,6 +49,9 @@ describe("migration source", () => {
       "project_data LONGTEXT NOT NULL",
       "properties_json LONGTEXT NOT NULL",
       "is_synthetic TINYINT(1) NOT NULL DEFAULT 0",
+      "UNIQUE KEY uq_accounts_email",
+      "UNIQUE KEY uq_authenticated_sessions_token_hash",
+      "FOREIGN KEY (user_id) REFERENCES users (id)",
     ]) {
       assert.ok(sql.includes(requiredFragment), `missing schema fragment: ${requiredFragment}`);
     }
@@ -113,13 +119,13 @@ describe("migration safety", () => {
   test("applies the initial migration once and records its checksum", async () => {
     const pool = new FakeMigrationPool();
     const first = await migrate(pool, migrationsDirectory);
-    assert.deepEqual(first, { applied: ["001_initial_schema"], alreadyApplied: 0 });
-    assert.equal(pool.applicationStatements.length, 6);
-    assert.equal(pool.applied.size, 1);
+    assert.deepEqual(first, { applied: ["001_initial_schema", "002_optional_accounts"], alreadyApplied: 0 });
+    assert.equal(pool.applicationStatements.length, 8);
+    assert.equal(pool.applied.size, 2);
 
     const second = await migrate(pool, migrationsDirectory);
-    assert.deepEqual(second, { applied: [], alreadyApplied: 1 });
-    assert.equal(pool.applicationStatements.length, 6);
+    assert.deepEqual(second, { applied: [], alreadyApplied: 2 });
+    assert.equal(pool.applicationStatements.length, 8);
     assert.equal(pool.releaseCount, 2);
   });
 });

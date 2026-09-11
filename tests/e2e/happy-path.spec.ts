@@ -26,13 +26,14 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
     await expect(page.getByRole("button", { name: "VI", exact: true })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(loadExample).toBeFocused();
-    await page.keyboard.press("Enter");
-  } else {
-    await loadExample.click();
   }
 
+  await page.getByLabel("Project brief").fill(
+    "Create a 20-second product animation in Blender for a university assignment. Deliver a 1080p MP4 with simple sound and a polished presentation.",
+  );
   await expect(page.getByLabel("Project brief")).toHaveValue(/20-second product animation/);
   await page.getByRole("button", { name: "Choose my workflow" }).click();
+  await page.getByLabel("Current experience").fill("Photoshop intermediate; completely new to Blender.");
   await page.getByRole("button", { name: "Understand my project" }).click();
   await expect(page.locator("#learning-path-review")).toBeVisible();
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
@@ -80,6 +81,7 @@ test("routes software briefs into the separate agentic engineering workflow", as
   page.on("pageerror", (error) => consoleErrors.push(error.message));
 
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "Build a small TypeScript sign-in website with validation, tests, and a verified production build for a class project.",
   );

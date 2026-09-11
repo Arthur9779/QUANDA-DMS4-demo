@@ -3,6 +3,7 @@ import type { QuandaProjectSnapshot } from "@/src/lib/projectSnapshot";
 
 const IDENTITY_KEY = "quanda:v1:identity-token";
 const SESSION_KEY = "quanda:v1:session-token";
+export const ACCOUNT_SESSION_KEY = "quanda:v1:account-session-token";
 const PROJECT_REFERENCE_KEY = "quanda:v1:backend-project";
 const RESTORE_SUPPRESSED_KEY = "quanda:v1:remote-restore-suppressed";
 const REQUEST_TIMEOUT_MS = 8_000;
@@ -235,6 +236,7 @@ export class QuandaApiClient {
     status: "draft" | "planning" | "active" | "completed";
     inputFingerprint: string;
     data: QuandaProjectSnapshot;
+    onConflict?: (remote: BackendProjectRecord) => void;
   }): Promise<BackendProjectRecord | null> {
     const payloadKey = JSON.stringify(input);
     if (payloadKey === this.lastProjectPayload) return this.saveChain;
@@ -257,13 +259,13 @@ export class QuandaApiClient {
 
   async restoreLatestProject(): Promise<BackendProjectRecord | null> {
     if (safeStorageRead(this.storage, RESTORE_SUPPRESSED_KEY) === "1") return null;
-    if (!(await this.initialize())) return null;
+    if (!(await this.ensureProjectAuthentication())) return null;
     try {
-      const response = await this.authenticatedRequest("/api/v1/projects?limit=1");
+      const response = await this.projectRequest("/api/v1/projects?limit=1");
       const list = ProjectListSchema.safeParse(await response.json());
       if (!list.success || !list.data.projects[0]) return null;
       const summary = list.data.projects[0];
-      const fullResponse = await this.authenticatedRequest(
+      const fullResponse = await this.projectRequest(
         `/api/v1/projects/${summary.id}`,
       );
       const record = ProjectRecordSchema.safeParse(await fullResponse.json());
@@ -281,12 +283,37 @@ export class QuandaApiClient {
     }
   }
 
+  async openProject(projectId: string): Promise<BackendProjectRecord | null> {
+    try {
+      const response = await this.projectRequest(`/api/v1/projects/${projectId}`);
+      const record = ProjectRecordSchema.safeParse(await response.json());
+      if (!record.success) return null;
+      this.writeProjectReference({
+        clientProjectId: record.data.clientProjectId,
+        serverProjectId: record.data.id,
+        version: record.data.version,
+        status: record.data.status,
+      });
+      this.currentProjectId = record.data.id;
+      this.lastProjectPayload = JSON.stringify({
+        title: record.data.title,
+        status: record.data.status,
+        inputFingerprint: record.data.inputFingerprint ?? "",
+        data: record.data.data,
+      });
+      safeStorageRemove(this.storage, RESTORE_SUPPRESSED_KEY);
+      return record.data;
+    } catch {
+      return null;
+    }
+  }
+
   async archiveCurrentProject(): Promise<void> {
     await this.saveChain.catch(() => null);
     const reference = this.readProjectReference();
-    if (reference?.serverProjectId && (await this.initialize())) {
+    if (reference?.serverProjectId && (await this.ensureProjectAuthentication())) {
       try {
-        await this.authenticatedRequest(`/api/v1/projects/${reference.serverProjectId}`, {
+        await this.projectRequest(`/api/v1/projects/${reference.serverProjectId}`, {
           method: "DELETE",
         });
       } catch {
@@ -329,8 +356,9 @@ export class QuandaApiClient {
     status: "draft" | "planning" | "active" | "completed";
     inputFingerprint: string;
     data: QuandaProjectSnapshot;
+    onConflict?: (remote: BackendProjectRecord) => void;
   }, allowConflictRetry = true): Promise<BackendProjectRecord | null> {
-    if (!(await this.initialize())) return null;
+    if (!(await this.ensureProjectAuthentication())) return null;
     const reference = this.readProjectReference() ?? {
       clientProjectId: randomUuid(),
     };
@@ -346,7 +374,7 @@ export class QuandaApiClient {
       let response: Response;
       let created = false;
       if (reference.serverProjectId && reference.version) {
-        response = await this.authenticatedRequest(
+        response = await this.projectRequest(
           `/api/v1/projects/${reference.serverProjectId}`,
           {
           method: "PATCH",
@@ -354,7 +382,7 @@ export class QuandaApiClient {
           },
         );
       } else {
-        response = await this.authenticatedRequest("/api/v1/projects", {
+        response = await this.projectRequest("/api/v1/projects", {
           method: "POST",
           body: JSON.stringify({ clientProjectId: reference.clientProjectId, ...body }),
         });
@@ -386,7 +414,7 @@ export class QuandaApiClient {
         reference.serverProjectId
       ) {
         try {
-          const response = await this.authenticatedRequest(
+          const response = await this.projectRequest(
             `/api/v1/projects/${reference.serverProjectId}`,
           );
           const current = ProjectRecordSchema.safeParse(await response.json());
@@ -397,7 +425,14 @@ export class QuandaApiClient {
               version: current.data.version,
               status: current.data.status,
             });
-            return this.saveProjectNow(input, false);
+            this.lastProjectPayload = JSON.stringify({
+              title: current.data.title,
+              status: current.data.status,
+              inputFingerprint: current.data.inputFingerprint ?? "",
+              data: current.data.data,
+            });
+            input.onConflict?.(current.data);
+            return current.data;
           }
         } catch {
           return null;
@@ -431,6 +466,26 @@ export class QuandaApiClient {
       Authorization: `Bearer ${sessionToken}`,
       "Content-Type": "application/json",
     };
+  }
+
+  private async projectRequest(path: string, init: RequestInit = {}): Promise<Response> {
+    const accountToken = safeStorageRead(this.storage, ACCOUNT_SESSION_KEY);
+    if (accountToken?.startsWith("qua_")) {
+      return this.request(path, {
+        ...init,
+        headers: {
+          ...this.authHeaders(accountToken),
+          ...(init.headers as Record<string, string> | undefined),
+        },
+      });
+    }
+    return this.authenticatedRequest(path, init);
+  }
+
+  private async ensureProjectAuthentication(): Promise<boolean> {
+    const accountToken = safeStorageRead(this.storage, ACCOUNT_SESSION_KEY);
+    if (accountToken?.startsWith("qua_")) return true;
+    return Boolean(await this.initialize());
   }
 
   private async authenticatedRequest(
@@ -499,6 +554,10 @@ export function persistQuandaProject(input: Parameters<QuandaApiClient["saveProj
 
 export function restoreLatestQuandaProject() {
   return getQuandaApiClient()?.restoreLatestProject() ?? Promise.resolve(null);
+}
+
+export function openQuandaProject(projectId: string) {
+  return getQuandaApiClient()?.openProject(projectId) ?? Promise.resolve(null);
 }
 
 export function archiveCurrentQuandaProject() {

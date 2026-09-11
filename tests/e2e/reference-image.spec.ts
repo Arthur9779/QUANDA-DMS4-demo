@@ -33,6 +33,7 @@ test("reference findings remain optional until the user approves them", async ({
   });
 
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Choose my workflow" })).toBeEnabled();
   await page.getByLabel("Project brief").fill(
     "Design a high-contrast surreal flower poster for a gallery exhibition using Photoshop, with a print-ready A2 deliverable.",
   );
