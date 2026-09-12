@@ -30,7 +30,7 @@ async function main() {
         "Generated ontology is missing. Run `pnpm ontology:build` and commit the result.",
       );
     }
-    if (current !== generated) {
+    if (current.replace(/\r\n?/gu, "\n") !== generated) {
       throw new Error(
         "Generated ontology is stale. Run `pnpm ontology:build` and commit the result.",
       );

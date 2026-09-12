@@ -27,10 +27,10 @@ describe("ontology semantic index artifacts", () => {
     const manifest = createSearchDocumentsManifest(ontologyArtifact, serialized);
     const projectRoot = resolve(import.meta.dirname, "..");
     expect(
-      await readFile(
+      (await readFile(
         resolve(projectRoot, "src/ontology/generated/search-documents.jsonl"),
         "utf8",
-      ),
+      )).replace(/\r\n?/gu, "\n"),
     ).toBe(serialized);
     expect(
       JSON.parse(
