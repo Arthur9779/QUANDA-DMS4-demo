@@ -198,7 +198,9 @@ describe("compiler validation and generated artifact", () => {
     expect(artifact.stats.familyCount).toBe(45);
     expect(artifact.stats.categoryCount).toBe(879);
     expect(artifact.stats.nodeCount).toBeGreaterThan(24_000);
-    expect(serializeOntologyArtifact(artifact)).toBe(generated);
+    expect(serializeOntologyArtifact(artifact)).toBe(
+      generated.replace(/\r\n?/gu, "\n"),
+    );
   });
 
   it("uses explicit compiler errors", () => {

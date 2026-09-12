@@ -36,8 +36,8 @@ if (checkOnly) {
     readFile(manifestPath, "utf8").catch(() => ""),
   ]);
   if (
-    currentDocuments !== serialized ||
-    currentManifest !== serializedManifest
+    currentDocuments.replace(/\r\n?/gu, "\n") !== serialized ||
+    currentManifest.replace(/\r\n?/gu, "\n") !== serializedManifest
   ) {
     throw new Error(
       "Ontology search documents are stale. Run `pnpm ontology:search-documents:build`.",
