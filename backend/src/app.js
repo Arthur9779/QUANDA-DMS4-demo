@@ -10,7 +10,6 @@ const {
   createAdminAuthenticator,
   createAccountAuthenticator,
   createProjectAuthenticator,
-  createSessionAuthenticator,
 } = require("./middleware/authenticate");
 const { createSessionService } = require("./services/session-service");
 const { createEventService } = require("./services/event-service");
@@ -65,7 +64,6 @@ function createApplication({ pool, config }) {
     }),
   );
 
-  const authenticateSession = createSessionAuthenticator({ pool, config });
   const authenticateAccount = createAccountAuthenticator({ pool, config });
   const authenticateProject = createProjectAuthenticator({ pool, config });
   const authenticateAdmin = createAdminAuthenticator(config);
@@ -91,7 +89,7 @@ function createApplication({ pool, config }) {
     limiter(60_000, 120),
     createEventRouter({
       eventService,
-      authenticateSession,
+      authenticateSession: authenticateProject,
       maximumBatchSize: config.eventBatchLimit,
     }),
   );

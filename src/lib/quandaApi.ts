@@ -212,13 +212,9 @@ export class QuandaApiClient {
 
   async flushEvents(): Promise<void> {
     if (this.eventQueue.length === 0) return;
-    if (!(await this.initialize())) {
-      this.eventQueue = [];
-      return;
-    }
     const events = this.eventQueue.splice(0, 50);
     try {
-      await this.authenticatedRequest("/api/v1/events", {
+      await this.userAuthenticatedRequest("/api/v1/events", {
         method: "POST",
         body: JSON.stringify({ events }),
         keepalive: true,
@@ -469,6 +465,13 @@ export class QuandaApiClient {
   }
 
   private async projectRequest(path: string, init: RequestInit = {}): Promise<Response> {
+    return this.userAuthenticatedRequest(path, init);
+  }
+
+  private async userAuthenticatedRequest(
+    path: string,
+    init: RequestInit = {},
+  ): Promise<Response> {
     const accountToken = safeStorageRead(this.storage, ACCOUNT_SESSION_KEY);
     if (accountToken?.startsWith("qua_")) {
       return this.request(path, {

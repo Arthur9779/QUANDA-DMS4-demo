@@ -216,6 +216,37 @@ describe("local API", () => {
     assert.equal(pool.events.size, 1);
   });
 
+  test("accepts event batches from a registered account session", async () => {
+    const { baseUrl, pool } = await start();
+    const accountToken = "qua_account-session-token";
+    pool.accountSessionsByHash.set(
+      hashToken(accountToken, testConfig().sessionSecret).toString("hex"),
+      {
+        session_id: "a1c2657b-0faf-4bb5-887d-f05642928a6a",
+        user_id: "b1c2657b-0faf-4bb5-887d-f05642928a6a",
+      },
+    );
+    const response = await fetch(`${baseUrl}/api/v1/events`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accountToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        events: [{
+          id: "c1c2657b-0faf-4bb5-887d-f05642928a6a",
+          name: "brief_submitted",
+          eventTime: new Date().toISOString(),
+          properties: { workflow: "design" },
+        }],
+      }),
+    });
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), { accepted: 1, duplicate: 0 });
+    assert.equal(pool.events.size, 1);
+  });
+
   test("protects project and analytics APIs", async () => {
     const { baseUrl } = await start();
     const project = await fetch(`${baseUrl}/api/v1/projects`);
@@ -481,6 +512,7 @@ class FakePool {
     this.credentials = new Map();
     this.sessionsById = new Map();
     this.sessionsByHash = new Map();
+    this.accountSessionsByHash = new Map();
     this.events = new Set();
     this.projects = new Map();
   }
@@ -501,6 +533,13 @@ class FakePool {
 
   async execute(sql, parameters) {
     const normalized = sql.replace(/\s+/g, " ").trim();
+    if (
+      normalized.startsWith("SELECT s.id AS session_id") &&
+      normalized.includes("FROM authenticated_sessions")
+    ) {
+      const session = this.accountSessionsByHash.get(parameters[0].toString("hex"));
+      return [[...(session ? [session] : [])], []];
+    }
     if (normalized.startsWith("INSERT INTO users")) {
       this.users.set(parameters[0], {
         id: parameters[0],
@@ -557,7 +596,8 @@ class FakePool {
       normalized.startsWith("UPDATE anonymous_credentials") ||
       normalized.startsWith("UPDATE users SET last_seen_at") ||
       normalized.startsWith("UPDATE sessions SET last_seen_at") ||
-      normalized.startsWith("UPDATE sessions s JOIN users")
+      normalized.startsWith("UPDATE sessions s JOIN users") ||
+      normalized.startsWith("UPDATE authenticated_sessions SET last_seen_at")
     ) {
       return [{ affectedRows: 1 }, []];
     }

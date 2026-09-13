@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QuandaApiClient } from "@/src/lib/quandaApi";
+import { ACCOUNT_SESSION_KEY, QuandaApiClient } from "@/src/lib/quandaApi";
 import { createProjectSnapshot } from "@/src/lib/projectSnapshot";
 import type { RoadmapRequest } from "@/src/types";
 
@@ -95,6 +95,35 @@ describe("QUANDA backend client", () => {
     expect(eventBody.events[0]).toMatchObject({
       name: "brief_submitted",
       properties: { outputType: "other" },
+    });
+  });
+
+  it("sends analytics with the account session after login", async () => {
+    const storage = new MemoryStorage();
+    storage.setItem(ACCOUNT_SESSION_KEY, "qua_account-session");
+    const requests: Array<{ url: string; init?: RequestInit }> = [];
+    const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      requests.push({ url, init });
+      if (url.endsWith("/api/v1/events")) {
+        return jsonResponse({ accepted: 1, duplicate: 0 }, 202);
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    };
+    const client = new QuandaApiClient({
+      apiBaseUrl: "https://quanda-api.example",
+      storage,
+      fetchImpl: fetchImpl as typeof fetch,
+      schedule: () => ({}) as ReturnType<typeof setTimeout>,
+    });
+
+    client.track("brief_submitted", { workflow: "design" });
+    await client.flushEvents();
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]?.url).toBe("https://quanda-api.example/api/v1/events");
+    expect(requests[0]?.init?.headers).toMatchObject({
+      Authorization: "Bearer qua_account-session",
     });
   });
 
