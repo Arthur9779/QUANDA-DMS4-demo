@@ -50,6 +50,57 @@ export function AccountLanding({
       </header>
 
       <div className="account-welcome-poster">
+        <div className="account-welcome-garden" aria-hidden="true">
+          <svg viewBox="0 0 640 640" role="presentation">
+            <defs>
+              <pattern id="account-garden-grid" width="160" height="160" patternUnits="userSpaceOnUse">
+                <rect width="160" height="160" fill="#f2d38d" />
+                <path d="M0 159.5h160M159.5 0v160" stroke="#19643d" strokeWidth="3" opacity=".2" />
+              </pattern>
+              <clipPath id="account-garden-clip"><rect width="640" height="640" rx="24" /></clipPath>
+            </defs>
+            <g clipPath="url(#account-garden-clip)">
+              <rect width="640" height="640" fill="url(#account-garden-grid)" />
+              <rect width="160" height="160" fill="#19643d" />
+              <rect x="320" width="160" height="160" fill="#da451f" />
+              <rect x="160" y="160" width="160" height="160" fill="#19643d" />
+              <rect x="480" y="160" width="160" height="160" fill="#19643d" />
+              <rect y="320" width="160" height="160" fill="#da451f" />
+              <rect x="320" y="320" width="160" height="160" fill="#19643d" />
+              <rect x="160" y="480" width="160" height="160" fill="#da451f" />
+              <rect x="480" y="480" width="160" height="160" fill="#19643d" />
+              <g fill="none" stroke="#19643d" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M36 122c38-43 71-63 108-68 4 39-7 79-38 108" />
+                <path d="M70 112c9-28 28-47 65-58" />
+                <path d="M206 285c25-48 57-80 99-96-3 46-21 82-58 107" />
+                <path d="M241 271c14-30 33-53 61-72" />
+                <path d="M526 286c29-42 65-65 106-75-6 41-27 73-65 97" />
+                <path d="M554 277c18-26 40-45 67-59" />
+                <path d="M36 447c29-43 66-68 107-78-7 42-28 75-67 98" />
+                <path d="M68 433c17-28 39-48 69-61" />
+                <path d="M368 447c23-48 56-79 99-95-3 44-23 81-61 105" />
+                <path d="M404 431c14-30 32-53 61-72" />
+                <path d="M207 606c20-43 53-73 98-89-2 42-19 77-55 101" />
+                <path d="M243 585c15-27 32-47 59-67" />
+              </g>
+              <g fill="#f2d38d" stroke="#19643d" strokeWidth="6">
+                <path d="M56 50c25-27 59-25 77 3 14 22 5 52-22 72-28 21-61 16-74-9-11-23-2-48 19-66Z" />
+                <path d="M376 48c25-27 59-25 77 3 14 22 5 52-22 72-28 21-61 16-74-9-11-23-2-48 19-66Z" />
+                <path d="M213 370c25-27 59-24 76 4 13 23 4 53-24 73-28 19-60 14-72-11-11-23-1-47 20-66Z" />
+                <path d="M533 370c25-27 59-24 76 4 13 23 4 53-24 73-28 19-60 14-72-11-11-23-1-47 20-66Z" />
+              </g>
+              <g fill="#da451f" stroke="#f2d38d" strokeWidth="6">
+                <circle cx="240" cy="84" r="20" /><circle cx="560" cy="244" r="20" />
+                <circle cx="80" cy="404" r="20" /><circle cx="400" cy="564" r="20" />
+              </g>
+              <g fill="#19643d">
+                <path d="M96 205c28-28 63-32 98-17-18 33-54 47-98 17Z" />
+                <path d="M416 205c28-28 63-32 98-17-18 33-54 47-98 17Z" />
+                <path d="M257 525c28-28 63-32 98-17-18 33-54 47-98 17Z" />
+              </g>
+            </g>
+          </svg>
+        </div>
         <div className="account-welcome-doodle account-welcome-doodle-left" aria-hidden="true">
           <span className="account-welcome-orbit" />
           <Sparkles size={52} strokeWidth={1.4} />
