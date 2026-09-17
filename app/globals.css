@@ -5150,3 +5150,67 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     width: 72px;
   }
 }
+
+/* Compact post-login hero and a quieter green system across the app. */
+:root {
+  --ink: #213f2d;
+  --muted: #587064;
+  --green: #4d7359;
+  --green-soft: #d9e5d9;
+  --green-deep: #294d38;
+  --blue: #4d7359;
+  --blue-soft: #d9e5d9;
+  --line: #b5c7b7;
+  --dark: #294d38;
+  --palm: #4d7359;
+  --moss: #4d7359;
+  --kombu: #294d38;
+  --purple: #4d7359;
+  --purple-soft: #d9e5d9;
+  --cyan-soft: #d9e5d9;
+}
+
+.hero {
+  min-height: min(720px, calc(100svh - 86px));
+  padding-top: clamp(46px, 5vw, 72px);
+  padding-bottom: clamp(46px, 5vw, 72px);
+  background-color: var(--green-deep);
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+}
+
+.hero-tagline {
+  margin-top: 24px;
+}
+
+.hero-description {
+  line-height: 1.55;
+}
+
+@media (max-width: 800px) {
+  .hero {
+    min-height: calc(100svh - 78px);
+    gap: 32px;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero {
+    min-height: 0;
+    gap: 26px;
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.65rem, 13vw, 4.2rem);
+  }
+
+  .hero-tagline {
+    margin-top: 20px;
+  }
+}
