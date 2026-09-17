@@ -4949,3 +4949,204 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .account-choice-guest { margin-top: 8px; }
   .account-choice-card > p { margin-top: 6px; }
 }
+
+/* Account landing: centered scrapbook hero with nature stickers at every breakpoint. */
+.account-welcome {
+  background: var(--green);
+}
+
+.account-welcome::before {
+  display: none;
+}
+
+.account-welcome-poster {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  min-height: 0;
+  padding: clamp(28px, 4vw, 64px) clamp(20px, 6vw, 84px);
+}
+
+.account-welcome-stickers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.account-sticker {
+  position: absolute;
+  display: block;
+  height: auto;
+  filter: drop-shadow(0 12px 9px rgba(4, 48, 18, 0.2));
+}
+
+.account-sticker-flower {
+  top: 10%;
+  left: 2%;
+  width: clamp(84px, 12vw, 156px);
+  transform: rotate(-13deg);
+}
+
+.account-sticker-leaf {
+  top: 8%;
+  right: 6%;
+  width: clamp(92px, 14vw, 180px);
+  transform: rotate(11deg);
+}
+
+.account-sticker-sun {
+  top: 34%;
+  left: 3%;
+  width: clamp(60px, 8vw, 104px);
+  transform: rotate(12deg);
+}
+
+.account-sticker-sprig {
+  bottom: 4%;
+  left: 4%;
+  width: clamp(78px, 11vw, 142px);
+  transform: rotate(-14deg);
+}
+
+.account-sticker-mushroom {
+  right: 4%;
+  bottom: 8%;
+  width: clamp(82px, 12vw, 148px);
+  transform: rotate(-8deg);
+}
+
+.account-sticker-sparkle {
+  right: 25%;
+  bottom: 13%;
+  width: clamp(40px, 6vw, 76px);
+  transform: rotate(-10deg);
+}
+
+.account-sticker-bloom {
+  right: 12%;
+  bottom: 25%;
+  width: clamp(72px, 10vw, 130px);
+  transform: rotate(13deg);
+}
+
+.account-welcome-copy {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  width: min(100%, 820px);
+  z-index: 1;
+}
+
+.account-welcome-copy h1 {
+  max-width: 860px;
+  font-size: clamp(2.7rem, 5vw, 5.2rem);
+  line-height: 0.96;
+}
+
+.account-welcome-intro {
+  max-width: 600px;
+  margin-top: clamp(16px, 2vw, 26px);
+}
+
+.account-choice-card {
+  width: min(100%, 660px);
+  margin-top: clamp(22px, 3vw, 34px);
+}
+
+.account-welcome-footer {
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+
+.account-welcome-footer span {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .account-welcome-poster {
+    grid-template-rows: minmax(0, 1fr);
+    padding: 30px clamp(20px, 5vw, 48px);
+  }
+
+  .account-sticker-flower { left: 2%; bottom: 23%; top: auto; }
+  .account-sticker-leaf { top: 12%; right: 1%; }
+  .account-sticker-sun { left: 3%; bottom: 33%; top: auto; }
+  .account-sticker-sprig { left: 1%; bottom: 3%; }
+  .account-sticker-mushroom { right: 1%; bottom: 9%; }
+  .account-sticker-sparkle { right: 9%; bottom: 30%; }
+  .account-sticker-bloom { right: 4%; bottom: 34%; }
+}
+
+@media (max-width: 620px) {
+  .account-welcome-poster {
+    grid-template-rows: minmax(0, 1fr);
+    padding: 26px 16px 22px;
+  }
+
+  .account-welcome-copy h1 {
+    max-width: 330px;
+    font-size: clamp(2.25rem, 12vw, 4rem);
+    line-height: 0.98;
+  }
+
+  .account-welcome-intro {
+    max-width: 330px;
+    margin-top: 16px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .account-choice-card {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+  }
+
+  .account-sticker-flower {
+    top: auto;
+    bottom: 25%;
+    left: -8%;
+    width: 82px;
+  }
+
+  .account-sticker-leaf {
+    top: 3%;
+    right: 2%;
+    width: 66px;
+  }
+
+  .account-sticker-sun {
+    top: auto;
+    bottom: 34%;
+    left: 2%;
+    width: 48px;
+  }
+
+  .account-sticker-sprig {
+    bottom: 1%;
+    left: -7%;
+    width: 74px;
+  }
+
+  .account-sticker-mushroom {
+    right: -10%;
+    bottom: 8%;
+    width: 82px;
+  }
+
+  .account-sticker-sparkle {
+    right: 3%;
+    bottom: 25%;
+    width: 36px;
+  }
+
+  .account-sticker-bloom {
+    right: -8%;
+    bottom: 32%;
+    width: 72px;
+  }
+}
