@@ -1,6 +1,19 @@
 "use client";
 
-import { ArrowRight, Compass, LogIn, Sparkles, UserPlus } from "lucide-react";
+import {
+  ArrowRight,
+  Cloud,
+  Compass,
+  Flower2,
+  Heart,
+  Leaf,
+  LogIn,
+  MessageCircle,
+  Sparkles,
+  Sprout,
+  Sun,
+  UserPlus,
+} from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/src/auth/AuthContext";
 import type { Translation } from "@/src/i18n/translations";
@@ -14,6 +27,27 @@ interface AccountLandingProps {
   onContinueGuest: () => void;
   onLanguageChange: (locale: Locale) => void;
   t: Translation;
+}
+
+function DoodlePattern() {
+  return (
+    <div className="account-doodle-pattern" aria-hidden="true">
+      <Heart className="account-pattern-doodle doodle-01" />
+      <Sun className="account-pattern-doodle doodle-02" />
+      <Flower2 className="account-pattern-doodle doodle-03" />
+      <Leaf className="account-pattern-doodle doodle-04" />
+      <Sparkles className="account-pattern-doodle doodle-05" />
+      <MessageCircle className="account-pattern-doodle doodle-06" />
+      <Sprout className="account-pattern-doodle doodle-07" />
+      <Cloud className="account-pattern-doodle doodle-08" />
+      <Flower2 className="account-pattern-doodle doodle-09" />
+      <Heart className="account-pattern-doodle doodle-10" />
+      <Sun className="account-pattern-doodle doodle-11" />
+      <Leaf className="account-pattern-doodle doodle-12" />
+      <MessageCircle className="account-pattern-doodle doodle-13" />
+      <Sparkles className="account-pattern-doodle doodle-14" />
+    </div>
+  );
 }
 
 export function AccountLanding({
@@ -50,11 +84,7 @@ export function AccountLanding({
       </header>
 
       <div className="account-welcome-poster">
-        <div className="account-welcome-doodle account-welcome-doodle-left" aria-hidden="true">
-          <span className="account-welcome-orbit" />
-          <Sparkles size={52} strokeWidth={1.4} />
-          <strong>Q</strong>
-        </div>
+        <DoodlePattern />
 
         <div className="account-welcome-copy">
           <p className="account-welcome-eyebrow">{t.accountLanding.eyebrow}</p>
@@ -100,12 +130,6 @@ export function AccountLanding({
             </button>
             <p>{t.accountLanding.guestNote}</p>
           </div>
-        </div>
-
-        <div className="account-welcome-doodle account-welcome-doodle-right" aria-hidden="true">
-          <span className="account-welcome-face">•ᴗ•</span>
-          <span className="account-welcome-checker" />
-          <small>BRIEF / PATH / MOMENTUM</small>
         </div>
       </div>
 
