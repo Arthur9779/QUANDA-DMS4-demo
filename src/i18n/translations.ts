@@ -49,6 +49,13 @@ export interface Translation {
     description: string;
     start: string;
     note: string;
+    preview: {
+      label: string;
+      status: string;
+      placeholder: string;
+      meta: string;
+      cta: string;
+    };
   };
   path: {
     initialEyebrow: string;
@@ -517,8 +524,15 @@ const en: Translation = {
     tagline: "From project brief to a practical learning path.",
     description:
       "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
-    start: "Plan my project",
     note: "No account required · Your work is saved on this device. Create an account anytime to sync across devices.",
+    start: "Plan my project",
+    preview: {
+      label: "Project brief",
+      status: "QUANDA AI",
+      placeholder: "Create a product animation for my university project…",
+      meta: "Brief · Skills · Deadline",
+      cta: "Choose my workflow",
+    },
   },
   path: {
     initialEyebrow: "Start with your project",
@@ -1066,8 +1080,15 @@ const vi: Translation = {
     tagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
     description:
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
-    start: "Lập kế hoạch dự án",
     note: "Không cần tài khoản · Công việc được lưu trên thiết bị này. Bạn có thể tạo tài khoản bất cứ lúc nào để đồng bộ giữa các thiết bị.",
+    start: "Lập kế hoạch dự án",
+    preview: {
+      label: "Đề bài dự án",
+      status: "QUANDA AI",
+      placeholder: "Tạo một video hoạt hình sản phẩm cho bài tập đại học…",
+      meta: "Đề bài · Kỹ năng · Thời hạn",
+      cta: "Chọn quy trình",
+    },
   },
   path: {
     initialEyebrow: "Bắt đầu từ dự án của bạn",
