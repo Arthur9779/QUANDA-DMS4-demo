@@ -4814,3 +4814,180 @@ footer {
     padding: 14px 16px;
   }
 }
+
+/* QUANDA palette refresh */
+:root {
+  --ink: #173c2a;
+  --muted: #496455;
+  --paper: #f8f0dc;
+  --white: #fffaf0;
+  --cream: #f2d38d;
+  --cream-soft: #f8e7b9;
+  --green: #19643d;
+  --green-soft: #dcebdc;
+  --green-deep: #10462c;
+  --orange: #da451f;
+  --orange-soft: #f6c0a1;
+  --blue: #19643d;
+  --blue-soft: #dcebdc;
+  --line: #b8c9b4;
+  --dark: #10462c;
+  --acid: #f2d38d;
+  --olivine: #f2d38d;
+  --palm: #19643d;
+  --moss: #19643d;
+  --kombu: #10462c;
+  --amber: #da451f;
+  --amber-soft: #f8dfbd;
+  --purple: #19643d;
+  --purple-soft: #dcebdc;
+  --pink-soft: #f6c0a1;
+  --cyan-soft: #dcebdc;
+}
+
+body { background: var(--paper); color: var(--ink); }
+body::before { opacity: .055; background-image: radial-gradient(circle at 18% 24%, #19643d 0 .55px, transparent .7px), radial-gradient(circle at 72% 66%, #19643d 0 .45px, transparent .65px); }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline-color: var(--orange); }
+.site-header { border-bottom-color: rgba(25, 100, 61, .22); background: rgba(248, 240, 220, .96); }
+.site-header nav > a:hover, .site-header nav > a:focus-visible { color: var(--orange); }
+.brand { color: var(--green-deep); }
+.brand-mark { border-color: var(--green); background: var(--cream); color: var(--green); }
+.language-toggle { border-color: var(--green); background: var(--white); }
+.language-toggle button.is-active { background: var(--green); color: var(--cream); }
+.language-toggle button:hover { color: var(--orange); }
+.button { border-radius: 10px; transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease; }
+.button:hover:not(:disabled) { transform: translateY(-2px); }
+.button-primary { border-color: var(--orange); background: var(--orange); color: var(--white); box-shadow: 0 8px 18px rgba(218, 69, 31, .18); }
+.button-primary:hover:not(:disabled) { border-color: var(--green); background: var(--green); color: var(--cream); }
+.button-secondary { border-color: var(--green); background: var(--white); color: var(--green); }
+.button-secondary:hover:not(:disabled) { border-color: var(--orange); background: var(--cream-soft); color: var(--green-deep); }
+
+/* Account landing: a modular garden sits beside the existing title and choices. */
+.account-entry-page { background: var(--green-deep); }
+.account-welcome { border-color: rgba(242, 211, 141, .48); background: var(--green); box-shadow: 0 32px 80px rgba(16, 70, 44, .28); }
+.account-welcome::before { opacity: .12; background-image: radial-gradient(circle at 1px 1px, var(--cream) .8px, transparent .9px), linear-gradient(90deg, transparent 49.8%, rgba(242, 211, 141, .18) 50%, transparent 50.2%); }
+.account-welcome-nav { border-bottom-color: rgba(242, 211, 141, .25); }
+.account-welcome-brand { color: var(--cream); }
+.account-welcome-brand-mark { border-color: var(--cream); color: var(--cream); }
+.account-welcome .language-toggle { border-color: rgba(242, 211, 141, .58); background: rgba(16, 70, 44, .72); }
+.account-welcome .language-toggle button { color: rgba(242, 211, 141, .78); }
+.account-welcome .language-toggle button.is-active { background: var(--cream); color: var(--green-deep); }
+.account-welcome-poster { grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: clamp(30px, 5vw, 82px); padding: clamp(28px, 5vw, 72px) clamp(24px, 5vw, 78px); }
+.account-welcome-garden { grid-column: 1; width: min(100%, 640px); aspect-ratio: 1; justify-self: center; overflow: hidden; border: 6px solid var(--cream); border-radius: 28px; background: var(--cream); box-shadow: 0 18px 0 rgba(16, 70, 44, .25); }
+.account-welcome-garden svg { display: block; width: 100%; height: 100%; }
+.account-welcome-copy { grid-column: 2; width: 100%; text-align: left; }
+.account-welcome-eyebrow { margin-left: 0; border-color: rgba(242, 211, 141, .6); color: var(--cream); background: rgba(242, 211, 141, .1); }
+.account-welcome-copy h1 { color: var(--white); font-size: clamp(3rem, 6vw, 6.8rem); line-height: .88; }
+.account-welcome-copy h1 em { color: var(--cream); }
+.account-welcome-intro { margin-left: 0; color: rgba(255, 250, 240, .82); }
+.account-choice-card { max-width: none; margin-left: 0; border-color: rgba(242, 211, 141, .45); background: var(--green-deep); box-shadow: 0 24px 52px rgba(16, 70, 44, .25); }
+.account-choice-index { color: var(--cream); }
+.account-choice-card h2 { color: var(--white); }
+.account-choice-login { border-color: var(--cream); background: var(--cream); color: var(--green-deep); }
+.account-choice-create { border-color: var(--orange); background: var(--orange); color: var(--white); }
+.account-choice-button:hover:not(:disabled), .account-choice-button:focus-visible { border-color: var(--cream); background: var(--white); color: var(--green-deep); }
+.account-choice-guest { color: var(--cream); text-decoration-color: rgba(242, 211, 141, .5); }
+.account-choice-guest:hover:not(:disabled) { color: var(--orange); }
+.account-choice-card > p { color: rgba(255, 250, 240, .7); }
+.account-welcome-doodle { position: absolute; opacity: .14; pointer-events: none; }
+.account-welcome-footer { color: rgba(242, 211, 141, .75); }
+.account-welcome-footer span { background: conic-gradient(from 90deg, rgba(242, 211, 141, .78) 25%, transparent 0 50%, rgba(242, 211, 141, .78) 0 75%, transparent 0) 0 0 / 16px 16px; }
+
+/* Guest/signed-in landing, roadmap cards, forms, and status treatments. */
+.landing-entry-section { border-color: rgba(242, 211, 141, .44); background: var(--green); box-shadow: 0 26px 70px rgba(16, 70, 44, .16); }
+.landing-entry-copy .eyebrow { border-color: rgba(242, 211, 141, .58); background: rgba(242, 211, 141, .1); color: var(--cream); }
+.landing-entry-copy h1, .landing-entry-copy .hero-tagline { color: var(--white); }
+.landing-entry-copy h1 em { color: var(--cream); }
+.landing-entry-copy .hero-description { color: rgba(255, 250, 240, .8); }
+.landing-entry-form .project-form, .form-note, .project-form, .path-entry-section .project-form { border-color: var(--green); background: var(--white); }
+.how-section, .results-section, footer { border-color: rgba(25, 100, 61, .22); }
+.section-heading h2, .form-intro h2, .results-hero h2 { color: var(--green-deep); }
+.steps li { border-color: var(--line); background: var(--white); box-shadow: 0 10px 0 rgba(25, 100, 61, .06); }
+.steps li:nth-child(2) { border-color: #e5aa78; background: var(--orange-soft); }
+.steps li:nth-child(3) { border-color: #91baa0; background: var(--green-soft); }
+.step-icon { border-color: var(--green); background: var(--cream); color: var(--green); }
+.step-arrow { border-color: var(--green); background: var(--paper); color: var(--green); }
+.form-section, .path-entry-section { border-color: rgba(25, 100, 61, .22); background: var(--cream-soft); }
+.field input, .field textarea, .field select, .auth-form input { border-color: #9fb5a2; background: #fffdf6; }
+.field input:focus, .field textarea:focus, .field select:focus, .auth-form input:focus-visible { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(218, 69, 31, .18); }
+.project-form fieldset, .stage-goal, .stage-facts div, .schedule-card, .note-card { border-color: var(--line); background: #fffdf6; }
+.check-pill span, .choice-card span { border-color: #9fb5a2; background: #fffdf6; }
+.check-pill input:checked + span, .choice-card input:checked + span { border-color: var(--green); background: var(--green); color: var(--cream); }
+.remember-profile input, .completion-control input { accent-color: var(--orange); }
+.loading-roadmap, .success-state { border-color: var(--green); background: var(--green-soft); }
+.total-card { background: var(--green); }
+.feasibility-card { border-color: #91baa0; background: var(--green-soft); }
+.feasibility-card.status-tight { border-color: #e5aa78; background: var(--cream-soft); }
+.feasibility-card.status-unrealistic, .warning-card { border-color: #dc805f; background: var(--orange-soft); }
+.stage-card { border-color: var(--line); background: var(--white); }
+.stage-card.is-complete { border-color: var(--green); background: var(--green-soft); }
+.stage-rail { border-color: #b4d0b9; background: var(--green-soft); }
+.stage-rail span { background: var(--green); color: var(--cream); }
+.stage-card:nth-child(3n+2) .stage-rail { border-color: #e5aa78; background: var(--orange-soft); }
+.stage-card:nth-child(3n+2) .stage-rail span { background: var(--orange); color: var(--white); }
+.stage-card:nth-child(3n+3) .stage-rail { border-color: #e5d29b; background: var(--cream); }
+.stage-card:nth-child(3n+3) .stage-rail span { background: var(--green); color: var(--cream); }
+.completion-control input:checked + span { border-color: var(--orange); background: var(--orange); }
+.task-list li::before, .note-card li::before { color: var(--orange); }
+.tutorial-card { border-color: #91baa0; background: var(--green-soft); }
+.tutorial-search-card { border-color: #e5aa78; background: var(--cream-soft); }
+.tutorial-search-visual { background: var(--cream); color: var(--green); }
+.tutorial-link { border-color: var(--green); background: var(--green); color: var(--cream); }
+.tutorial-link:hover { background: var(--orange); }
+
+/* Calendar and day-plan controls. */
+.calendar-section { border-top-color: var(--green); background: var(--cream); }
+.calendar-heading { background: var(--cream); }
+.calendar-heading h2 { color: var(--green-deep); }
+.calendar-heading > p { color: var(--green-deep); }
+.calendar-stage { background-color: var(--green-soft); background-image: radial-gradient(circle at 12% 20%, rgba(242, 211, 141, .8) 0 70px, transparent 72px), radial-gradient(circle at 88% 80%, rgba(218, 69, 31, .18) 0 120px, transparent 122px), linear-gradient(135deg, transparent 0 44%, rgba(25, 100, 61, .1) 44% 45%, transparent 45% 100%); }
+.calendar-app { border-color: var(--green); background: var(--white); box-shadow: 0 28px 72px rgba(16, 70, 44, .2); }
+.today-label, .more-tasks { color: var(--orange); }
+.calendar-controls button { border-color: var(--green); color: var(--green); }
+.calendar-controls button:hover { border-color: var(--orange); background: var(--cream); }
+.weekday-row span { color: var(--green); }
+.calendar-day { border-color: var(--line); background: rgba(255, 250, 240, .5); }
+.calendar-day:hover { background: rgba(242, 211, 141, .45); }
+.calendar-day.is-outside { color: #789081; background: rgba(220, 235, 220, .42); }
+.calendar-day.is-selected { background: var(--cream-soft); box-shadow: inset 0 0 0 2px var(--orange); }
+.calendar-day.is-today .day-number { background: var(--green); color: var(--cream); }
+.day-task { border-left-color: var(--green); background: var(--green-soft); color: var(--green-deep); }
+.task-color-sage { --task-bg: #dcebdc; --task-accent: #19643d; --task-ink: #10462c; }
+.task-color-peach { --task-bg: #f6c0a1; --task-accent: #da451f; --task-ink: #6f2a19; }
+.task-color-lavender { --task-bg: #f2d38d; --task-accent: #19643d; --task-ink: #10462c; }
+.task-color-sky { --task-bg: #dcebdc; --task-accent: #19643d; --task-ink: #10462c; }
+.task-color-butter { --task-bg: #f2d38d; --task-accent: #da451f; --task-ink: #6f2a19; }
+.today-dot { background: var(--green); }
+.task-dot { background: var(--orange); }
+.task-panel { background: var(--green); }
+.task-panel .eyebrow { color: var(--cream); }
+.task-panel-head > p:last-child { color: #cae0cb; }
+.task-form label { color: var(--cream-soft); }
+.task-form input { border-color: rgba(242, 211, 141, .38); background: rgba(255, 250, 240, .1); }
+.task-form input::placeholder { color: #b8d0ba; }
+.task-form input:focus { border-color: var(--cream); box-shadow: 0 0 0 3px rgba(242, 211, 141, .2); }
+.button-green { border-color: var(--cream); background: var(--cream); color: var(--green-deep); }
+.button-green:hover:not(:disabled) { border-color: var(--orange); background: var(--orange); color: var(--white); }
+.task-item { border-color: rgba(242, 211, 141, .24); background: rgba(255, 250, 240, .08); }
+.task-copy strong { color: var(--white); }
+.task-copy small, .empty-tasks { color: #b8d0ba; }
+.delete-task { color: #b8d0ba; }
+.delete-task:hover { background: rgba(242, 211, 141, .16); color: var(--cream); }
+.account-login-button:hover, .account-profile-button:hover { border-color: var(--orange); background: var(--orange); color: var(--white); }
+.account-menu, .auth-modal { border-color: var(--green); background: var(--white); }
+.account-menu button:hover, .account-menu button:focus-visible { background: var(--green-soft); }
+.auth-error { border-left-color: var(--orange); background: var(--orange-soft); color: var(--green-deep); }
+
+@media (max-width: 980px) {
+  .account-welcome-poster { grid-template-columns: 1fr; gap: 28px; }
+  .account-welcome-garden { grid-column: 1; width: min(100%, 620px); max-height: min(42vh, 390px); aspect-ratio: 1.55 / 1; }
+  .account-welcome-copy { grid-column: 1; width: min(100%, 700px); justify-self: center; }
+}
+
+@media (max-width: 620px) {
+  .account-welcome-poster { gap: 20px; padding: 24px 16px 28px; }
+  .account-welcome-garden { max-height: 230px; border-width: 3px; border-radius: 18px; box-shadow: 0 10px 0 rgba(16, 70, 44, .22); }
+  .account-welcome-copy h1 { font-size: clamp(3rem, 15vw, 5rem); }
+  .account-choice-card { margin-top: 24px; padding: 18px; border-radius: 21px; }
+  .account-choice-actions { grid-template-columns: 1fr; }
+}
