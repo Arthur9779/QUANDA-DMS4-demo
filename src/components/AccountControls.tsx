@@ -7,7 +7,8 @@ import type { Translation } from "@/src/i18n/translations";
 import { AuthApiError } from "@/src/lib/auth";
 import { useAuth } from "@/src/auth/AuthContext";
 
-type Dialog = "login" | "register" | "profile" | "projects" | null;
+export type AuthMode = "login" | "register";
+type Dialog = AuthMode | "profile" | "projects" | null;
 
 export function AccountControls({ t, onOpenProject }: { t: Translation; onOpenProject: (id: string) => Promise<void> }) {
   const auth = useAuth();
@@ -32,7 +33,7 @@ export function AccountControls({ t, onOpenProject }: { t: Translation; onOpenPr
   if (!auth.user) {
     return <>
       <button className="account-login-button" onClick={() => setDialog("login")} type="button"><LogIn size={16} />{t.auth.login}</button>
-      {dialog && <AuthDialog mode={dialog === "register" ? "register" : "login"} t={t} error={error} onClose={() => { setDialog(null); setError(""); }} onSwitch={setDialog} onSubmit={async (input) => {
+      {dialog && <AuthDialog mode={dialog === "register" ? "register" : "login"} t={t} error={error} onClose={() => { setDialog(null); setError(""); }} onSwitch={(mode) => setDialog(mode)} onSubmit={async (input) => {
         setError("");
         try {
           if (dialog === "register") await auth.register(input as { displayName: string; email: string; password: string });
@@ -130,7 +131,7 @@ function Modal({ title, onClose, closeLabel, children }: { title: string; onClos
   );
 }
 
-function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit }: { mode: "login" | "register"; t: Translation; error: string; onClose: () => void; onSwitch: (mode: Dialog) => void; onSubmit: (input: { displayName?: string; email: string; password: string }) => Promise<void> }) {
+export function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit, onContinueGuest }: { mode: AuthMode; t: Translation; error: string; onClose: () => void; onSwitch: (mode: AuthMode) => void; onSubmit: (input: { displayName?: string; email: string; password: string }) => Promise<void>; onContinueGuest?: () => void }) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState("");
   const hasError = Boolean(localError || error);
@@ -153,7 +154,7 @@ function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit }: { mode: "lo
       <button className="button button-primary" disabled={busy} type="submit">{busy ? t.auth.working : mode === "register" ? t.auth.createAccount : t.auth.login}</button>
     </form>
     <button className="button button-text" onClick={() => onSwitch(mode === "login" ? "register" : "login")} type="button">{mode === "login" ? t.auth.needAccount : t.auth.haveAccount}</button>
-    <button className="button button-text" onClick={onClose} type="button">{t.auth.continueGuest}</button>
+    <button className="button button-text" onClick={onContinueGuest ?? onClose} type="button">{t.auth.continueGuest}</button>
   </Modal>;
 }
 
@@ -179,7 +180,7 @@ function ProjectsDialog({ t, onClose, onOpen }: { t: Translation; onClose: () =>
   </Modal>;
 }
 
-function authErrorMessage(error: unknown, t: Translation): string {
+export function authErrorMessage(error: unknown, t: Translation): string {
   if (error instanceof AuthApiError) {
     if (error.code === "invalid_credentials") return t.auth.invalidCredentials;
     if (error.code === "account_exists") return t.auth.accountExists;

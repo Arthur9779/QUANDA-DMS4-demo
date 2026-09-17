@@ -41,6 +41,16 @@ export interface Translation {
     close: string;
     passwordMismatch: string;
   };
+  accountLanding: {
+    eyebrow: string;
+    titleLead: string;
+    titleAccent: string;
+    intro: string;
+    question: string;
+    hasAccount: string;
+    noAccount: string;
+    guestNote: string;
+  };
   hero: {
     eyebrow: string;
     titleLead: string;
@@ -516,6 +526,16 @@ const en: Translation = {
     working: "Working…",
     close: "Close",
     passwordMismatch: "Passwords do not match.",
+  },
+  accountLanding: {
+    eyebrow: "Your clearest route starts here",
+    titleLead: "Plan boldly.",
+    titleAccent: "Finish calmly.",
+    intro: "Sign in to keep every project in sync, create your first QUANDA account, or plan privately on this device.",
+    question: "Have you created your account?",
+    hasAccount: "Welcome back—sync your projects",
+    noAccount: "Save plans across your devices",
+    guestNote: "Guest work stays on this device. You can create an account whenever you are ready.",
   },
   hero: {
     eyebrow: "A practical co-pilot for creative projects",
@@ -1072,6 +1092,16 @@ const vi: Translation = {
     working: "Đang xử lý…",
     close: "Đóng",
     passwordMismatch: "Mật khẩu xác nhận không khớp.",
+  },
+  accountLanding: {
+    eyebrow: "Lộ trình rõ ràng nhất bắt đầu từ đây",
+    titleLead: "Lên kế hoạch táo bạo.",
+    titleAccent: "Hoàn thành thật nhẹ nhàng.",
+    intro: "Đăng nhập để đồng bộ mọi dự án, tạo tài khoản QUANDA đầu tiên hoặc lập kế hoạch riêng tư trên thiết bị này.",
+    question: "Bạn đã tạo tài khoản chưa?",
+    hasAccount: "Chào mừng trở lại—đồng bộ dự án",
+    noAccount: "Lưu kế hoạch trên nhiều thiết bị",
+    guestNote: "Dữ liệu khách được lưu trên thiết bị này. Bạn có thể tạo tài khoản bất cứ lúc nào.",
   },
   hero: {
     eyebrow: "Trợ lý thực tế cho dự án sáng tạo",
