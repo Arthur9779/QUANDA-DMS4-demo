@@ -4701,39 +4701,6 @@ footer {
   line-height: 1.5;
 }
 
-.account-doodle-pattern {
-  position: absolute;
-  inset: 12px;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.account-pattern-doodle {
-  position: absolute;
-  width: clamp(42px, 5.5vw, 82px);
-  height: auto;
-  color: #ffffff;
-  opacity: 0.34;
-  stroke-width: 1.45;
-  filter: drop-shadow(0 3px 0 rgba(3, 48, 17, 0.12));
-}
-
-.doodle-01 { top: 2%; left: 3%; transform: rotate(-13deg); }
-.doodle-02 { top: 0; left: 30%; transform: rotate(8deg) scale(0.78); }
-.doodle-03 { top: 5%; left: 58%; transform: rotate(-7deg) scale(1.08); }
-.doodle-04 { top: 1%; left: 88%; transform: rotate(17deg) scale(0.82); }
-.doodle-05 { top: 27%; left: 15%; transform: rotate(14deg) scale(0.7); }
-.doodle-06 { top: 31%; left: 43%; transform: rotate(-9deg) scale(0.9); }
-.doodle-07 { top: 25%; left: 73%; transform: rotate(12deg) scale(0.82); }
-.doodle-08 { top: 53%; left: 1%; transform: rotate(-8deg) scale(0.86); }
-.doodle-09 { top: 59%; left: 29%; transform: rotate(11deg) scale(1.06); }
-.doodle-10 { top: 52%; left: 59%; transform: rotate(-12deg) scale(0.8); }
-.doodle-11 { top: 62%; left: 88%; transform: rotate(8deg) scale(0.72); }
-.doodle-12 { top: 83%; left: 14%; transform: rotate(-15deg) scale(0.86); }
-.doodle-13 { top: 78%; left: 46%; transform: rotate(9deg) scale(0.76); }
-.doodle-14 { top: 86%; left: 77%; transform: rotate(-8deg) scale(0.68); }
-
 .account-welcome-footer {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -4748,12 +4715,6 @@ footer {
 .account-welcome-footer span {
   height: 16px;
   background: conic-gradient(from 90deg, rgba(248, 244, 223, 0.78) 25%, transparent 0 50%, rgba(248, 244, 223, 0.78) 0 75%, transparent 0) 0 0 / 16px 16px;
-}
-
-@media (max-width: 980px) {
-  .account-pattern-doodle {
-    opacity: 0.24;
-  }
 }
 
 @media (max-width: 620px) {
@@ -4798,15 +4759,6 @@ footer {
 
   .account-choice-button {
     min-height: 66px;
-  }
-
-  .account-doodle-pattern {
-    inset: 0;
-  }
-
-  .account-pattern-doodle {
-    width: clamp(32px, 12vw, 52px);
-    opacity: 0.18;
   }
 
   .account-welcome-footer {
@@ -4862,9 +4814,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .button-secondary { border-color: var(--green); background: var(--white); color: var(--green); }
 .button-secondary:hover:not(:disabled) { border-color: var(--orange); background: var(--cream-soft); color: var(--green-deep); }
 
-/* Account landing: a modular garden sits beside the existing title and choices. */
+/* Account landing: a compact modular garden sits beside the title and choices. */
 .account-entry-page { background: var(--green-deep); }
-.account-welcome { border-color: rgba(242, 211, 141, .48); background: var(--green); box-shadow: 0 32px 80px rgba(16, 70, 44, .28); }
+.account-welcome { height: calc(100svh - clamp(20px, 4vw, 48px)); grid-template-rows: auto minmax(0, 1fr) auto; border-color: rgba(242, 211, 141, .48); background: var(--green); box-shadow: 0 32px 80px rgba(16, 70, 44, .28); }
+.account-welcome-nav { min-height: 62px; padding-top: 10px; padding-bottom: 10px; }
 .account-welcome::before { opacity: .12; background-image: radial-gradient(circle at 1px 1px, var(--cream) .8px, transparent .9px), linear-gradient(90deg, transparent 49.8%, rgba(242, 211, 141, .18) 50%, transparent 50.2%); }
 .account-welcome-nav { border-bottom-color: rgba(242, 211, 141, .25); }
 .account-welcome-brand { color: var(--cream); }
@@ -4872,25 +4825,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .account-welcome .language-toggle { border-color: rgba(242, 211, 141, .58); background: rgba(16, 70, 44, .72); }
 .account-welcome .language-toggle button { color: rgba(242, 211, 141, .78); }
 .account-welcome .language-toggle button.is-active { background: var(--cream); color: var(--green-deep); }
-.account-welcome-poster { grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: clamp(30px, 5vw, 82px); padding: clamp(28px, 5vw, 72px) clamp(24px, 5vw, 78px); }
-.account-welcome-garden { grid-column: 1; width: min(100%, 640px); aspect-ratio: 1; justify-self: center; overflow: hidden; border: 6px solid var(--cream); border-radius: 28px; background: var(--cream); box-shadow: 0 18px 0 rgba(16, 70, 44, .25); }
+.account-welcome-poster { grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: clamp(22px, 3.2vw, 52px); align-items: stretch; padding: clamp(16px, 2.4vw, 30px) clamp(24px, 4vw, 58px); }
+.account-welcome-garden { grid-column: 1; width: 100%; height: 100%; min-height: 0; aspect-ratio: auto; justify-self: stretch; overflow: hidden; border: 6px solid var(--cream); border-radius: 28px; background: var(--cream); box-shadow: 0 18px 0 rgba(16, 70, 44, .25); }
 .account-welcome-garden svg { display: block; width: 100%; height: 100%; }
-.account-welcome-copy { grid-column: 2; width: 100%; text-align: left; }
-.account-welcome-eyebrow { margin-left: 0; border-color: rgba(242, 211, 141, .6); color: var(--cream); background: rgba(242, 211, 141, .1); }
-.account-welcome-copy h1 { color: var(--white); font-size: clamp(3rem, 6vw, 6.8rem); line-height: .88; }
+.account-welcome-copy { grid-column: 2; align-self: center; width: 100%; text-align: left; }
+.account-welcome-eyebrow { margin: 0 0 10px; border-color: rgba(242, 211, 141, .6); color: var(--cream); background: rgba(242, 211, 141, .1); }
+.account-welcome-copy h1 { color: var(--white); font-size: clamp(1.9rem, 3.3vw, 3.8rem); line-height: .88; }
 .account-welcome-copy h1 em { color: var(--cream); }
-.account-welcome-intro { margin-left: 0; color: rgba(255, 250, 240, .82); }
-.account-choice-card { max-width: none; margin-left: 0; border-color: rgba(242, 211, 141, .45); background: var(--green-deep); box-shadow: 0 24px 52px rgba(16, 70, 44, .25); }
+.account-welcome-copy h1 em { line-height: .92; }
+.account-welcome-intro { margin: 12px 0 0; color: rgba(255, 250, 240, .82); font-size: clamp(.9rem, 1.25vw, 1rem); line-height: 1.4; }
+.account-choice-card { max-width: none; margin: 18px 0 0; padding: 18px; border-color: rgba(242, 211, 141, .45); background: var(--green-deep); box-shadow: 0 24px 52px rgba(16, 70, 44, .25); }
 .account-choice-index { color: var(--cream); }
-.account-choice-card h2 { color: var(--white); }
+.account-choice-card h2 { margin: 6px 0 12px; color: var(--white); font-size: clamp(1.5rem, 2.3vw, 2.1rem); line-height: 1; }
 .account-choice-login { border-color: var(--cream); background: var(--cream); color: var(--green-deep); }
 .account-choice-create { border-color: var(--orange); background: var(--orange); color: var(--white); }
+.account-choice-button { min-height: 58px; padding: 9px 12px; }
 .account-choice-button:hover:not(:disabled), .account-choice-button:focus-visible { border-color: var(--cream); background: var(--white); color: var(--green-deep); }
-.account-choice-guest { color: var(--cream); text-decoration-color: rgba(242, 211, 141, .5); }
+.account-choice-guest { margin-top: 10px; color: var(--cream); text-decoration-color: rgba(242, 211, 141, .5); }
 .account-choice-guest:hover:not(:disabled) { color: var(--orange); }
-.account-choice-card > p { color: rgba(255, 250, 240, .7); }
-.account-welcome-doodle { position: absolute; opacity: .14; pointer-events: none; }
-.account-welcome-footer { color: rgba(242, 211, 141, .75); }
+.account-choice-card > p { margin-top: 6px; color: rgba(255, 250, 240, .7); line-height: 1.35; }
+.account-welcome-footer { padding-top: 10px; padding-bottom: 10px; color: rgba(242, 211, 141, .75); }
 .account-welcome-footer span { background: conic-gradient(from 90deg, rgba(242, 211, 141, .78) 25%, transparent 0 50%, rgba(242, 211, 141, .78) 0 75%, transparent 0) 0 0 / 16px 16px; }
 
 /* Guest/signed-in landing, roadmap cards, forms, and status treatments. */
@@ -4940,7 +4894,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .calendar-heading { background: var(--cream); }
 .calendar-heading h2 { color: var(--green-deep); }
 .calendar-heading > p { color: var(--green-deep); }
-.calendar-stage { background-color: var(--green-soft); background-image: radial-gradient(circle at 12% 20%, rgba(242, 211, 141, .8) 0 70px, transparent 72px), radial-gradient(circle at 88% 80%, rgba(218, 69, 31, .18) 0 120px, transparent 122px), linear-gradient(135deg, transparent 0 44%, rgba(25, 100, 61, .1) 44% 45%, transparent 45% 100%); }
+.calendar-stage { background-color: var(--green-soft); background-image: url("/calendar-vector-garden.svg"); background-position: center bottom; background-size: cover; background-repeat: no-repeat; }
 .calendar-app { border-color: var(--green); background: var(--white); box-shadow: 0 28px 72px rgba(16, 70, 44, .2); }
 .today-label, .more-tasks { color: var(--orange); }
 .calendar-controls button { border-color: var(--green); color: var(--green); }
@@ -4979,15 +4933,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .auth-error { border-left-color: var(--orange); background: var(--orange-soft); color: var(--green-deep); }
 
 @media (max-width: 980px) {
-  .account-welcome-poster { grid-template-columns: 1fr; gap: 28px; }
-  .account-welcome-garden { grid-column: 1; width: min(100%, 620px); max-height: min(42vh, 390px); aspect-ratio: 1.55 / 1; }
+  .account-welcome-poster { grid-template-columns: 1fr; grid-template-rows: minmax(180px, 30svh) minmax(0, 1fr); gap: 18px; }
+  .account-welcome-garden { grid-column: 1; width: 100%; height: 100%; max-height: none; aspect-ratio: auto; }
   .account-welcome-copy { grid-column: 1; width: min(100%, 700px); justify-self: center; }
 }
 
 @media (max-width: 620px) {
-  .account-welcome-poster { gap: 20px; padding: 24px 16px 28px; }
-  .account-welcome-garden { max-height: 230px; border-width: 3px; border-radius: 18px; box-shadow: 0 10px 0 rgba(16, 70, 44, .22); }
-  .account-welcome-copy h1 { font-size: clamp(3rem, 15vw, 5rem); }
-  .account-choice-card { margin-top: 24px; padding: 18px; border-radius: 21px; }
+  .account-welcome { min-height: 100svh; }
+  .account-welcome-nav { min-height: 58px; padding: 10px 14px; }
+  .account-welcome-poster { grid-template-rows: minmax(140px, 24svh) minmax(0, 1fr); gap: 10px; padding: 10px 14px 12px; }
+  .account-welcome-garden { border-width: 3px; border-radius: 18px; box-shadow: 0 10px 0 rgba(16, 70, 44, .22); }
+  .account-welcome-copy h1 { max-width: 340px; font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: .9; }
+  .account-welcome-intro { margin-top: 10px; font-size: .9rem; line-height: 1.35; }
+  .account-choice-card { margin-top: 12px; padding: 13px; border-radius: 18px; }
   .account-choice-actions { grid-template-columns: 1fr; }
+  .account-choice-card h2 { margin: 5px 0 9px; font-size: clamp(1.35rem, 6.5vw, 1.85rem); }
+  .account-choice-button { min-height: 50px; padding: 8px 10px; }
+  .account-choice-guest { margin-top: 8px; }
+  .account-choice-card > p { margin-top: 6px; }
 }

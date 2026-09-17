@@ -2,16 +2,8 @@
 
 import {
   ArrowRight,
-  Cloud,
   Compass,
-  Flower2,
-  Heart,
-  Leaf,
   LogIn,
-  MessageCircle,
-  Sparkles,
-  Sprout,
-  Sun,
   UserPlus,
 } from "lucide-react";
 import { useState } from "react";
@@ -27,27 +19,6 @@ interface AccountLandingProps {
   onContinueGuest: () => void;
   onLanguageChange: (locale: Locale) => void;
   t: Translation;
-}
-
-function DoodlePattern() {
-  return (
-    <div className="account-doodle-pattern" aria-hidden="true">
-      <Heart className="account-pattern-doodle doodle-01" />
-      <Sun className="account-pattern-doodle doodle-02" />
-      <Flower2 className="account-pattern-doodle doodle-03" />
-      <Leaf className="account-pattern-doodle doodle-04" />
-      <Sparkles className="account-pattern-doodle doodle-05" />
-      <MessageCircle className="account-pattern-doodle doodle-06" />
-      <Sprout className="account-pattern-doodle doodle-07" />
-      <Cloud className="account-pattern-doodle doodle-08" />
-      <Flower2 className="account-pattern-doodle doodle-09" />
-      <Heart className="account-pattern-doodle doodle-10" />
-      <Sun className="account-pattern-doodle doodle-11" />
-      <Leaf className="account-pattern-doodle doodle-12" />
-      <MessageCircle className="account-pattern-doodle doodle-13" />
-      <Sparkles className="account-pattern-doodle doodle-14" />
-    </div>
-  );
 }
 
 export function AccountLanding({
@@ -85,63 +56,69 @@ export function AccountLanding({
 
       <div className="account-welcome-poster">
         <div className="account-welcome-garden" aria-hidden="true">
-          <svg viewBox="0 0 640 640" role="presentation">
+          <svg viewBox="0 0 640 640" preserveAspectRatio="xMidYMid slice" role="presentation">
             <defs>
-              <pattern id="account-garden-grid" width="160" height="160" patternUnits="userSpaceOnUse">
-                <rect width="160" height="160" fill="#f2d38d" />
-                <path d="M0 159.5h160M159.5 0v160" stroke="#19643d" strokeWidth="3" opacity=".2" />
-              </pattern>
-              <clipPath id="account-garden-clip"><rect width="640" height="640" rx="24" /></clipPath>
+              <symbol id="garden-flower" viewBox="0 0 160 160">
+                <g fill="#f2d38d" stroke="#10462c" strokeWidth="6">
+                  <circle cx="80" cy="34" r="24" /><circle cx="122" cy="64" r="24" />
+                  <circle cx="106" cy="112" r="24" /><circle cx="54" cy="112" r="24" />
+                  <circle cx="38" cy="64" r="24" />
+                </g>
+                <circle cx="80" cy="76" r="22" fill="#da451f" stroke="#10462c" strokeWidth="6" />
+              </symbol>
+              <symbol id="garden-star" viewBox="0 0 160 160">
+                <path d="m80 18 15 43 45-4-34 30 19 42-45-22-45 22 19-42-34-30 45 4Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+              </symbol>
+              <symbol id="garden-tulip" viewBox="0 0 160 160">
+                <path d="M79 79v57" fill="none" stroke="#10462c" strokeWidth="8" strokeLinecap="round" />
+                <path d="M80 46C51 18 29 34 35 65c4 22 21 33 45 25 24 8 41-3 45-25 6-31-16-47-45-19Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+                <path d="M77 104c-17-18-34-22-51-12 15 22 32 28 51 12Zm7 4c17-18 34-22 51-12-15 22-32 28-51 12Z" fill="#19643d" stroke="#10462c" strokeWidth="6" strokeLinejoin="round" />
+              </symbol>
+              <symbol id="garden-house" viewBox="0 0 160 160">
+                <path d="M29 75 80 30l51 45v56H29Z" fill="#f2d38d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+                <path d="m22 77 58-51 58 51" fill="none" stroke="#da451f" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M68 131V96h24v35" fill="#da451f" stroke="#10462c" strokeWidth="6" />
+                <circle cx="80" cy="82" r="8" fill="#19643d" />
+              </symbol>
+              <symbol id="garden-leaf" viewBox="0 0 160 160">
+                <path d="M42 128C40 78 71 38 125 31c-5 50-34 85-83 97Z" fill="#19643d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+                <path d="M43 127c23-27 47-51 75-77" fill="none" stroke="#f2d38d" strokeWidth="7" strokeLinecap="round" />
+              </symbol>
+              <symbol id="garden-pot" viewBox="0 0 160 160">
+                <path d="M47 78h66l-9 57H56Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+                <path d="M80 78V45M80 57c-20-20-37-18-46-4 18 17 31 18 46 4Zm0 4c20-20 37-18 46-4-18 17-31 18-46 4Z" fill="#19643d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
+              </symbol>
             </defs>
-            <g clipPath="url(#account-garden-clip)">
-              <rect width="640" height="640" fill="url(#account-garden-grid)" />
-              <rect width="160" height="160" fill="#19643d" />
-              <rect x="320" width="160" height="160" fill="#da451f" />
-              <rect x="160" y="160" width="160" height="160" fill="#19643d" />
-              <rect x="480" y="160" width="160" height="160" fill="#19643d" />
-              <rect y="320" width="160" height="160" fill="#da451f" />
-              <rect x="320" y="320" width="160" height="160" fill="#19643d" />
-              <rect x="160" y="480" width="160" height="160" fill="#da451f" />
-              <rect x="480" y="480" width="160" height="160" fill="#19643d" />
-              <g fill="none" stroke="#19643d" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M36 122c38-43 71-63 108-68 4 39-7 79-38 108" />
-                <path d="M70 112c9-28 28-47 65-58" />
-                <path d="M206 285c25-48 57-80 99-96-3 46-21 82-58 107" />
-                <path d="M241 271c14-30 33-53 61-72" />
-                <path d="M526 286c29-42 65-65 106-75-6 41-27 73-65 97" />
-                <path d="M554 277c18-26 40-45 67-59" />
-                <path d="M36 447c29-43 66-68 107-78-7 42-28 75-67 98" />
-                <path d="M68 433c17-28 39-48 69-61" />
-                <path d="M368 447c23-48 56-79 99-95-3 44-23 81-61 105" />
-                <path d="M404 431c14-30 32-53 61-72" />
-                <path d="M207 606c20-43 53-73 98-89-2 42-19 77-55 101" />
-                <path d="M243 585c15-27 32-47 59-67" />
-              </g>
-              <g fill="#f2d38d" stroke="#19643d" strokeWidth="6">
-                <path d="M56 50c25-27 59-25 77 3 14 22 5 52-22 72-28 21-61 16-74-9-11-23-2-48 19-66Z" />
-                <path d="M376 48c25-27 59-25 77 3 14 22 5 52-22 72-28 21-61 16-74-9-11-23-2-48 19-66Z" />
-                <path d="M213 370c25-27 59-24 76 4 13 23 4 53-24 73-28 19-60 14-72-11-11-23-1-47 20-66Z" />
-                <path d="M533 370c25-27 59-24 76 4 13 23 4 53-24 73-28 19-60 14-72-11-11-23-1-47 20-66Z" />
-              </g>
-              <g fill="#da451f" stroke="#f2d38d" strokeWidth="6">
-                <circle cx="240" cy="84" r="20" /><circle cx="560" cy="244" r="20" />
-                <circle cx="80" cy="404" r="20" /><circle cx="400" cy="564" r="20" />
-              </g>
-              <g fill="#19643d">
-                <path d="M96 205c28-28 63-32 98-17-18 33-54 47-98 17Z" />
-                <path d="M416 205c28-28 63-32 98-17-18 33-54 47-98 17Z" />
-                <path d="M257 525c28-28 63-32 98-17-18 33-54 47-98 17Z" />
-              </g>
+            <g>
+              <rect width="160" height="160" fill="#19643d" /><rect x="160" width="160" height="160" fill="#f2d38d" />
+              <rect x="320" width="160" height="160" fill="#da451f" /><rect x="480" width="160" height="160" fill="#f2d38d" />
+              <rect y="160" width="160" height="160" fill="#f2d38d" /><rect x="160" y="160" width="160" height="160" fill="#da451f" />
+              <rect x="320" y="160" width="160" height="160" fill="#19643d" /><rect x="480" y="160" width="160" height="160" fill="#f2d38d" />
+              <rect y="320" width="160" height="160" fill="#da451f" /><rect x="160" y="320" width="160" height="160" fill="#f2d38d" />
+              <rect x="320" y="320" width="160" height="160" fill="#f2d38d" /><rect x="480" y="320" width="160" height="160" fill="#19643d" />
+              <rect y="480" width="160" height="160" fill="#19643d" /><rect x="160" y="480" width="160" height="160" fill="#f2d38d" />
+              <rect x="320" y="480" width="160" height="160" fill="#da451f" /><rect x="480" y="480" width="160" height="160" fill="#f2d38d" />
+            </g>
+            <g>
+              <use href="#garden-flower" x="0" y="0" width="160" height="160" />
+              <use href="#garden-star" x="160" y="0" width="160" height="160" />
+              <use href="#garden-tulip" x="320" y="0" width="160" height="160" />
+              <use href="#garden-house" x="480" y="0" width="160" height="160" />
+              <use href="#garden-leaf" x="0" y="160" width="160" height="160" />
+              <use href="#garden-flower" x="160" y="160" width="160" height="160" />
+              <use href="#garden-pot" x="320" y="160" width="160" height="160" />
+              <use href="#garden-star" x="480" y="160" width="160" height="160" />
+              <use href="#garden-house" x="0" y="320" width="160" height="160" />
+              <use href="#garden-leaf" x="160" y="320" width="160" height="160" />
+              <use href="#garden-tulip" x="320" y="320" width="160" height="160" />
+              <use href="#garden-flower" x="480" y="320" width="160" height="160" />
+              <use href="#garden-pot" x="0" y="480" width="160" height="160" />
+              <use href="#garden-star" x="160" y="480" width="160" height="160" />
+              <use href="#garden-tulip" x="320" y="480" width="160" height="160" />
+              <use href="#garden-house" x="480" y="480" width="160" height="160" />
             </g>
           </svg>
         </div>
-        <div className="account-welcome-doodle account-welcome-doodle-left" aria-hidden="true">
-          <span className="account-welcome-orbit" />
-          <Sparkles size={52} strokeWidth={1.4} />
-          <strong>Q</strong>
-        </div>
-        <DoodlePattern />
-
         <div className="account-welcome-copy">
           <p className="account-welcome-eyebrow">{t.accountLanding.eyebrow}</p>
           <h1 id="account-welcome-title">

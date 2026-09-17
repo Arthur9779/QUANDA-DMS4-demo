@@ -58,7 +58,6 @@ export interface Translation {
     tagline: string;
     description: string;
     start: string;
-    note: string;
     preview: {
       label: string;
       status: string;
@@ -544,7 +543,6 @@ const en: Translation = {
     tagline: "From project brief to a practical learning path.",
     description:
       "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
-    note: "No account required · Your work is saved on this device. Create an account anytime to sync across devices.",
     start: "Plan my project",
     preview: {
       label: "Project brief",
@@ -1110,7 +1108,6 @@ const vi: Translation = {
     tagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
     description:
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
-    note: "Không cần tài khoản · Công việc được lưu trên thiết bị này. Bạn có thể tạo tài khoản bất cứ lúc nào để đồng bộ giữa các thiết bị.",
     start: "Lập kế hoạch dự án",
     preview: {
       label: "Đề bài dự án",

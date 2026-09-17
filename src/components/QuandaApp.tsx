@@ -1413,9 +1413,6 @@ export function QuandaApp() {
               </h1>
               <p className="hero-tagline">{t.hero.tagline}</p>
               <p className="hero-description">{t.hero.description}</p>
-              <div className="hero-actions">
-                <span>{t.hero.note}</span>
-              </div>
             </div>
             <div className="landing-entry-form">
               <InitialBriefForm
@@ -1442,7 +1439,6 @@ export function QuandaApp() {
                 {t.hero.start}
                 <ArrowDown aria-hidden="true" size={17} />
               </button>
-              <span>{t.hero.note}</span>
             </div>
           </div>
           <div className="hero-preview" aria-label={t.hero.preview.label} role="img">
