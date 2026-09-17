@@ -3831,6 +3831,115 @@ footer {
 }
 
 /* The first-brief entry is the public landing view on the current workflow. */
+/* Editorial landing refresh: keep the workflow intact while making the first
+   decision feel more like a confident product moment. */
+:root {
+  --ink: #152119;
+  --muted: #5d665d;
+  --paper: #f4f0e6;
+  --white: #fffdf7;
+  --blue: #285d35;
+  --blue-soft: #e3ecd9;
+  --green: #174c2c;
+  --green-soft: #dfead7;
+  --line: #c9c9b9;
+  --dark: #142018;
+  --acid: #d4e787;
+  --moss: #365a35;
+}
+
+body {
+  background:
+    linear-gradient(rgba(244, 240, 230, 0.84), rgba(244, 240, 230, 0.84)),
+    radial-gradient(circle at 18% 12%, rgba(23, 76, 44, 0.08), transparent 32rem),
+    var(--paper);
+}
+
+.site-header {
+  min-height: 76px;
+  border-bottom-color: rgba(23, 76, 44, 0.22);
+  background: rgba(244, 240, 230, 0.9);
+  box-shadow: 0 10px 30px rgba(23, 76, 44, 0.08);
+}
+
+.site-header-inner { min-height: 76px; }
+
+.site-header nav > a {
+  position: relative;
+  color: var(--green);
+}
+
+.site-header nav > a::after {
+  position: absolute;
+  right: 0;
+  bottom: -8px;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 180ms ease;
+}
+
+.site-header nav > a:hover::after,
+.site-header nav > a:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.brand { color: var(--green); }
+
+.brand-mark {
+  border-color: rgba(23, 76, 44, 0.35);
+  background: var(--green);
+  color: var(--acid);
+  box-shadow: 0 0 0 5px rgba(212, 231, 135, 0.24);
+}
+
+.language-toggle { border-color: rgba(23, 76, 44, 0.25); }
+
+.language-toggle button.is-active {
+  background: var(--green);
+  color: var(--paper);
+}
+
+.button {
+  border-width: 1.5px;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(23, 76, 44, 0.14);
+}
+
+.button:active:not(:disabled) { transform: translateY(0); }
+
+.button-primary {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
+}
+
+.button-primary:hover:not(:disabled) {
+  border-color: var(--acid);
+  background: var(--acid);
+  color: var(--green);
+}
+
+.button-secondary {
+  border-color: rgba(23, 76, 44, 0.36);
+  background: var(--white);
+  color: var(--green);
+}
+
+.button-secondary:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
+}
+
 .landing-entry-section {
   position: relative;
   isolation: isolate;
@@ -3857,10 +3966,43 @@ footer {
 .landing-entry-copy h1 {
   font-size: clamp(3.2rem, 6.3vw, 6rem);
   letter-spacing: -0.08em;
+  max-width: 8ch;
+  line-height: 0.9;
+}
+
+.landing-entry-section::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  opacity: 0.16;
+  background-image: radial-gradient(rgba(255, 253, 247, 0.8) 0.7px, transparent 0.7px);
+  background-size: 8px 8px;
+  mask-image: linear-gradient(120deg, black, transparent 70%);
+}
+
+.landing-entry-section::after {
+  position: absolute;
+  top: 26px;
+  right: 32px;
+  content: "BRIEF  /  PATH  /  MOMENTUM";
+  color: rgba(255, 253, 247, 0.62);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.landing-entry-copy h1 {
+  max-width: 8ch;
+  font-size: clamp(3.1rem, 6.2vw, 6rem);
+  letter-spacing: -0.075em;
+  line-height: 0.9;
 }
 
 .landing-entry-copy h1 em {
   color: var(--acid);
+  font-size: 1.05em;
+  letter-spacing: -0.05em;
 }
 
 .landing-entry-form .project-form {
@@ -3874,6 +4016,66 @@ footer {
     font-size: clamp(2.65rem, 14vw, 4.7rem);
     letter-spacing: -0.065em;
   }
+}
+
+.landing-entry-copy .hero-tagline {
+  max-width: 19rem;
+  color: var(--paper);
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.landing-entry-copy .hero-description { color: rgba(255, 253, 247, 0.76); }
+
+.landing-entry-form .project-form {
+  border: 1px solid rgba(23, 76, 44, 0.22);
+  border-radius: 26px;
+  box-shadow: 0 20px 45px rgba(8, 34, 19, 0.18);
+}
+
+.landing-entry-form .project-form textarea {
+  min-height: 238px;
+  border-color: #b9c0ae;
+  background: #fbfaf3;
+}
+
+.landing-entry-form .project-form textarea::placeholder { color: #899288; }
+
+.landing-entry-form .project-form textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(23, 76, 44, 0.13);
+}
+
+.account-login-button,
+.account-profile-button {
+  border-color: rgba(23, 76, 44, 0.28);
+  color: var(--green);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.account-login-button:hover,
+.account-profile-button:hover {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
+  transform: translateY(-1px);
+}
+
+.button-text { color: var(--green); }
+.button-text:hover:not(:disabled) { color: #0b2c19; text-decoration: underline; }
+
+footer {
+  border-top-color: rgba(23, 76, 44, 0.24);
+}
+
+@media (max-width: 960px) {
+  .landing-entry-section { border-radius: 28px; }
+  .landing-entry-copy h1 { max-width: 13ch; }
+}
+
+@media (max-width: 520px) {
+  .landing-entry-section::after { top: 18px; right: 18px; font-size: 0.52rem; }
+  .landing-entry-copy h1 { max-width: 10ch; font-size: clamp(3rem, 15vw, 4.6rem); }
 }
 
 .account-login-button,
