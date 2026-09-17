@@ -4138,10 +4138,7 @@ footer {
   padding-top: clamp(72px, 9vw, 118px);
   padding-bottom: clamp(72px, 9vw, 118px);
   border-radius: 0 0 34px 34px;
-  background:
-    radial-gradient(circle at 86% 14%, rgba(216, 233, 141, 0.22), transparent 24%),
-    linear-gradient(112deg, rgba(15, 75, 31, 0.98), rgba(31, 100, 49, 0.94) 55%, rgba(43, 111, 54, 0.8)),
-    url("/assets/hero-vector-garden.svg") center / cover no-repeat;
+  background: #527938 url("/assets/hero-vector-garden.svg") center / cover no-repeat;
 }
 
 .hero-copy {

@@ -2,8 +2,8 @@
   <title id="title">Abstract green garden</title>
   <desc id="desc">Minimal vector leaves, bell flowers and sparkles on a green field.</desc>
   <rect width="1600" height="900" fill="#527938"/>
-  <circle cx="1430" cy="110" r="260" fill="#6f9650" opacity=".55"/>
-  <circle cx="130" cy="780" r="330" fill="#40652f" opacity=".72"/>
+  <circle cx="1430" cy="110" r="260" fill="#6f9650"/>
+  <circle cx="130" cy="780" r="330" fill="#40652f"/>
   <path d="M1190 900C1195 665 1248 535 1358 392C1430 297 1465 203 1447 72" fill="none" stroke="#263f21" stroke-width="34" stroke-linecap="round"/>
   <path d="M1358 392c-88-94-169-111-241-50M1319 447c88-44 174-35 249 30M1408 269c-71-50-124-55-186-18" fill="none" stroke="#315228" stroke-width="22" stroke-linecap="round"/>
   <g fill="#dcebb4">
@@ -26,5 +26,5 @@
     <path d="m1510 165 9 25 25 9-25 9-9 25-9-25-25-9 25-9Z"/>
     <path d="m1055 505 10 27 27 10-27 10-10 27-10-27-27-10 27-10Z"/>
   </g>
-  <g opacity=".13" fill="#f7f8df"><circle cx="180" cy="180" r="5"/><circle cx="260" cy="120" r="4"/><circle cx="380" cy="210" r="6"/><circle cx="710" cy="115" r="4"/><circle cx="850" cy="240" r="5"/><circle cx="580" cy="690" r="6"/></g>
+  <g fill="#f7f8df"><circle cx="180" cy="180" r="5"/><circle cx="260" cy="120" r="4"/><circle cx="380" cy="210" r="6"/><circle cx="710" cy="115" r="4"/><circle cx="850" cy="240" r="5"/><circle cx="580" cy="690" r="6"/></g>
 </svg>

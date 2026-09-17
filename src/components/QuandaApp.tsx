@@ -1441,27 +1441,6 @@ export function QuandaApp() {
               </button>
             </div>
           </div>
-          <div className="hero-preview" aria-label={t.hero.preview.label} role="img">
-            <div className="hero-preview-header">
-              <div>
-                <span className="hero-preview-kicker">{t.hero.preview.status}</span>
-                <strong>{t.hero.preview.label}</strong>
-              </div>
-              <span className="hero-preview-dot" aria-hidden="true" />
-            </div>
-            <div className="hero-preview-field">
-              <span>{t.hero.preview.placeholder}</span>
-            </div>
-            <div className="hero-preview-meta">
-              <span>{t.hero.preview.meta}</span>
-              <span>03 / 03</span>
-            </div>
-            <div className="hero-preview-footer">
-              <span className="hero-preview-lock" aria-hidden="true">✦</span>
-              <span>{t.hero.preview.cta}</span>
-              <ArrowRight aria-hidden="true" size={17} />
-            </div>
-          </div>
           </section>
         )}
         <section className="how-section" id="how-it-works" aria-labelledby="how-title">
