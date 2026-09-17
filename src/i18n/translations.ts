@@ -519,8 +519,8 @@ const en: Translation = {
   },
   hero: {
     eyebrow: "A practical co-pilot for creative projects",
-    titleLead: "Agentic planner find the most optimal path",
-    titleAccent: "for the deadline",
+    titleLead: "Find the clearest path",
+    titleAccent: "to your deadline",
     tagline: "From project brief to a practical learning path.",
     description:
       "QUANDA turns your brief, experience, and available time into a focused production plan—with trustworthy places to learn each skill.",
@@ -1075,8 +1075,8 @@ const vi: Translation = {
   },
   hero: {
     eyebrow: "Trợ lý thực tế cho dự án sáng tạo",
-    titleLead: "Trợ lý lập kế hoạch chủ động",
-    titleAccent: "",
+    titleLead: "Tìm lộ trình rõ ràng nhất",
+    titleAccent: "cho deadline của bạn",
     tagline: "Từ đề bài dự án đến lộ trình học tập thực tế.",
     description:
       "QUANDA biến đề bài, kinh nghiệm và thời gian của bạn thành kế hoạch sản xuất tập trung—kèm nguồn học đáng tin cậy cho từng kỹ năng.",
