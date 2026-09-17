@@ -55,68 +55,40 @@ export function AccountLanding({
       </header>
 
       <div className="account-welcome-poster">
-        <div className="account-welcome-garden" aria-hidden="true">
-          <svg viewBox="0 0 640 640" preserveAspectRatio="xMidYMid slice" role="presentation">
-            <defs>
-              <symbol id="garden-flower" viewBox="0 0 160 160">
-                <g fill="#f2d38d" stroke="#10462c" strokeWidth="6">
-                  <circle cx="80" cy="34" r="24" /><circle cx="122" cy="64" r="24" />
-                  <circle cx="106" cy="112" r="24" /><circle cx="54" cy="112" r="24" />
-                  <circle cx="38" cy="64" r="24" />
-                </g>
-                <circle cx="80" cy="76" r="22" fill="#da451f" stroke="#10462c" strokeWidth="6" />
-              </symbol>
-              <symbol id="garden-star" viewBox="0 0 160 160">
-                <path d="m80 18 15 43 45-4-34 30 19 42-45-22-45 22 19-42-34-30 45 4Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-              </symbol>
-              <symbol id="garden-tulip" viewBox="0 0 160 160">
-                <path d="M79 79v57" fill="none" stroke="#10462c" strokeWidth="8" strokeLinecap="round" />
-                <path d="M80 46C51 18 29 34 35 65c4 22 21 33 45 25 24 8 41-3 45-25 6-31-16-47-45-19Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-                <path d="M77 104c-17-18-34-22-51-12 15 22 32 28 51 12Zm7 4c17-18 34-22 51-12-15 22-32 28-51 12Z" fill="#19643d" stroke="#10462c" strokeWidth="6" strokeLinejoin="round" />
-              </symbol>
-              <symbol id="garden-house" viewBox="0 0 160 160">
-                <path d="M29 75 80 30l51 45v56H29Z" fill="#f2d38d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-                <path d="m22 77 58-51 58 51" fill="none" stroke="#da451f" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M68 131V96h24v35" fill="#da451f" stroke="#10462c" strokeWidth="6" />
-                <circle cx="80" cy="82" r="8" fill="#19643d" />
-              </symbol>
-              <symbol id="garden-leaf" viewBox="0 0 160 160">
-                <path d="M42 128C40 78 71 38 125 31c-5 50-34 85-83 97Z" fill="#19643d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-                <path d="M43 127c23-27 47-51 75-77" fill="none" stroke="#f2d38d" strokeWidth="7" strokeLinecap="round" />
-              </symbol>
-              <symbol id="garden-pot" viewBox="0 0 160 160">
-                <path d="M47 78h66l-9 57H56Z" fill="#da451f" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-                <path d="M80 78V45M80 57c-20-20-37-18-46-4 18 17 31 18 46 4Zm0 4c20-20 37-18 46-4-18 17-31 18-46 4Z" fill="#19643d" stroke="#10462c" strokeWidth="7" strokeLinejoin="round" />
-              </symbol>
-            </defs>
-            <g>
-              <rect width="160" height="160" fill="#19643d" /><rect x="160" width="160" height="160" fill="#f2d38d" />
-              <rect x="320" width="160" height="160" fill="#da451f" /><rect x="480" width="160" height="160" fill="#f2d38d" />
-              <rect y="160" width="160" height="160" fill="#f2d38d" /><rect x="160" y="160" width="160" height="160" fill="#da451f" />
-              <rect x="320" y="160" width="160" height="160" fill="#19643d" /><rect x="480" y="160" width="160" height="160" fill="#f2d38d" />
-              <rect y="320" width="160" height="160" fill="#da451f" /><rect x="160" y="320" width="160" height="160" fill="#f2d38d" />
-              <rect x="320" y="320" width="160" height="160" fill="#f2d38d" /><rect x="480" y="320" width="160" height="160" fill="#19643d" />
-              <rect y="480" width="160" height="160" fill="#19643d" /><rect x="160" y="480" width="160" height="160" fill="#f2d38d" />
-              <rect x="320" y="480" width="160" height="160" fill="#da451f" /><rect x="480" y="480" width="160" height="160" fill="#f2d38d" />
+        <div className="account-welcome-stickers" aria-hidden="true">
+          <svg className="account-sticker account-sticker-flower" viewBox="0 0 160 160" role="presentation">
+            <g fill="#da451f" stroke="#fffdf1" strokeWidth="9" strokeLinejoin="round">
+              <circle cx="80" cy="34" r="25" /><circle cx="124" cy="65" r="25" />
+              <circle cx="106" cy="116" r="25" /><circle cx="54" cy="116" r="25" />
+              <circle cx="36" cy="65" r="25" />
             </g>
-            <g>
-              <use href="#garden-flower" x="0" y="0" width="160" height="160" />
-              <use href="#garden-star" x="160" y="0" width="160" height="160" />
-              <use href="#garden-tulip" x="320" y="0" width="160" height="160" />
-              <use href="#garden-house" x="480" y="0" width="160" height="160" />
-              <use href="#garden-leaf" x="0" y="160" width="160" height="160" />
-              <use href="#garden-flower" x="160" y="160" width="160" height="160" />
-              <use href="#garden-pot" x="320" y="160" width="160" height="160" />
-              <use href="#garden-star" x="480" y="160" width="160" height="160" />
-              <use href="#garden-house" x="0" y="320" width="160" height="160" />
-              <use href="#garden-leaf" x="160" y="320" width="160" height="160" />
-              <use href="#garden-tulip" x="320" y="320" width="160" height="160" />
-              <use href="#garden-flower" x="480" y="320" width="160" height="160" />
-              <use href="#garden-pot" x="0" y="480" width="160" height="160" />
-              <use href="#garden-star" x="160" y="480" width="160" height="160" />
-              <use href="#garden-tulip" x="320" y="480" width="160" height="160" />
-              <use href="#garden-house" x="480" y="480" width="160" height="160" />
-            </g>
+            <circle cx="80" cy="76" r="22" fill="#f2d38d" stroke="#fffdf1" strokeWidth="9" />
+          </svg>
+          <svg className="account-sticker account-sticker-leaf" viewBox="0 0 180 150" role="presentation">
+            <path d="M32 126C37 77 72 37 145 24c-9 57-46 91-113 102Z" fill="#19643d" stroke="#fffdf1" strokeWidth="10" strokeLinejoin="round" />
+            <path d="M36 124c27-31 58-60 94-86" fill="none" stroke="#f2d38d" strokeWidth="8" strokeLinecap="round" />
+          </svg>
+          <svg className="account-sticker account-sticker-sun" viewBox="0 0 170 170" role="presentation">
+            <path d="m85 12 12 39 40-13-24 34 36 22-42 3 3 42-25-33-34 25 14-39-39-14 41-8Z" fill="#f2d38d" stroke="#fffdf1" strokeWidth="9" strokeLinejoin="round" />
+            <circle cx="85" cy="85" r="22" fill="#da451f" stroke="#fffdf1" strokeWidth="8" />
+          </svg>
+          <svg className="account-sticker account-sticker-sprig" viewBox="0 0 170 190" role="presentation">
+            <path d="M84 176C80 125 85 74 105 22" fill="none" stroke="#fffdf1" strokeWidth="10" strokeLinecap="round" />
+            <path d="M91 117C56 105 38 82 39 52c31 5 51 26 52 58Zm5-49c-1-28 13-47 40-55 6 27-8 47-40 55Zm-8 80c-35-2-55-17-64-45 30-5 53 10 64 45Z" fill="#79a35b" stroke="#fffdf1" strokeWidth="9" strokeLinejoin="round" />
+          </svg>
+          <svg className="account-sticker account-sticker-mushroom" viewBox="0 0 180 160" role="presentation">
+            <path d="M90 20C53 20 27 47 27 79h126c0-32-26-59-63-59Z" fill="#da451f" stroke="#fffdf1" strokeWidth="10" strokeLinejoin="round" />
+            <path d="M75 79h30v49c0 17-30 17-30 0Z" fill="#f2d38d" stroke="#fffdf1" strokeWidth="9" />
+            <circle cx="61" cy="54" r="7" fill="#f2d38d" /><circle cx="111" cy="43" r="7" fill="#f2d38d" />
+          </svg>
+          <svg className="account-sticker account-sticker-sparkle" viewBox="0 0 130 130" role="presentation">
+            <path d="m65 8 12 45 45 12-45 12-12 45-12-45-45-12 45-12Z" fill="#f2d38d" stroke="#fffdf1" strokeWidth="9" strokeLinejoin="round" />
+          </svg>
+          <svg className="account-sticker account-sticker-bloom" viewBox="0 0 170 180" role="presentation">
+            <path d="M85 169V91" fill="none" stroke="#fffdf1" strokeWidth="10" strokeLinecap="round" />
+            <path d="M83 121c-31-19-49-17-63 3 25 15 45 13 63-3Zm5 0c31-19 49-17 63 3-25 15-45 13-63-3Z" fill="#19643d" stroke="#fffdf1" strokeWidth="9" strokeLinejoin="round" />
+            <path d="M85 98C51 98 30 78 34 51c3-23 20-35 42-20 4-25 26-31 40-13 15-18 39-7 41 16 3 34-26 64-72 64Z" fill="#d7e8a3" stroke="#fffdf1" strokeWidth="10" strokeLinejoin="round" />
+            <circle cx="85" cy="63" r="18" fill="#da451f" stroke="#fffdf1" strokeWidth="8" />
           </svg>
         </div>
         <div className="account-welcome-copy">
