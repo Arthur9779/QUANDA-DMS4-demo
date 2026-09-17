@@ -3,6 +3,8 @@
 import { ArrowDown, ArrowRight, BookOpenCheck, ListChecks, PencilLine } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./Header";
+import { AccountLanding } from "./AccountLanding";
+import { useAuth } from "@/src/auth/AuthContext";
 import { getTranslation } from "@/src/i18n/translations";
 import type {
   CalendarTask,
@@ -161,7 +163,9 @@ function emptyEngineeringForm(locale: Locale, brief = ""): EngineeringProject {
 }
 
 export function QuandaApp() {
+  const auth = useAuth();
   const [locale, setLocale] = useState<Locale>("en");
+  const [guestAccessGranted, setGuestAccessGranted] = useState(false);
   const [projectPath, setProjectPath] = useState<ProjectPath | null>(null);
   const [pathClassification, setPathClassification] = useState<PathClassification | null>(null);
   const [form, setForm] = useState<RoadmapRequest>(() => emptyForm("en"));
@@ -1365,6 +1369,28 @@ export function QuandaApp() {
       }
     }
   };
+
+  const showAccountLanding =
+    !auth.user &&
+    !guestAccessGranted &&
+    !projectPath &&
+    !pathClassification;
+
+  if (showAccountLanding) {
+    return (
+      <main className="account-entry-page" id="top">
+        <div className="account-entry-shell">
+          <AccountLanding
+            isReady={isHydrated && !auth.loading}
+            locale={locale}
+            onContinueGuest={() => setGuestAccessGranted(true)}
+            onLanguageChange={changeLanguage}
+            t={t}
+          />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main id="top">
