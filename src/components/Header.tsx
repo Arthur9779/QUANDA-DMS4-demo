@@ -1,4 +1,4 @@
-import { Compass, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { Locale } from "@/src/types";
 import type { Translation } from "@/src/i18n/translations";
 import { LanguageToggle } from "./LanguageToggle";
@@ -26,7 +26,7 @@ export function Header({
       <div className="site-header-inner">
         <a className="brand" href="#top" aria-label={t.nav.homeLabel}>
           <span className="brand-mark" aria-hidden="true">
-            <Compass size={20} strokeWidth={2.2} />
+            Q
           </span>
           <span>QUANDA</span>
         </a>
