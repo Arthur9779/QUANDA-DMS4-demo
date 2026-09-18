@@ -15,9 +15,10 @@ const migrationsDirectory = path.join(__dirname, "..", "database", "migrations")
 describe("migration source", () => {
   test("loads the versioned initial schema with a stable checksum", async () => {
     const migrations = await loadMigrations(migrationsDirectory);
-    assert.equal(migrations.length, 2);
+    assert.equal(migrations.length, 3);
     assert.equal(migrations[0].version, "001_initial_schema");
     assert.equal(migrations[1].version, "002_optional_accounts");
+    assert.equal(migrations[2].version, "003_password_reset_tokens");
     assert.match(migrations[0].checksum, /^[a-f0-9]{64}$/);
     assert.equal(migrations[0].statements.length, 6);
   });
@@ -35,6 +36,7 @@ describe("migration source", () => {
       "events",
       "accounts",
       "authenticated_sessions",
+      "password_reset_tokens",
     ]) {
       assert.match(sql, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}\\b`));
     }
@@ -51,6 +53,7 @@ describe("migration source", () => {
       "is_synthetic TINYINT(1) NOT NULL DEFAULT 0",
       "UNIQUE KEY uq_accounts_email",
       "UNIQUE KEY uq_authenticated_sessions_token_hash",
+      "UNIQUE KEY uq_password_reset_tokens_hash",
       "FOREIGN KEY (user_id) REFERENCES users (id)",
     ]) {
       assert.ok(sql.includes(requiredFragment), `missing schema fragment: ${requiredFragment}`);
@@ -119,13 +122,13 @@ describe("migration safety", () => {
   test("applies the initial migration once and records its checksum", async () => {
     const pool = new FakeMigrationPool();
     const first = await migrate(pool, migrationsDirectory);
-    assert.deepEqual(first, { applied: ["001_initial_schema", "002_optional_accounts"], alreadyApplied: 0 });
-    assert.equal(pool.applicationStatements.length, 8);
-    assert.equal(pool.applied.size, 2);
+    assert.deepEqual(first, { applied: ["001_initial_schema", "002_optional_accounts", "003_password_reset_tokens"], alreadyApplied: 0 });
+    assert.equal(pool.applicationStatements.length, 9);
+    assert.equal(pool.applied.size, 3);
 
     const second = await migrate(pool, migrationsDirectory);
-    assert.deepEqual(second, { applied: [], alreadyApplied: 2 });
-    assert.equal(pool.applicationStatements.length, 8);
+    assert.deepEqual(second, { applied: [], alreadyApplied: 3 });
+    assert.equal(pool.applicationStatements.length, 9);
     assert.equal(pool.releaseCount, 2);
   });
 });

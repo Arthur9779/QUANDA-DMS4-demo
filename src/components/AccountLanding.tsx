@@ -5,11 +5,11 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/src/auth/AuthContext";
 import type { Translation } from "@/src/i18n/translations";
 import type { Locale } from "@/src/types";
-import { AuthDialog, authErrorMessage, type AuthMode } from "./AccountControls";
+import { AuthDialog, authErrorMessage, ForgotPasswordDialog, type AuthMode } from "./AccountControls";
 import { LanguageToggle } from "./LanguageToggle";
 
 interface AccountLandingProps {
@@ -28,13 +28,22 @@ export function AccountLanding({
   t,
 }: AccountLandingProps) {
   const auth = useAuth();
-  const [dialog, setDialog] = useState<AuthMode | null>(null);
+  const [dialog, setDialog] = useState<AuthMode | "forgot" | null>(null);
   const [error, setError] = useState("");
 
   const closeDialog = () => {
     setDialog(null);
     setError("");
+    if (typeof window !== "undefined" && window.location.search) window.history.replaceState({}, "", window.location.pathname);
   };
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "1") { setDialog("login"); window.history.replaceState({}, "", window.location.pathname); }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <section className="account-welcome" aria-labelledby="account-welcome-title">
@@ -107,7 +116,11 @@ export function AccountLanding({
         <span />
       </div>
 
-      {dialog && (
+      {dialog === "forgot" && <ForgotPasswordDialog t={t} error={error} onClose={closeDialog} onBack={() => { setDialog("login"); setError(""); }} onSubmit={async (email) => {
+        setError("");
+        try { await auth.requestPasswordReset(email); } catch (caught) { setError(authErrorMessage(caught, t)); throw caught; }
+      }} />}
+      {(dialog === "login" || dialog === "register") && (
         <AuthDialog
           error={error}
           mode={dialog}
@@ -129,7 +142,8 @@ export function AccountLanding({
               setError(authErrorMessage(caught, t));
             }
           }}
-          onSwitch={setDialog}
+          onForgotPassword={() => { setDialog("forgot"); setError(""); }}
+          onSwitch={(mode) => setDialog(mode)}
           t={t}
         />
       )}

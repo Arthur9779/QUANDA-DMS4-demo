@@ -40,6 +40,13 @@ export interface Translation {
     working: string;
     close: string;
     passwordMismatch: string;
+    forgotPassword: string;
+    resetPassword: string;
+    resetPasswordIntro: string;
+    resetEmailSent: string;
+    newPassword: string;
+    backToLogin: string;
+    invalidResetToken: string;
   };
   accountLanding: {
     eyebrow: string;
@@ -525,6 +532,13 @@ const en: Translation = {
     working: "Working…",
     close: "Close",
     passwordMismatch: "Passwords do not match.",
+    forgotPassword: "Forgot your password?",
+    resetPassword: "Reset password",
+    resetPasswordIntro: "Enter your email and we’ll send a secure, one-time reset link if an account exists.",
+    resetEmailSent: "If an account exists for that email, a password reset link has been sent.",
+    newPassword: "New password",
+    backToLogin: "Back to login",
+    invalidResetToken: "This password reset link is invalid or expired. Request a new one to continue.",
   },
   accountLanding: {
     eyebrow: "Your clearest route starts here",
@@ -1090,6 +1104,13 @@ const vi: Translation = {
     working: "Đang xử lý…",
     close: "Đóng",
     passwordMismatch: "Mật khẩu xác nhận không khớp.",
+    forgotPassword: "Bạn quên mật khẩu?",
+    resetPassword: "Đặt lại mật khẩu",
+    resetPasswordIntro: "Nhập email và chúng tôi sẽ gửi liên kết đặt lại bảo mật, dùng một lần nếu tài khoản tồn tại.",
+    resetEmailSent: "Nếu email này có tài khoản, liên kết đặt lại mật khẩu đã được gửi.",
+    newPassword: "Mật khẩu mới",
+    backToLogin: "Quay lại đăng nhập",
+    invalidResetToken: "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới.",
   },
   accountLanding: {
     eyebrow: "Lộ trình rõ ràng nhất bắt đầu từ đây",

@@ -2,7 +2,7 @@ const crypto = require("node:crypto");
 const bcrypt = require("bcryptjs");
 const { withTransaction } = require("../db/pool");
 const { hashToken, randomToken } = require("../lib/tokens");
-const { conflict, unauthorized } = require("../lib/errors");
+const { badRequest, conflict, unauthorized } = require("../lib/errors");
 
 function publicUser(row) {
   return {
@@ -15,7 +15,7 @@ function publicUser(row) {
   };
 }
 
-function createAuthService({ pool, config }) {
+function createAuthService({ pool, config, passwordResetEmailSender = { send: async () => undefined } }) {
   async function createAccountSession(connection, userId) {
     const id = crypto.randomUUID();
     const token = randomToken("qua");
@@ -105,6 +105,77 @@ function createAuthService({ pool, config }) {
     });
   }
 
+  async function requestPasswordReset(email) {
+    const [rows] = await pool.execute(
+      `SELECT a.user_id, a.email
+         FROM accounts a JOIN users u ON u.id = a.user_id
+        WHERE a.email = ? AND u.deleted_at IS NULL
+        LIMIT 1`,
+      [email],
+    );
+    const account = rows[0];
+    if (!account) return;
+
+    const token = randomToken("qur");
+    const tokenId = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + config.passwordResetTokenMinutes * 60_000);
+    await withTransaction(pool, async (connection) => {
+      await connection.execute(
+        `UPDATE password_reset_tokens
+            SET used_at = UTC_TIMESTAMP(3)
+          WHERE user_id = ? AND used_at IS NULL`,
+        [account.user_id],
+      );
+      await connection.execute(
+        `INSERT INTO password_reset_tokens
+           (id, user_id, token_hash, created_at, expires_at, used_at)
+         VALUES (?, ?, ?, UTC_TIMESTAMP(3), ?, NULL)`,
+        [tokenId, account.user_id, hashToken(token, config.sessionSecret), expiresAt],
+      );
+    });
+
+    const resetUrl = new URL(`${config.publicAppUrl}/`);
+    resetUrl.searchParams.set("resetToken", token);
+    try {
+      await passwordResetEmailSender.send({ to: account.email, resetUrl: resetUrl.toString() });
+    } catch (error) {
+      await pool.execute(
+        "UPDATE password_reset_tokens SET used_at = UTC_TIMESTAMP(3) WHERE id = ? AND used_at IS NULL",
+        [tokenId],
+      ).catch(() => undefined);
+      console.error(`[QUANDA API] password_reset_email_failed code=${error?.code ?? "unknown"}`);
+    }
+  }
+
+  async function resetPassword(input) {
+    return withTransaction(pool, async (connection) => {
+      const [rows] = await connection.execute(
+        `SELECT id, user_id
+           FROM password_reset_tokens
+          WHERE token_hash = ? AND used_at IS NULL AND expires_at > UTC_TIMESTAMP(3)
+          LIMIT 1 FOR UPDATE`,
+        [hashToken(input.token, config.sessionSecret)],
+      );
+      const resetToken = rows[0];
+      if (!resetToken) throw badRequest("invalid_reset_token", "This password reset link is invalid or expired.");
+
+      const passwordHash = await bcrypt.hash(input.password, config.passwordHashRounds);
+      await connection.execute(
+        `UPDATE accounts SET password_hash = ?, updated_at = UTC_TIMESTAMP(3) WHERE user_id = ?`,
+        [passwordHash, resetToken.user_id],
+      );
+      await connection.execute(
+        `UPDATE password_reset_tokens SET used_at = UTC_TIMESTAMP(3) WHERE id = ? AND used_at IS NULL`,
+        [resetToken.id],
+      );
+      await connection.execute(
+        `UPDATE authenticated_sessions SET revoked_at = UTC_TIMESTAMP(3)
+          WHERE user_id = ? AND revoked_at IS NULL`,
+        [resetToken.user_id],
+      );
+    });
+  }
+
   async function getProfile(userId) {
     const [rows] = await pool.execute("SELECT * FROM accounts WHERE user_id = ? LIMIT 1", [userId]);
     if (!rows[0]) throw unauthorized();
@@ -154,7 +225,7 @@ function createAuthService({ pool, config }) {
     });
   }
 
-  return { claimAnonymousProjects, getProfile, login, logout, register, updateProfile };
+  return { claimAnonymousProjects, getProfile, login, logout, register, requestPasswordReset, resetPassword, updateProfile };
 }
 
 module.exports = { createAuthService, publicUser };

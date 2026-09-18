@@ -16,6 +16,7 @@ const { createEventService } = require("./services/event-service");
 const { createProjectService } = require("./services/project-service");
 const { createAnalyticsService } = require("./services/analytics-service");
 const { createAuthService } = require("./services/auth-service");
+const { createPasswordResetEmailSender } = require("./services/password-reset-email-service");
 const { createHealthRouter } = require("./routes/health-routes");
 const { createSessionRouter } = require("./routes/session-routes");
 const { createEventRouter } = require("./routes/event-routes");
@@ -71,7 +72,8 @@ function createApplication({ pool, config }) {
   const eventService = createEventService({ pool });
   const projectService = createProjectService({ pool });
   const analyticsService = createAnalyticsService({ pool });
-  const authService = createAuthService({ pool, config });
+  const passwordResetEmailSender = createPasswordResetEmailSender({ config });
+  const authService = createAuthService({ pool, config, passwordResetEmailSender });
 
   app.use("/health", createHealthRouter({ pool }));
   app.use(

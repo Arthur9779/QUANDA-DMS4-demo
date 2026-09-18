@@ -120,6 +120,20 @@ export async function loginAccount(input: { email: string; password: string }): 
   return user;
 }
 
+export async function requestPasswordReset(email: string): Promise<void> {
+  await request("/api/v1/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(input: { token: string; password: string }): Promise<void> {
+  await request("/api/v1/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
 export async function logoutAccount(): Promise<void> {
   const token = read(ACCOUNT_SESSION_KEY);
   remove(ACCOUNT_SESSION_KEY);

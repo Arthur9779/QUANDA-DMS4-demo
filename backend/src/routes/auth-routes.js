@@ -1,7 +1,7 @@
 const express = require("express");
 const { badRequest } = require("../lib/errors");
 const { parseOrThrow } = require("../validation/common");
-const { ClaimAnonymousSchema, LoginSchema, RegisterSchema, UpdateProfileSchema } = require("../validation/auth");
+const { ClaimAnonymousSchema, LoginSchema, RegisterSchema, RequestPasswordResetSchema, ResetPasswordSchema, UpdateProfileSchema } = require("../validation/auth");
 
 function createAuthRouter({ authService, authenticateAccount }) {
   const router = express.Router();
@@ -15,6 +15,20 @@ function createAuthRouter({ authService, authenticateAccount }) {
     try {
       const input = parseOrThrow(LoginSchema, request.body, badRequest);
       response.json(await authService.login(input));
+    } catch (error) { next(error); }
+  });
+  router.post("/forgot-password", async (request, response, next) => {
+    try {
+      const input = parseOrThrow(RequestPasswordResetSchema, request.body, badRequest);
+      await authService.requestPasswordReset(input.email);
+      response.status(202).json({ message: "If an account exists for that email, a reset link has been sent." });
+    } catch (error) { next(error); }
+  });
+  router.post("/reset-password", async (request, response, next) => {
+    try {
+      const input = parseOrThrow(ResetPasswordSchema, request.body, badRequest);
+      await authService.resetPassword(input);
+      response.status(204).end();
     } catch (error) { next(error); }
   });
   router.get("/me", authenticateAccount, async (request, response, next) => {

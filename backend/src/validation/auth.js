@@ -19,6 +19,12 @@ const LoginSchema = z.object({
   password: z.string().min(1).max(128),
 }).strict();
 
+const RequestPasswordResetSchema = z.object({ email: EmailSchema }).strict();
+const ResetPasswordSchema = z.object({
+  token: z.string().startsWith("qur_").max(200),
+  password: PasswordSchema,
+}).strict();
+
 const UpdateProfileSchema = z.object({
   displayName: DisplayNameSchema.optional(),
   avatar: z.string().trim().max(32).nullable().optional(),
@@ -33,6 +39,8 @@ const ClaimAnonymousSchema = z.object({
 module.exports = {
   ClaimAnonymousSchema,
   LoginSchema,
+  RequestPasswordResetSchema,
   RegisterSchema,
+  ResetPasswordSchema,
   UpdateProfileSchema,
 };
