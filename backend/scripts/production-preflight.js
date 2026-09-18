@@ -12,6 +12,7 @@ const REQUIRED_TABLES = [
   "sessions",
   "synthetic_scenarios",
   "users",
+  "password_reset_tokens",
 ];
 
 function parseNodeVersion(version) {
@@ -31,6 +32,14 @@ function assertSupportedNode(version = process.version) {
 
   if (!isNode20 || !meetsMinimum) {
     throw new Error(`Unsupported Node.js ${version}; expected >=20.20.2 <21`);
+  }
+}
+
+function assertPasswordResetDelivery(config) {
+  if (config.nodeEnv === "production" && config.passwordResetEmailMode !== "gmail") {
+    throw new Error(
+      "Production password reset delivery must use Gmail; set PASSWORD_RESET_EMAIL_MODE=gmail and provide Gmail credentials",
+    );
   }
 }
 
@@ -56,6 +65,7 @@ async function inspectDatabase(pool, databaseName) {
 async function main() {
   assertSupportedNode();
   const config = loadEnvironment();
+  assertPasswordResetDelivery(config);
   if (config.nodeEnv !== "production") {
     throw new Error("NODE_ENV must be production for the production preflight");
   }
@@ -98,4 +108,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { REQUIRED_TABLES, assertSupportedNode, inspectDatabase, parseNodeVersion };
+module.exports = { REQUIRED_TABLES, assertPasswordResetDelivery, assertSupportedNode, inspectDatabase, parseNodeVersion };

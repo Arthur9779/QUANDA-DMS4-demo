@@ -37,6 +37,11 @@ or paste them into chat.
 | `SESSION_IDLE_MINUTES` | `30` | No |
 | `AUTH_SESSION_DAYS` | `30` | No |
 | `PASSWORD_HASH_ROUNDS` | `12` | No |
+| `PASSWORD_RESET_EMAIL_MODE` | `gmail` | No |
+| `PASSWORD_RESET_TOKEN_MINUTES` | `30` | No |
+| `PUBLIC_APP_URL` | `https://quanda-dms4-demo-jet.vercel.app` | No |
+| `GMAIL_USER` | Gmail mailbox used to send QUANDA reset emails | No |
+| `GMAIL_APP_PASSWORD` | A Gmail App Password for `GMAIL_USER`, not the normal Gmail password | Yes |
 | `EVENT_BATCH_LIMIT` | `50` | No |
 | `LOG_LEVEL` | `info` | No |
 
@@ -47,6 +52,11 @@ platform-managed value.
 Generate `SESSION_SECRET` and `ADMIN_API_TOKEN` privately and independently,
 for example with `openssl rand -hex 32`. Do not reuse the database password or
 either token for another purpose.
+
+Password reset delivery requires a Gmail account with two-step verification and
+an App Password. Store the mailbox and App Password only in cPanel environment
+variables. Never commit them or paste them into chat. Restart the Node.js app
+after saving the variables.
 
 ## Upload contents
 
@@ -73,7 +83,8 @@ a recoverable backup of material existing content.
 5. Run **Run NPM Install** for this application only.
 6. Enter the displayed QUANDA virtual environment and run `npm run deployment:check`.
 7. Run `npm run migrate:status`, review every pending migration (including
-   `002_optional_accounts.sql`), then run `npm run migrate` once.
+   `002_optional_accounts.sql` and `003_password_reset_tokens.sql`), then run
+   `npm run migrate` once.
 8. Run `npm run migrate:status` again and then `npm run deployment:preflight`.
 9. Restart only `quanda-api.dms.onl`.
 10. Verify `/health`, `/admin/`, anonymous session creation, registration,
