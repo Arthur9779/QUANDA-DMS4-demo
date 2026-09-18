@@ -2,13 +2,13 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LogIn, UserRound, X } from "lucide-react";
+import { ArrowRight, LogIn, UserRound, X } from "lucide-react";
 import type { Translation } from "@/src/i18n/translations";
-import { AuthApiError } from "@/src/lib/auth";
+import { AuthApiError, resetPassword } from "@/src/lib/auth";
 import { useAuth } from "@/src/auth/AuthContext";
 
 export type AuthMode = "login" | "register";
-type Dialog = AuthMode | "profile" | "projects" | null;
+type Dialog = AuthMode | "forgot" | "profile" | "projects" | null;
 
 export function AccountControls({ t, onOpenProject }: { t: Translation; onOpenProject: (id: string) => Promise<void> }) {
   const auth = useAuth();
@@ -29,11 +29,23 @@ export function AccountControls({ t, onOpenProject }: { t: Translation; onOpenPr
     return () => { document.removeEventListener("keydown", onKey); document.removeEventListener("mousedown", onPointer); };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "1") { setDialog("login"); window.history.replaceState({}, "", window.location.pathname); }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   if (auth.loading) return <span className="account-loading" aria-hidden="true" />;
   if (!auth.user) {
     return <>
       <button className="account-login-button" onClick={() => setDialog("login")} type="button"><LogIn size={16} />{t.auth.login}</button>
-      {dialog && <AuthDialog mode={dialog === "register" ? "register" : "login"} t={t} error={error} onClose={() => { setDialog(null); setError(""); }} onSwitch={(mode) => setDialog(mode)} onSubmit={async (input) => {
+      {dialog === "forgot" && <ForgotPasswordDialog t={t} error={error} onClose={() => { setDialog(null); setError(""); }} onBack={() => { setDialog("login"); setError(""); }} onSubmit={async (email) => {
+        setError("");
+        try { await auth.requestPasswordReset(email); } catch (caught) { setError(authErrorMessage(caught, t)); throw caught; }
+      }} />}
+      {(dialog === "login" || dialog === "register") && <AuthDialog mode={dialog} t={t} error={error} onClose={() => { setDialog(null); setError(""); }} onForgotPassword={() => { setDialog("forgot"); setError(""); }} onSwitch={(mode) => setDialog(mode)} onSubmit={async (input) => {
         setError("");
         try {
           if (dialog === "register") await auth.register(input as { displayName: string; email: string; password: string });
@@ -131,7 +143,7 @@ function Modal({ title, onClose, closeLabel, children }: { title: string; onClos
   );
 }
 
-export function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit, onContinueGuest }: { mode: AuthMode; t: Translation; error: string; onClose: () => void; onSwitch: (mode: AuthMode) => void; onSubmit: (input: { displayName?: string; email: string; password: string }) => Promise<void>; onContinueGuest?: () => void }) {
+export function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit, onForgotPassword, onContinueGuest }: { mode: AuthMode; t: Translation; error: string; onClose: () => void; onSwitch: (mode: AuthMode) => void; onSubmit: (input: { displayName?: string; email: string; password: string }) => Promise<void>; onForgotPassword?: () => void; onContinueGuest?: () => void }) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState("");
   const hasError = Boolean(localError || error);
@@ -149,12 +161,53 @@ export function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit, onCont
       {mode === "register" && <label>{t.auth.displayName}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete="name" autoFocus name="displayName" required minLength={2} /></label>}
       <label>{t.auth.email}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete="email" autoFocus={mode === "login"} name="email" required type="email" /></label>
       <label>{t.auth.password}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete={mode === "login" ? "current-password" : "new-password"} name="password" required minLength={mode === "register" ? 10 : 1} type="password" /></label>
+      {mode === "login" && onForgotPassword && <button className="auth-forgot-password" onClick={onForgotPassword} type="button">{t.auth.forgotPassword}<ArrowRight aria-hidden="true" size={16} /></button>}
       {mode === "register" && <label>{t.auth.confirmPassword}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete="new-password" name="confirmPassword" required minLength={10} type="password" /></label>}
       {hasError && <p className="auth-error" id="auth-form-error" role="alert">{localError || error}</p>}
       <button className="button button-primary" disabled={busy} type="submit">{busy ? t.auth.working : mode === "register" ? t.auth.createAccount : t.auth.login}</button>
     </form>
     <button className="button button-text" onClick={() => onSwitch(mode === "login" ? "register" : "login")} type="button">{mode === "login" ? t.auth.needAccount : t.auth.haveAccount}</button>
     <button className="button button-text" onClick={onContinueGuest ?? onClose} type="button">{t.auth.continueGuest}</button>
+  </Modal>;
+}
+
+export function ForgotPasswordDialog({ t, error, onClose, onBack, onSubmit }: { t: Translation; error: string; onClose: () => void; onBack: () => void; onSubmit: (email: string) => Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const hasError = Boolean(error);
+  return <Modal title={t.auth.resetPassword} closeLabel={t.auth.close} onClose={onClose}>
+    <p>{t.auth.resetPasswordIntro}</p>
+    {submitted ? <div className="auth-reset-success" role="status"><p>{t.auth.resetEmailSent}</p><button className="button button-primary" onClick={onBack} type="button">{t.auth.backToLogin}<ArrowRight aria-hidden="true" size={16} /></button></div> : <form className="auth-form" onSubmit={(event) => {
+      event.preventDefault(); setBusy(true);
+      const email = String(new FormData(event.currentTarget).get("email") ?? "");
+      void onSubmit(email).then(() => setSubmitted(true)).catch(() => undefined).finally(() => setBusy(false));
+    }}>
+      <label>{t.auth.email}<input aria-describedby={hasError ? "forgot-password-error" : undefined} autoComplete="email" autoFocus name="email" required type="email" /></label>
+      {hasError && <p className="auth-error" id="forgot-password-error" role="alert">{error}</p>}
+      <button className="button button-primary" disabled={busy} type="submit">{busy ? t.auth.working : t.auth.resetPassword}<ArrowRight aria-hidden="true" size={16} /></button>
+      <button className="button button-text" onClick={onBack} type="button">{t.auth.backToLogin}</button>
+    </form>}
+  </Modal>;
+}
+
+export function PasswordResetDialog({ token, t, onClose, onComplete }: { token: string; t: Translation; onClose: () => void; onComplete: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  return <Modal title={t.auth.resetPassword} closeLabel={t.auth.close} onClose={onClose}>
+    <p>{t.auth.newPassword}</p>
+    <form className="auth-form" onSubmit={(event) => {
+      event.preventDefault(); setBusy(true); setError("");
+      const data = new FormData(event.currentTarget);
+      const password = String(data.get("password") ?? "");
+      const confirmation = String(data.get("confirmPassword") ?? "");
+      if (password !== confirmation) { setError(t.auth.passwordMismatch); setBusy(false); return; }
+      void resetPassword({ token, password }).then(onComplete).catch((caught) => setError(caught instanceof AuthApiError && caught.code === "invalid_reset_token" ? t.auth.invalidResetToken : authErrorMessage(caught, t))).finally(() => setBusy(false));
+    }}>
+      <label>{t.auth.newPassword}<input aria-describedby={error ? "reset-password-error" : undefined} autoComplete="new-password" autoFocus name="password" required minLength={10} type="password" /></label>
+      <label>{t.auth.confirmPassword}<input aria-describedby={error ? "reset-password-error" : undefined} autoComplete="new-password" name="confirmPassword" required minLength={10} type="password" /></label>
+      {error && <p className="auth-error" id="reset-password-error" role="alert">{error}</p>}
+      <button className="button button-primary" disabled={busy} type="submit">{busy ? t.auth.working : t.auth.resetPassword}<ArrowRight aria-hidden="true" size={16} /></button>
+    </form>
   </Modal>;
 }
 

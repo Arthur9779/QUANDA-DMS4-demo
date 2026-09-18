@@ -4105,6 +4105,12 @@ footer {
 .auth-form input { background: #fffefa; border: 1px solid var(--line); border-radius: 12px; color: var(--dark); font: inherit; min-height: 48px; padding: 0 13px; width: 100%; }
 .auth-form input:focus-visible { border-color: var(--green); outline: 3px solid rgba(64, 112, 48, 0.2); }
 .auth-error { background: #fff0e9; border-left: 3px solid var(--amber); color: #7b3427; margin: 0; padding: 10px 12px; }
+.auth-forgot-password { align-items: center; align-self: start; background: transparent; border: 0; color: var(--green); cursor: pointer; display: inline-flex; font: inherit; font-size: 0.88rem; font-weight: 800; gap: 6px; line-height: 1.25; max-width: 100%; padding: 0; text-align: left; }
+.auth-forgot-password:hover, .auth-forgot-password:focus-visible { color: var(--orange); text-decoration: underline; }
+.auth-forgot-password svg, .auth-reset-success .button svg, .auth-form > .button svg { flex: 0 0 auto; }
+.auth-reset-success { display: grid; gap: 16px; margin-top: 22px; }
+.auth-reset-success p { margin: 0; }
+.auth-reset-success .button { justify-content: center; width: 100%; }
 .account-project-list { display: grid; gap: 12px; margin-top: 20px; }
 .account-project-list article { align-items: center; border: 1px solid var(--line); border-radius: 14px; display: flex; gap: 16px; justify-content: space-between; padding: 14px; }
 .account-project-list article div { display: grid; gap: 4px; min-width: 0; }
@@ -4119,7 +4125,13 @@ footer {
   .account-profile-button > span:nth-child(2), .account-profile-button > span:last-child { display: none; }
   .account-project-list article { align-items: stretch; flex-direction: column; }
   .account-project-list .button { width: 100%; }
+  .auth-forgot-password { font-size: 0.84rem; }
 }
+
+/* Keep the bilingual landing heading readable at every responsive width. */
+.landing-entry-copy h1,
+.landing-entry-copy.hero-vi h1 { line-height: 1.06; }
+.landing-entry-copy h1 em { line-height: 1.02; }
 
 /* Landing refresh: bold forest green, warm paper, and clear interactive states. */
 .hero {

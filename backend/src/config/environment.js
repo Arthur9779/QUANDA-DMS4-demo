@@ -17,8 +17,20 @@ const EnvironmentSchema = DatabaseEnvironmentSchema.extend({
   SESSION_IDLE_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
   AUTH_SESSION_DAYS: z.coerce.number().int().min(1).max(90).default(30),
   PASSWORD_HASH_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
+  PASSWORD_RESET_EMAIL_MODE: z.enum(["console", "gmail"]).default("console"),
+  PASSWORD_RESET_TOKEN_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
+  PUBLIC_APP_URL: z.string().trim().url().default("http://localhost:3000"),
+  GMAIL_USER: z.string().trim().email().optional(),
+  GMAIL_APP_PASSWORD: z.string().trim().min(1).optional(),
   EVENT_BATCH_LIMIT: z.coerce.number().int().min(1).max(100).default(50),
   LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
+}).superRefine((data, context) => {
+  if (data.PASSWORD_RESET_EMAIL_MODE === "gmail" && !data.GMAIL_USER) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["GMAIL_USER"], message: "GMAIL_USER is required when Gmail delivery is enabled" });
+  }
+  if (data.PASSWORD_RESET_EMAIL_MODE === "gmail" && !data.GMAIL_APP_PASSWORD) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["GMAIL_APP_PASSWORD"], message: "GMAIL_APP_PASSWORD is required when Gmail delivery is enabled" });
+  }
 });
 
 function invalidEnvironmentError(prefix, issues) {
@@ -73,6 +85,11 @@ function loadEnvironment(source = process.env) {
     sessionIdleMinutes: parsed.data.SESSION_IDLE_MINUTES,
     authSessionDays: parsed.data.AUTH_SESSION_DAYS,
     passwordHashRounds: parsed.data.PASSWORD_HASH_ROUNDS,
+    passwordResetEmailMode: parsed.data.PASSWORD_RESET_EMAIL_MODE,
+    passwordResetTokenMinutes: parsed.data.PASSWORD_RESET_TOKEN_MINUTES,
+    publicAppUrl: parsed.data.PUBLIC_APP_URL.replace(/\/+$/u, ""),
+    gmailUser: parsed.data.GMAIL_USER ?? null,
+    gmailAppPassword: parsed.data.GMAIL_APP_PASSWORD ?? null,
     eventBatchLimit: parsed.data.EVENT_BATCH_LIMIT,
     logLevel: parsed.data.LOG_LEVEL,
   };

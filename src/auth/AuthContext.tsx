@@ -7,6 +7,8 @@ import {
   loginAccount,
   logoutAccount,
   registerAccount,
+  requestPasswordReset,
+  resetPassword,
   updateAccountProfile,
   type AccountProjectSummary,
   type AccountUser,
@@ -18,6 +20,8 @@ interface AuthContextValue {
   loading: boolean;
   login(input: { email: string; password: string }): Promise<void>;
   register(input: { displayName: string; email: string; password: string }): Promise<void>;
+  requestPasswordReset(email: string): Promise<void>;
+  resetPassword(input: { token: string; password: string }): Promise<void>;
   logout(): Promise<void>;
   updateProfile(displayName: string): Promise<void>;
   refreshProjects(): Promise<void>;
@@ -55,6 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(account);
       setProjects(await listAccountProjects().catch(() => []));
     },
+    requestPasswordReset,
+    resetPassword,
     async logout() {
       await logoutAccount();
       setUser(null);

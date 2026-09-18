@@ -88,6 +88,49 @@ describe("optional accounts", () => {
   });
 });
 
+describe("password reset", () => {
+  test("creates an expiring hashed token without revealing unknown accounts", async () => {
+    const pool = new PasswordResetPool();
+    const deliveries = [];
+    const auth = createAuthService({
+      pool,
+      config: { ...config, passwordResetTokenMinutes: 30, publicAppUrl: "https://quanda.example" },
+      passwordResetEmailSender: { send: async (message) => deliveries.push(message) },
+    });
+
+    await auth.requestPasswordReset("missing@example.com");
+    assert.equal(deliveries.length, 0);
+    await auth.requestPasswordReset("artist@example.com");
+    assert.equal(deliveries.length, 1);
+    const token = new URL(deliveries[0].resetUrl).searchParams.get("resetToken");
+    assert.match(token, /^qur_/);
+    const stored = [...pool.resetTokens.values()][0];
+    assert.notEqual(stored.token_hash.toString("base64"), Buffer.from(token).toString("base64"));
+    assert.ok(stored.expires_at > new Date());
+  });
+
+  test("updates the password once, rejects reuse, and rejects expired tokens", async () => {
+    const pool = new PasswordResetPool();
+    let delivery;
+    const auth = createAuthService({
+      pool,
+      config: { ...config, passwordResetTokenMinutes: 30, publicAppUrl: "https://quanda.example" },
+      passwordResetEmailSender: { send: async (message) => { delivery = message; } },
+    });
+    await auth.requestPasswordReset("artist@example.com");
+    const token = new URL(delivery.resetUrl).searchParams.get("resetToken");
+
+    await auth.resetPassword({ token, password: "NewStrongPass1" });
+    assert.equal(await bcrypt.compare("NewStrongPass1", pool.accounts.get("account-user").password_hash), true);
+    await assert.rejects(() => auth.resetPassword({ token, password: "AnotherStrongPass1" }), /invalid or expired/);
+
+    await auth.requestPasswordReset("artist@example.com");
+    const nextToken = new URL(delivery.resetUrl).searchParams.get("resetToken");
+    [...pool.resetTokens.values()].find((row) => row.used_at === null && row.token_hash.equals(hashToken(nextToken, config.sessionSecret))).expires_at = new Date(Date.now() - 1);
+    await assert.rejects(() => auth.resetPassword({ token: nextToken, password: "ExpiredStrongPass1" }), /invalid or expired/);
+  });
+});
+
 class AuthPool {
   constructor() {
     this.users = new Map(); this.accounts = new Map(); this.authSessions = new Map();
@@ -139,5 +182,52 @@ class AuthPool {
       const row = this.projects.get(parameters[0]); return [[...(row && row.user_id === parameters[1] && !row.deleted_at ? [row] : [])], []];
     }
     throw new Error(`Unsupported AuthPool query: ${query}`);
+  }
+}
+
+class PasswordResetPool {
+  constructor() {
+    this.accounts = new Map([["account-user", {
+      user_id: "account-user", email: "artist@example.com", password_hash: bcrypt.hashSync("OldStrongPass1", 4),
+      display_name: "Artist", avatar: null, created_at: new Date(), updated_at: new Date(),
+    }]]);
+    this.users = new Map([["account-user", { deleted_at: null }]]);
+    this.resetTokens = new Map();
+    this.authSessions = new Map([["session", { user_id: "account-user", revoked_at: null }]]);
+  }
+  async getConnection() { return this; }
+  async beginTransaction() {}
+  async commit() {}
+  async rollback() {}
+  release() {}
+  async execute(sql, parameters = []) {
+    const query = sql.replace(/\s+/gu, " ").trim();
+    if (query.startsWith("SELECT a.user_id, a.email FROM accounts")) {
+      const account = [...this.accounts.values()].find((row) => row.email === parameters[0]);
+      return [[...(account && !this.users.get(account.user_id).deleted_at ? [{ user_id: account.user_id, email: account.email }] : [])], []];
+    }
+    if (query.startsWith("UPDATE password_reset_tokens SET used_at") && query.includes("WHERE user_id")) {
+      for (const row of this.resetTokens.values()) if (row.user_id === parameters[0] && row.used_at === null) row.used_at = new Date();
+      return [{ affectedRows: 1 }, []];
+    }
+    if (query.startsWith("INSERT INTO password_reset_tokens")) {
+      this.resetTokens.set(parameters[0], { id: parameters[0], user_id: parameters[1], token_hash: parameters[2], expires_at: parameters[3], used_at: null });
+      return [{ affectedRows: 1 }, []];
+    }
+    if (query.startsWith("SELECT id, user_id FROM password_reset_tokens")) {
+      const row = [...this.resetTokens.values()].find((candidate) => candidate.token_hash.equals(parameters[0]) && candidate.used_at === null && candidate.expires_at > new Date());
+      return [[...(row ? [{ id: row.id, user_id: row.user_id }] : [])], []];
+    }
+    if (query.startsWith("UPDATE accounts SET password_hash")) {
+      const account = this.accounts.get(parameters[1]); account.password_hash = parameters[0]; account.updated_at = new Date(); return [{ affectedRows: 1 }, []];
+    }
+    if (query.startsWith("UPDATE password_reset_tokens SET used_at") && query.includes("WHERE id")) {
+      const row = this.resetTokens.get(parameters[0]); if (row?.used_at === null) row.used_at = new Date(); return [{ affectedRows: row ? 1 : 0 }, []];
+    }
+    if (query.startsWith("UPDATE authenticated_sessions SET revoked_at")) {
+      for (const row of this.authSessions.values()) if (row.user_id === parameters[0] && row.revoked_at === null) row.revoked_at = new Date();
+      return [{ affectedRows: 1 }, []];
+    }
+    throw new Error(`Unsupported PasswordResetPool query: ${query}`);
   }
 }

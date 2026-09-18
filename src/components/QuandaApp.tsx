@@ -114,6 +114,7 @@ import {
 import { classifyProjectPath, EngineeringRoadmapSchema, inferEngineeringHints, type EngineeringInterpretation as EngineeringInterpretationValue, type EngineeringProject, type EngineeringRoadmap, type PathClassification, type ProjectPath, type PreparationMethod, type EngineeringGuidedPlan as EngineeringGuidedPlanValue } from "@/src/project-path";
 import { generateEngineeringGuidedPlan, generateEngineeringRoadmap, interpretEngineeringProject } from "@/src/agentic-engineering";
 import { WorkflowToast, type WorkflowStage } from "./WorkflowToast";
+import { PasswordResetDialog } from "./AccountControls";
 import { createDesignRouteEvaluation, createEngineeringRouteEvaluation } from "@/src/route-planning/generate";
 import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 import { createIntegratedFallback, createRoadmapInput } from "@/src/roadmap";
@@ -195,11 +196,29 @@ export function QuandaApp() {
   const [matchingError, setMatchingError] = useState<string | null>(null);
   const [engineeringError, setEngineeringError] = useState<string | null>(null);
   const [workflowStage, setWorkflowStage] = useState<WorkflowStage | null>(null);
+  const [passwordResetToken, setPasswordResetToken] = useState<string | null>(null);
   const calendarViewTracked = useRef(false);
   const viewedRoadmapIds = useRef(new Set<string>());
   const restoredRoadmapIds = useRef(new Set<string>());
   const shouldScrollToPreparation = useRef(false);
   const t = getTranslation(locale);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const token = new URLSearchParams(window.location.search).get("resetToken");
+      if (token) setPasswordResetToken(token);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+  const dismissPasswordReset = () => {
+    setPasswordResetToken(null);
+    if (typeof window !== "undefined") window.history.replaceState({}, "", window.location.pathname);
+  };
+  const passwordResetDialog = passwordResetToken ? <PasswordResetDialog
+    token={passwordResetToken}
+    t={t}
+    onClose={dismissPasswordReset}
+    onComplete={() => { dismissPasswordReset(); window.location.assign("/?login=1"); }}
+  /> : null;
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
   const guidedRouteEvaluation = useMemo(() => {
     if (!engineeringGuidedPlan || !engineeringInterpretation) return null;
@@ -1409,6 +1428,7 @@ export function QuandaApp() {
             t={t}
           />
         </div>
+        {passwordResetDialog}
       </main>
     );
   }
@@ -1782,6 +1802,7 @@ export function QuandaApp() {
           <p>{t.hero.tagline}</p>
           <span>© {new Date().getFullYear()} QUANDA</span>
         </footer>
+        {passwordResetDialog}
       </div>
     </main>
   );
