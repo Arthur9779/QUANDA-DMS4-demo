@@ -198,6 +198,7 @@ export function QuandaApp() {
   const calendarViewTracked = useRef(false);
   const viewedRoadmapIds = useRef(new Set<string>());
   const restoredRoadmapIds = useRef(new Set<string>());
+  const shouldScrollToPreparation = useRef(false);
   const t = getTranslation(locale);
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
   const guidedRouteEvaluation = useMemo(() => {
@@ -386,6 +387,25 @@ export function QuandaApp() {
     if (projectPath) writeProjectPath(window.localStorage, projectPath);
     else clearProjectPath(window.localStorage);
   }, [isHydrated, projectPath]);
+
+  useEffect(() => {
+    if (
+      !shouldScrollToPreparation.current ||
+      !engineeringInterpretation ||
+      !engineeringInterpretationConfirmed
+    ) {
+      return;
+    }
+
+    shouldScrollToPreparation.current = false;
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector("#preparation-method")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [engineeringInterpretation, engineeringInterpretationConfirmed]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -626,7 +646,8 @@ export function QuandaApp() {
   };
 
   const scrollToForm = () => {
-    document.querySelector("#project-form")?.scrollIntoView({ behavior: "smooth" });
+    const targetId = projectPath === "agentic_engineering" ? "engineering-form" : "project-form";
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const selectPath = (nextPath: ProjectPath, brief = form.projectBrief) => {
@@ -699,6 +720,7 @@ export function QuandaApp() {
   };
 
   const interpretEngineering = async (request: EngineeringProject) => {
+    shouldScrollToPreparation.current = true;
     beginAnalyticsJourney("agentic_engineering", request, { newJourney: true });
     setEngineeringForm(request);
     setEngineeringError(null);
@@ -746,7 +768,6 @@ export function QuandaApp() {
         source: "fallback",
       });
     }
-    requestAnimationFrame(() => document.querySelector("#preparation-method")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   const generateEngineering = async (

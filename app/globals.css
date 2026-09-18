@@ -178,10 +178,14 @@ a:focus-visible {
   height: 38px;
   display: grid;
   place-items: center;
-  border: 1px solid #a6b878;
-  border-radius: 50%;
-  background: var(--blue-soft);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--blue);
+  font-size: 2rem;
+  font-weight: 950;
+  letter-spacing: -0.16em;
+  line-height: 1;
 }
 
 .language-toggle {
@@ -3981,17 +3985,6 @@ body {
   mask-image: linear-gradient(120deg, black, transparent 70%);
 }
 
-.landing-entry-section::after {
-  position: absolute;
-  top: 26px;
-  right: 32px;
-  content: "BRIEF  /  PATH  /  MOMENTUM";
-  color: rgba(255, 253, 247, 0.62);
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.13em;
-}
-
 .landing-entry-copy h1 {
   max-width: 8ch;
   font-size: clamp(3.1rem, 6.2vw, 6rem);
@@ -4074,7 +4067,6 @@ footer {
 }
 
 @media (max-width: 520px) {
-  .landing-entry-section::after { top: 18px; right: 18px; font-size: 0.52rem; }
   .landing-entry-copy h1 { max-width: 10ch; font-size: clamp(3rem, 15vw, 4.6rem); }
 }
 
@@ -4138,7 +4130,7 @@ footer {
   padding-top: clamp(72px, 9vw, 118px);
   padding-bottom: clamp(72px, 9vw, 118px);
   border-radius: 0 0 34px 34px;
-  background: #527938 url("/assets/hero-vector-garden.svg") center / cover no-repeat;
+  background: #527938;
 }
 
 .hero-copy {
@@ -4494,9 +4486,13 @@ footer {
   height: 38px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(248, 244, 223, 0.7);
-  border-radius: 50%;
+  border: 0;
+  border-radius: 0;
   color: #d7e8a3;
+  font-size: 2rem;
+  font-weight: 950;
+  letter-spacing: -0.16em;
+  line-height: 1;
 }
 
 .account-welcome .language-toggle {
@@ -4800,7 +4796,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .site-header { border-bottom-color: rgba(25, 100, 61, .22); background: rgba(248, 240, 220, .96); }
 .site-header nav > a:hover, .site-header nav > a:focus-visible { color: var(--orange); }
 .brand { color: var(--green-deep); }
-.brand-mark { border-color: var(--green); background: var(--cream); color: var(--green); }
+.brand-mark { border: 0; background: transparent; box-shadow: none; color: var(--green); }
 .language-toggle { border-color: var(--green); background: var(--white); }
 .language-toggle button.is-active { background: var(--green); color: var(--cream); }
 .language-toggle button:hover { color: var(--orange); }
@@ -4969,70 +4965,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   padding: clamp(28px, 4vw, 64px) clamp(20px, 6vw, 84px);
 }
 
-.account-welcome-stickers {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.account-sticker {
-  position: absolute;
-  display: block;
-  height: auto;
-  filter: drop-shadow(0 12px 9px rgba(4, 48, 18, 0.2));
-}
-
-.account-sticker-flower {
-  top: 10%;
-  left: 2%;
-  width: clamp(84px, 12vw, 156px);
-  transform: rotate(-13deg);
-}
-
-.account-sticker-leaf {
-  top: 8%;
-  right: 6%;
-  width: clamp(92px, 14vw, 180px);
-  transform: rotate(11deg);
-}
-
-.account-sticker-sun {
-  top: 34%;
-  left: 3%;
-  width: clamp(60px, 8vw, 104px);
-  transform: rotate(12deg);
-}
-
-.account-sticker-sprig {
-  bottom: 4%;
-  left: 4%;
-  width: clamp(78px, 11vw, 142px);
-  transform: rotate(-14deg);
-}
-
-.account-sticker-mushroom {
-  right: 4%;
-  bottom: 8%;
-  width: clamp(82px, 12vw, 148px);
-  transform: rotate(-8deg);
-}
-
-.account-sticker-sparkle {
-  right: 25%;
-  bottom: 13%;
-  width: clamp(40px, 6vw, 76px);
-  transform: rotate(-10deg);
-}
-
-.account-sticker-bloom {
-  right: 12%;
-  bottom: 25%;
-  width: clamp(72px, 10vw, 130px);
-  transform: rotate(13deg);
-}
-
 .account-welcome-copy {
   grid-column: 1;
   grid-row: 1;
@@ -5072,13 +5004,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     padding: 30px clamp(20px, 5vw, 48px);
   }
 
-  .account-sticker-flower { left: 2%; bottom: 23%; top: auto; }
-  .account-sticker-leaf { top: 12%; right: 1%; }
-  .account-sticker-sun { left: 3%; bottom: 33%; top: auto; }
-  .account-sticker-sprig { left: 1%; bottom: 3%; }
-  .account-sticker-mushroom { right: 1%; bottom: 9%; }
-  .account-sticker-sparkle { right: 9%; bottom: 30%; }
-  .account-sticker-bloom { right: 4%; bottom: 34%; }
 }
 
 @media (max-width: 620px) {
@@ -5106,49 +5031,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     padding: 15px;
   }
 
-  .account-sticker-flower {
-    top: auto;
-    bottom: 25%;
-    left: -8%;
-    width: 82px;
-  }
-
-  .account-sticker-leaf {
-    top: 3%;
-    right: 2%;
-    width: 66px;
-  }
-
-  .account-sticker-sun {
-    top: auto;
-    bottom: 34%;
-    left: 2%;
-    width: 48px;
-  }
-
-  .account-sticker-sprig {
-    bottom: 1%;
-    left: -7%;
-    width: 74px;
-  }
-
-  .account-sticker-mushroom {
-    right: -10%;
-    bottom: 8%;
-    width: 82px;
-  }
-
-  .account-sticker-sparkle {
-    right: 3%;
-    bottom: 25%;
-    width: 36px;
-  }
-
-  .account-sticker-bloom {
-    right: -8%;
-    bottom: 32%;
-    width: 72px;
-  }
 }
 
 /* Compact post-login hero and a quieter green system across the app. */
