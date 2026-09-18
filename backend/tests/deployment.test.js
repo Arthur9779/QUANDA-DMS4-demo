@@ -10,8 +10,10 @@ const {
   inspectDeploymentPackage,
 } = require("../scripts/check-deployment-package");
 const {
+  assertPasswordResetDelivery,
   assertSupportedNode,
   parseNodeVersion,
+  REQUIRED_TABLES,
 } = require("../scripts/production-preflight");
 
 test("the checked-in backend is a complete deployment package", () => {
@@ -45,4 +47,17 @@ test("production runtime accepts only the supported Node 20 range", () => {
   assert.doesNotThrow(() => assertSupportedNode("20.21.0"));
   assert.throws(() => assertSupportedNode("v20.20.1"), /Unsupported Node/);
   assert.throws(() => assertSupportedNode("v21.0.0"), /Unsupported Node/);
+});
+
+test("production preflight includes the password reset table", () => {
+  assert.ok(REQUIRED_TABLES.includes("password_reset_tokens"));
+});
+
+test("production preflight requires Gmail password reset delivery", () => {
+  assert.doesNotThrow(() => assertPasswordResetDelivery({ nodeEnv: "development", passwordResetEmailMode: "console" }));
+  assert.doesNotThrow(() => assertPasswordResetDelivery({ nodeEnv: "production", passwordResetEmailMode: "gmail" }));
+  assert.throws(
+    () => assertPasswordResetDelivery({ nodeEnv: "production", passwordResetEmailMode: "console" }),
+    /PASSWORD_RESET_EMAIL_MODE=gmail/,
+  );
 });
