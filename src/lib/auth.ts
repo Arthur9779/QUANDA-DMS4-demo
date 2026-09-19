@@ -108,7 +108,10 @@ export async function registerAccount(input: { displayName: string; email: strin
 }
 
 export async function loginAccount(input: { email: string; password: string }): Promise<AccountUser> {
-  const user = await storeAuth(await request("/api/v1/auth/login", { method: "POST", body: JSON.stringify(input) }));
+  const user = await storeAuth(await request("/api/v1/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email: input.email, password: input.password }),
+  }));
   const token = read(ACCOUNT_SESSION_KEY);
   const anonymousSessionToken = read(ANONYMOUS_SESSION_KEY);
   if (token && anonymousSessionToken) {
