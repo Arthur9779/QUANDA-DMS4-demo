@@ -24,10 +24,12 @@ test("renders only the selected preparation method", async ({ page }) => {
   await expect(page.locator("#engineering-roadmap-results")).toHaveCount(0);
   await expect(page.getByText("This is not a general programming course.")).toBeVisible();
   await expect(page.getByTestId("project-calendar")).toBeVisible();
+  const evidenceBackedRoute = page.locator("#evidence-backed-route-choice");
+  await expect(evidenceBackedRoute).toBeVisible();
   const routeEvaluation = page.locator(".route-evaluation");
   await expect(routeEvaluation).toBeVisible();
   await expect(page.locator(".route-evaluation .route-score-item")).toHaveCount(6);
-  await expect.poll(() => page.evaluate(() => document.querySelector(".route-evaluation")?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY)).toBeLessThan(200);
+  await expect.poll(() => page.evaluate(() => document.querySelector("#evidence-backed-route-choice")?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY)).toBeLessThan(200);
   expect(await routeEvaluation.evaluate((element) => {
     const guidedPlan = document.querySelector("#engineering-guided-plan");
     return Boolean(guidedPlan && (element.compareDocumentPosition(guidedPlan) & Node.DOCUMENT_POSITION_FOLLOWING));
