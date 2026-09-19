@@ -14,7 +14,7 @@ function TaskCard({ task, t, complete, onToggle }: { task: EngineeringTask; t: T
       <label className="engineering-task-check"><input checked={complete} onChange={onToggle} type="checkbox" /><span className="sr-only">{task.title}</span></label>
       <span className="engineering-task-number">{String(task.order).padStart(2, "0")}</span>
       <div><p className="eyebrow">{executor}</p><h3>{task.title}</h3></div>
-      <button aria-expanded={open} aria-label={`${open ? t.engineering.collapse : t.engineering.expand}: ${task.title}`} className="icon-button" onClick={() => setOpen((current) => !current)} type="button">{open ? <ChevronUp aria-hidden="true" size={19} /> : <ChevronDown aria-hidden="true" size={19} />}</button>
+      <button aria-expanded={open} aria-label={`${open ? t.engineering.collapse : t.engineering.expand}: ${task.title}`} className="icon-button engineering-task-toggle" onClick={() => setOpen((current) => !current)} type="button">{open ? <ChevronUp aria-hidden="true" size={19} /> : <ChevronDown aria-hidden="true" size={19} />}</button>
     </div>
     {open && <div className="engineering-task-content">
       <div className="engineering-task-summary"><div><strong>{t.engineering.outcome}</strong><p>{task.outcome}</p></div><div><strong>{t.engineering.whyItMatters}</strong><p>{task.whyItMatters}</p></div></div>
