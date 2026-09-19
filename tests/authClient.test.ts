@@ -97,8 +97,16 @@ describe("optional account client", () => {
     });
     installBrowser(storage, fetchMock as typeof fetch);
 
-    expect(await loginAccount({ email: "artist@example.com", password: "StrongPass1" })).toEqual(account);
+    expect(await loginAccount({
+      email: "artist@example.com",
+      password: "StrongPass1",
+      displayName: "",
+    } as { email: string; password: string })).toEqual(account);
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({
+      email: "artist@example.com",
+      password: "StrongPass1",
+    });
     expect(fetchMock.mock.calls[1][1]?.headers).toMatchObject({
       Authorization: "Bearer qua_account-session",
     });

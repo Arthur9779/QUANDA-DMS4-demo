@@ -156,7 +156,10 @@ export function AuthDialog({ mode, t, error, onClose, onSwitch, onSubmit, onForg
       const confirmation = String(data.get("confirmPassword") ?? "");
       if (mode === "register" && password !== confirmation) { setLocalError(t.auth.passwordMismatch); setBusy(false); return; }
       setLocalError("");
-      void onSubmit({ displayName: String(data.get("displayName") ?? ""), email: String(data.get("email") ?? ""), password }).finally(() => setBusy(false));
+      const credentials = { email: String(data.get("email") ?? ""), password };
+      void onSubmit(mode === "register"
+        ? { ...credentials, displayName: String(data.get("displayName") ?? "") }
+        : credentials).finally(() => setBusy(false));
     }}>
       {mode === "register" && <label>{t.auth.displayName}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete="name" autoFocus name="displayName" required minLength={2} /></label>}
       <label>{t.auth.email}<input aria-describedby={hasError ? "auth-form-error" : undefined} autoComplete="email" autoFocus={mode === "login"} name="email" required type="email" /></label>
@@ -237,7 +240,7 @@ export function authErrorMessage(error: unknown, t: Translation): string {
   if (error instanceof AuthApiError) {
     if (error.code === "invalid_credentials") return t.auth.invalidCredentials;
     if (error.code === "account_exists") return t.auth.accountExists;
-    if (error.code === "invalid_request") return t.auth.invalidDetails;
+    if (error.code === "invalid_request" || error.code === "validation") return t.auth.invalidDetails;
   }
   return t.auth.unavailable;
 }
