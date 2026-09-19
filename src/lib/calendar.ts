@@ -19,6 +19,37 @@ export const calendarTaskCategories: CalendarTaskCategory[] = [
   "butter",
 ];
 
+export interface CalendarAvailability {
+  hoursPerDay: number;
+  daysPerWeek: number;
+}
+
+const defaultAvailability: CalendarAvailability = { hoursPerDay: 2, daysPerWeek: 6 };
+
+function isAvailableWorkday(date: Date, daysPerWeek: number): boolean {
+  if (daysPerWeek >= 7) return true;
+  const mondayIndex = (date.getDay() + 6) % 7;
+  return mondayIndex < Math.max(1, Math.min(7, daysPerWeek));
+}
+
+export function dueDateForCumulativeMinutes(
+  start: Date,
+  end: Date,
+  cumulativeMinutes: number,
+  availability: CalendarAvailability,
+): Date {
+  const daySpan = Math.max(0, localCalendarDayDistance(start, end));
+  const minutesPerDay = Math.max(30, availability.hoursPerDay * 60);
+  let remaining = Math.max(1, cumulativeMinutes);
+  for (let offset = 0; offset <= daySpan; offset += 1) {
+    const date = addLocalDays(start, offset);
+    if (!isAvailableWorkday(date, availability.daysPerWeek)) continue;
+    remaining -= minutesPerDay;
+    if (remaining <= 0) return date;
+  }
+  return end;
+}
+
 export function isCalendarTask(value: unknown): value is CalendarTask {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const task = value as Partial<CalendarTask>;
@@ -49,30 +80,16 @@ export function createRoadmapCalendarTasks(
   deadline: string,
   completedStageIds: readonly string[] = [],
   now = new Date(),
+  availability: CalendarAvailability = defaultAvailability,
 ): CalendarTask[] {
   const start = atLocalNoon(now);
   const parsedDeadline = fromLocalDateKey(deadline) ?? start;
   const end = parsedDeadline < start ? start : parsedDeadline;
-  const daySpan = Math.max(0, localCalendarDayDistance(start, end));
-  const totalMinutes = Math.max(
-    1,
-    roadmap.stages.reduce(
-      (sum, stage) => sum + stage.learningMinutes + stage.productionMinutes,
-      0,
-    ),
-  );
   let cumulativeMinutes = 0;
 
   return roadmap.stages.map((stage, index) => {
     cumulativeMinutes += stage.learningMinutes + stage.productionMinutes;
-    const proportionalOffset = Math.round(
-      daySpan * (cumulativeMinutes / totalMinutes),
-    );
-    const minimumOffset = daySpan > 0 ? 1 : 0;
-    const dueDate = addLocalDays(
-      start,
-      Math.min(daySpan, Math.max(minimumOffset, proportionalOffset)),
-    );
+    const dueDate = dueDateForCumulativeMinutes(start, end, cumulativeMinutes, availability);
 
     return {
       id: `roadmap:${roadmap.id}:${stage.id}`,
@@ -94,6 +111,7 @@ export function syncRoadmapCalendarTasks(
   deadline: string,
   completedStageIds: readonly string[] = [],
   now = new Date(),
+  availability: CalendarAvailability = defaultAvailability,
 ): CalendarTask[] {
   const existingById = new Map(tasks.map((task) => [task.id, task]));
   const manualTasks = tasks.filter((task) => task.source === "manual");
@@ -102,6 +120,7 @@ export function syncRoadmapCalendarTasks(
     deadline,
     completedStageIds,
     now,
+    availability,
   ).map((task) => ({
     ...task,
     createdAt: existingById.get(task.id)?.createdAt ?? task.createdAt,

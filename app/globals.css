@@ -2452,6 +2452,10 @@ footer {
   gap: 6px;
 }
 
+.calendar-undo { align-items: center; border-top: 1px solid var(--line); display: flex; gap: 12px; justify-content: space-between; margin-top: 14px; padding-top: 12px; }
+.calendar-undo span { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-undo .button { flex: 0 0 auto; }
+
 .legend-dot {
   width: 8px;
   height: 8px;
@@ -3533,6 +3537,9 @@ footer {
 .engineering-guided-card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; display: grid; gap: 16px; grid-template-columns: 48px 1fr; padding: 22px; }
 .engineering-guided-number { color: var(--palm); font-size: .78rem; font-weight: 900; letter-spacing: .08em; }
 .engineering-guided-card h3 { font-family: var(--font-newsreader), Georgia, serif; font-size: clamp(1.35rem, 2.6vw, 2rem); line-height: 1.05; margin: 0 0 12px; }
+.engineering-guided-card summary { cursor: pointer; list-style: none; }
+.engineering-guided-card summary::-webkit-details-marker { display: none; }
+.engineering-guided-card summary h3 { margin-bottom: 0; }
 .engineering-guided-card p { color: var(--muted); margin: 8px 0; }
 .engineering-guided-card h4 { font-size: .76rem; letter-spacing: .05em; margin: 18px 0 6px; text-transform: uppercase; }
 .engineering-guided-card ul { color: var(--muted); margin: 0; padding-left: 20px; }

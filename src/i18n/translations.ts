@@ -159,6 +159,15 @@ export interface Translation {
     warnings: string;
     noValue: string;
     validationError: string;
+    retry: string;
+    errors: {
+      technicalBrief: string;
+      definitionOfDone: string;
+      currentExperience: string;
+      deadline: string;
+      repository: string;
+      existingErrors: string;
+    };
   };
   preparation: {
     eyebrow: string;
@@ -480,6 +489,7 @@ export interface Translation {
     taskSingular: string;
     taskPlural: string;
     deleteTask: string;
+    undoDelete: string;
   };
   loading: {
     eyebrow: string;
@@ -667,6 +677,15 @@ const en: Translation = {
     warnings: "Important limits",
     noValue: "Not provided",
     validationError: "Please complete the required build details.",
+    retry: "Try the review again",
+    errors: {
+      technicalBrief: "Describe the build in at least 30 characters.",
+      definitionOfDone: "Describe what must be true when the build is accepted.",
+      currentExperience: "Describe your current technical experience.",
+      deadline: "Choose today or a future deadline.",
+      repository: "Provide a repository URL or project location for this existing project.",
+      existingErrors: "Describe the existing error or blocker.",
+    },
   },
   preparation: {
     eyebrow: "Choose your preparation route",
@@ -1042,6 +1061,7 @@ const en: Translation = {
     taskSingular: "task",
     taskPlural: "tasks",
     deleteTask: "Delete task",
+    undoDelete: "Undo",
   },
   loading: {
     eyebrow: "Building your path",
@@ -1239,6 +1259,15 @@ const vi: Translation = {
     warnings: "Giới hạn quan trọng",
     noValue: "Chưa cung cấp",
     validationError: "Vui lòng hoàn thành các thông tin xây dựng bắt buộc.",
+    retry: "Thử review lại",
+    errors: {
+      technicalBrief: "Hãy mô tả bản build ít nhất 30 ký tự.",
+      definitionOfDone: "Hãy mô tả điều kiện cần đạt khi chấp nhận bản build.",
+      currentExperience: "Hãy mô tả kinh nghiệm kỹ thuật hiện tại.",
+      deadline: "Chọn hôm nay hoặc một ngày trong tương lai.",
+      repository: "Hãy cung cấp URL repository hoặc vị trí dự án hiện có.",
+      existingErrors: "Hãy mô tả lỗi hoặc blocker hiện tại.",
+    },
   },
   preparation: {
     eyebrow: "Chọn cách chuẩn bị",
@@ -1614,6 +1643,7 @@ const vi: Translation = {
     taskSingular: "công việc",
     taskPlural: "công việc",
     deleteTask: "Xóa công việc",
+    undoDelete: "Hoàn tác",
   },
   loading: {
     eyebrow: "Đang xây dựng lộ trình",

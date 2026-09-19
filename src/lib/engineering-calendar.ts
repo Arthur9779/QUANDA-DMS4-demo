@@ -1,11 +1,13 @@
 import {
-  addLocalDays,
   atLocalNoon,
   fromLocalDateKey,
-  localCalendarDayDistance,
   toLocalDateKey,
 } from "@/src/lib/date";
-import { categoryForIndex } from "@/src/lib/calendar";
+import {
+  categoryForIndex,
+  dueDateForCumulativeMinutes,
+  type CalendarAvailability,
+} from "@/src/lib/calendar";
 import type { EngineeringGuidedPlan, EngineeringRoadmap } from "@/src/project-path/contracts";
 import type { CalendarTask } from "@/src/types";
 
@@ -29,28 +31,16 @@ export function createEngineeringRoadmapCalendarTasks(
   deadline: string,
   completedTaskIds: readonly string[] = [],
   now = new Date(),
+  availability: CalendarAvailability = { hoursPerDay: 2, daysPerWeek: 6 },
 ): CalendarTask[] {
   const start = atLocalNoon(now);
   const parsedDeadline = fromLocalDateKey(deadline) ?? start;
   const end = parsedDeadline < start ? start : parsedDeadline;
-  const daySpan = Math.max(0, localCalendarDayDistance(start, end));
-  const totalMinutes = Math.max(
-    1,
-    roadmap.tasks.reduce(
-      (sum, task) => sum + task.estimatedAgentMinutes + task.estimatedHumanReviewMinutes,
-      0,
-    ),
-  );
   let cumulativeMinutes = 0;
 
   return roadmap.tasks.map((task, index) => {
     cumulativeMinutes += task.estimatedAgentMinutes + task.estimatedHumanReviewMinutes;
-    const proportionalOffset = Math.round(daySpan * (cumulativeMinutes / totalMinutes));
-    const minimumOffset = daySpan > 0 ? 1 : 0;
-    const dueDate = addLocalDays(
-      start,
-      Math.min(daySpan, Math.max(minimumOffset, proportionalOffset)),
-    );
+    const dueDate = dueDateForCumulativeMinutes(start, end, cumulativeMinutes, availability);
     return {
       id: `${engineeringRoadmapPrefix}${roadmap.id}:${task.id}`,
       title: task.title,
@@ -69,20 +59,15 @@ export function createEngineeringGuidedPlanCalendarTasks(
   plan: EngineeringGuidedPlan,
   deadline: string,
   now = new Date(),
+  availability: CalendarAvailability = { hoursPerDay: 2, daysPerWeek: 6 },
 ): CalendarTask[] {
   const start = atLocalNoon(now);
   const parsedDeadline = fromLocalDateKey(deadline) ?? start;
   const end = parsedDeadline < start ? start : parsedDeadline;
-  const daySpan = Math.max(0, localCalendarDayDistance(start, end));
-  const stepCount = Math.max(1, plan.steps.length);
+  const minutesPerStep = Math.max(30, availability.hoursPerDay * 60);
 
   return plan.steps.map((step, index) => {
-    const proportionalOffset = Math.round(daySpan * ((index + 1) / stepCount));
-    const minimumOffset = daySpan > 0 ? 1 : 0;
-    const dueDate = addLocalDays(
-      start,
-      Math.min(daySpan, Math.max(minimumOffset, proportionalOffset)),
-    );
+    const dueDate = dueDateForCumulativeMinutes(start, end, (index + 1) * minutesPerStep, availability);
     return {
       id: `${engineeringGuidedPlanPrefix}${plan.id}:${step.id}`,
       title: step.title,
@@ -103,6 +88,7 @@ export function syncEngineeringRoadmapCalendarTasks(
   deadline: string,
   completedTaskIds: readonly string[] = [],
   now = new Date(),
+  availability: CalendarAvailability = { hoursPerDay: 2, daysPerWeek: 6 },
 ): CalendarTask[] {
   const existingById = new Map(tasks.map((task) => [task.id, task]));
   const roadmapTasks = createEngineeringRoadmapCalendarTasks(
@@ -110,6 +96,7 @@ export function syncEngineeringRoadmapCalendarTasks(
     deadline,
     completedTaskIds,
     now,
+    availability,
   ).map((task) => ({
     ...task,
     createdAt: existingById.get(task.id)?.createdAt ?? task.createdAt,
@@ -125,9 +112,10 @@ export function syncEngineeringGuidedPlanCalendarTasks(
   plan: EngineeringGuidedPlan,
   deadline: string,
   now = new Date(),
+  availability: CalendarAvailability = { hoursPerDay: 2, daysPerWeek: 6 },
 ): CalendarTask[] {
   const existingById = new Map(tasks.map((task) => [task.id, task]));
-  const guidedTasks = createEngineeringGuidedPlanCalendarTasks(plan, deadline, now).map((task) => ({
+  const guidedTasks = createEngineeringGuidedPlanCalendarTasks(plan, deadline, now, availability).map((task) => ({
     ...task,
     createdAt: existingById.get(task.id)?.createdAt ?? task.createdAt,
     done: existingById.get(task.id)?.done ?? task.done,
