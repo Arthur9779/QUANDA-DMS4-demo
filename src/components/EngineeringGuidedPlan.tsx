@@ -10,7 +10,7 @@ export function EngineeringGuidedPlan({ plan, t, onStartOver }: { plan: Engineer
         {plan.steps.map((step, index) => (
           <article className="engineering-guided-card" key={step.id}>
             <span className="engineering-guided-number">{String(index + 1).padStart(2, "0")}</span>
-            <div><h3>{step.title}</h3><p><strong>{t.preparation.outcome}:</strong> {step.outcome}</p><p><strong>{t.preparation.why}:</strong> {step.whyItMatters}</p><h4>{t.preparation.checks}</h4><ul>{step.checks.map((check) => <li key={check}>{check}</li>)}</ul>{step.resources.length > 0 && <div className="engineering-guided-resources"><h4>{t.preparation.resources}</h4>{step.resources.map((resource) => <a href={resource.url} key={resource.url} rel="noreferrer" target="_blank">{resource.label}<ExternalLink aria-hidden="true" size={14} /><small>{resource.reason}</small></a>)}</div>}</div>
+            <div><details open={index === 0}><summary><h3>{step.title}</h3></summary><p><strong>{t.preparation.outcome}:</strong> {step.outcome}</p><p><strong>{t.preparation.why}:</strong> {step.whyItMatters}</p><h4>{t.preparation.checks}</h4><ul>{step.checks.map((check) => <li key={check}>{check}</li>)}</ul>{step.resources.length > 0 && <div className="engineering-guided-resources"><h4>{t.preparation.resources}</h4>{step.resources.map((resource) => <a href={resource.url} key={resource.url} rel="noreferrer" target="_blank">{resource.label}<ExternalLink aria-hidden="true" size={14} /><small>{resource.reason}</small></a>)}</div>}</details></div>
           </article>
         ))}
       </div>

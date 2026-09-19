@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Translation } from "@/src/i18n/translations";
 import { categoryForIndex } from "@/src/lib/calendar";
 import {
@@ -17,6 +17,7 @@ interface ProjectCalendarProps {
   tasks: CalendarTask[];
   onAddTask: (task: CalendarTask) => void;
   onDeleteTask: (taskId: string) => void;
+  onRestoreTask: (task: CalendarTask) => void;
   onToggleTask: (taskId: string) => void;
   onNavigate: (direction: "previous" | "today" | "next") => void;
 }
@@ -54,6 +55,7 @@ export function ProjectCalendar({
   tasks,
   onAddTask,
   onDeleteTask,
+  onRestoreTask,
   onToggleTask,
   onNavigate,
 }: ProjectCalendarProps) {
@@ -62,6 +64,7 @@ export function ProjectCalendar({
   const [selectedDate, setSelectedDate] = useState(() => new Date(today));
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDeadline, setTaskDeadline] = useState(() => toLocalDateKey(today));
+  const [deletedTask, setDeletedTask] = useState<CalendarTask | null>(null);
   const languageTag = locale === "vi" ? "vi-VN" : "en-US";
   const calendarDays = useMemo(
     () => createCalendarDays(visibleMonth),
@@ -74,6 +77,12 @@ export function ProjectCalendar({
     locale === "vi"
       ? ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
       : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  useEffect(() => {
+    if (!deletedTask) return;
+    const timeout = window.setTimeout(() => setDeletedTask(null), 6_000);
+    return () => window.clearTimeout(timeout);
+  }, [deletedTask]);
 
   const selectDate = (date: Date) => {
     const next = atLocalNoon(date);
@@ -339,7 +348,10 @@ export function ProjectCalendar({
                     <button
                       aria-label={`${t.calendar.deleteTask}: ${task.title}`}
                       className="delete-task"
-                      onClick={() => onDeleteTask(task.id)}
+                      onClick={() => {
+                        onDeleteTask(task.id);
+                        setDeletedTask(task);
+                      }}
                       type="button"
                     >
                       <Trash2 aria-hidden="true" size={15} />
@@ -348,6 +360,7 @@ export function ProjectCalendar({
                 ))
               )}
             </div>
+            {deletedTask && <div className="calendar-undo" role="status"><span>{deletedTask.title}</span><button className="button button-text" onClick={() => { onRestoreTask(deletedTask); setDeletedTask(null); }} type="button">{t.calendar.undoDelete}</button></div>}
           </aside>
         </div>
       </div>

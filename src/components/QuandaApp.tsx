@@ -191,6 +191,7 @@ export function QuandaApp() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isMatchingTutorials, setIsMatchingTutorials] = useState(false);
+  const [isEngineeringInterpreting, setIsEngineeringInterpreting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [matchingError, setMatchingError] = useState<string | null>(null);
@@ -200,7 +201,11 @@ export function QuandaApp() {
   const calendarViewTracked = useRef(false);
   const viewedRoadmapIds = useRef(new Set<string>());
   const restoredRoadmapIds = useRef(new Set<string>());
-  const shouldScrollToPreparation = useRef(false);
+  const pendingScrollTarget = useRef<string | null>(null);
+  const analysisInFlight = useRef(false);
+  const matchingInFlight = useRef(false);
+  const roadmapInFlight = useRef(false);
+  const engineeringInterpretationInFlight = useRef(false);
   const t = getTranslation(locale);
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -220,6 +225,9 @@ export function QuandaApp() {
     onComplete={() => { dismissPasswordReset(); window.location.assign("/?login=1"); }}
   /> : null;
   const announceWorkflowStage = (stage: WorkflowStage) => setWorkflowStage(stage);
+  const requestScrollAfterMount = (targetId: string) => {
+    pendingScrollTarget.current = targetId;
+  };
   const guidedRouteEvaluation = useMemo(() => {
     if (!engineeringGuidedPlan || !engineeringInterpretation) return null;
     // Use the existing engineering estimate and route scorer so guided preparation
@@ -248,7 +256,7 @@ export function QuandaApp() {
     setCompletion(snapshot.completion);
     if (snapshot.roadmap) restoredRoadmapIds.current.add(snapshot.roadmap.id);
     setCalendarTasks(snapshot.roadmap
-      ? syncRoadmapCalendarTasks(snapshot.calendarTasks, snapshot.roadmap, snapshot.form.deadline, snapshot.completion[snapshot.roadmap.id] ?? [])
+      ? syncRoadmapCalendarTasks(snapshot.calendarTasks, snapshot.roadmap, snapshot.form.deadline, snapshot.completion[snapshot.roadmap.id] ?? [], undefined, { hoursPerDay: snapshot.form.hoursPerDay, daysPerWeek: snapshot.form.daysPerWeek })
       : removeRoadmapCalendarTasks(snapshot.calendarTasks));
     setEngineeringForm(snapshot.engineeringForm ?? emptyEngineeringForm(restoredLocale, snapshot.form.projectBrief));
     setEngineeringInterpretation(snapshot.engineeringInterpretation);
@@ -259,9 +267,9 @@ export function QuandaApp() {
     setEngineeringCompletion(snapshot.engineeringCompletion);
     const deadline = snapshot.engineeringForm?.deadline ?? emptyEngineeringForm(restoredLocale).deadline;
     setEngineeringCalendarTasks(snapshot.engineeringRoadmap
-      ? syncEngineeringRoadmapCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringRoadmap, deadline, snapshot.engineeringCompletion)
+      ? syncEngineeringRoadmapCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringRoadmap, deadline, snapshot.engineeringCompletion, undefined, { hoursPerDay: snapshot.engineeringForm?.hoursPerDay ?? 2, daysPerWeek: snapshot.engineeringForm?.daysPerWeek ?? 6 })
       : snapshot.engineeringGuidedPlan
-        ? syncEngineeringGuidedPlanCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringGuidedPlan, deadline)
+        ? syncEngineeringGuidedPlanCalendarTasks(snapshot.engineeringCalendarTasks, snapshot.engineeringGuidedPlan, deadline, undefined, { hoursPerDay: snapshot.engineeringForm?.hoursPerDay ?? 2, daysPerWeek: snapshot.engineeringForm?.daysPerWeek ?? 6 })
         : removeEngineeringCalendarTasks(snapshot.engineeringCalendarTasks));
   }, []);
 
@@ -317,12 +325,16 @@ export function QuandaApp() {
               savedEngineeringRoadmap,
               engineeringDeadline,
               savedEngineeringCompletion,
+              undefined,
+              { hoursPerDay: savedEngineeringDraft?.hoursPerDay ?? 2, daysPerWeek: savedEngineeringDraft?.daysPerWeek ?? 6 },
             )
           : savedEngineeringGuidedPlan
             ? syncEngineeringGuidedPlanCalendarTasks(
                 savedEngineeringCalendarTasks,
                 savedEngineeringGuidedPlan,
                 engineeringDeadline,
+                undefined,
+                { hoursPerDay: savedEngineeringDraft?.hoursPerDay ?? 2, daysPerWeek: savedEngineeringDraft?.daysPerWeek ?? 6 },
               )
             : removeEngineeringCalendarTasks(savedEngineeringCalendarTasks),
       );
@@ -343,6 +355,8 @@ export function QuandaApp() {
               restoredRoadmap,
               restoredForm.deadline,
               savedCompletion[restoredRoadmap.id] ?? [],
+              undefined,
+              { hoursPerDay: restoredForm.hoursPerDay, daysPerWeek: restoredForm.daysPerWeek },
             )
           : removeRoadmapCalendarTasks(savedCalendarTasks),
       );
@@ -408,23 +422,16 @@ export function QuandaApp() {
   }, [isHydrated, projectPath]);
 
   useEffect(() => {
-    if (
-      !shouldScrollToPreparation.current ||
-      !engineeringInterpretation ||
-      !engineeringInterpretationConfirmed
-    ) {
-      return;
-    }
-
-    shouldScrollToPreparation.current = false;
+    const targetId = pendingScrollTarget.current;
+    if (!targetId) return;
     const frame = window.requestAnimationFrame(() => {
-      document.querySelector("#preparation-method")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      pendingScrollTarget.current = null;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [engineeringInterpretation, engineeringInterpretationConfirmed]);
+  }, [engineeringInterpretation, engineeringInterpretationConfirmed, engineeringGuidedPlan, engineeringRoadmap, learningPlan, roadmap]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -632,6 +639,8 @@ export function QuandaApp() {
           nextRoadmap,
           nextForm.deadline,
           completion[nextRoadmap.id] ?? [],
+          undefined,
+          { hoursPerDay: nextForm.hoursPerDay, daysPerWeek: nextForm.daysPerWeek },
         ),
       );
     } else if (roadmap?.source === "fallback") {
@@ -739,7 +748,10 @@ export function QuandaApp() {
   };
 
   const interpretEngineering = async (request: EngineeringProject) => {
-    shouldScrollToPreparation.current = true;
+    if (engineeringInterpretationInFlight.current) return;
+    engineeringInterpretationInFlight.current = true;
+    setIsEngineeringInterpreting(true);
+    requestScrollAfterMount("preparation-method");
     beginAnalyticsJourney("agentic_engineering", request, { newJourney: true });
     setEngineeringForm(request);
     setEngineeringError(null);
@@ -786,6 +798,9 @@ export function QuandaApp() {
         workflow: "agentic_engineering",
         source: "fallback",
       });
+    } finally {
+      engineeringInterpretationInFlight.current = false;
+      setIsEngineeringInterpreting(false);
     }
   };
 
@@ -795,6 +810,8 @@ export function QuandaApp() {
     interpretation: EngineeringInterpretationValue | null = engineeringInterpretation,
   ) => {
     if (!interpretation || method !== "agentic_project_plan") return;
+    if (roadmapInFlight.current) return;
+    roadmapInFlight.current = true;
     beginAnalyticsJourney("agentic_engineering", project);
     setEngineeringError(null);
     trackEvent("engineering_plan_generate_started", {
@@ -847,13 +864,16 @@ export function QuandaApp() {
         withEvaluation,
         project.deadline,
         engineeringCompletion,
+        undefined,
+        { hoursPerDay: project.hoursPerDay, daysPerWeek: project.daysPerWeek },
       ),
     );
-    requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestScrollAfterMount("engineering-roadmap-results");
+    roadmapInFlight.current = false;
   };
 
   const choosePreparationMethod = (method: PreparationMethod) => {
-    if (!engineeringInterpretation || !engineeringInterpretationConfirmed) return;
+    if (!engineeringInterpretation || !engineeringInterpretationConfirmed || roadmapInFlight.current) return;
     beginAnalyticsJourney("agentic_engineering", engineeringForm);
     setPreparationMethod(method);
     trackEvent("engineering_preparation_selected", {
@@ -868,6 +888,7 @@ export function QuandaApp() {
     clearPreparationState(window.localStorage);
     writePreparationMethod(window.localStorage, method);
     if (method === "guided_tutorials") {
+      requestScrollAfterMount("engineering-guided-plan");
       trackEvent("engineering_plan_generate_started", {
         workflow: "agentic_engineering",
         preparationMethod: method,
@@ -882,12 +903,11 @@ export function QuandaApp() {
       });
       writeEngineeringGuidedPlan(window.localStorage, plan);
       setEngineeringCalendarTasks((current) =>
-        syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline),
+        syncEngineeringGuidedPlanCalendarTasks(current, plan, engineeringForm.deadline, undefined, { hoursPerDay: engineeringForm.hoursPerDay, daysPerWeek: engineeringForm.daysPerWeek }),
       );
-      requestAnimationFrame(() => document.querySelector(".route-evaluation")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       return;
     }
-    requestAnimationFrame(() => document.querySelector("#engineering-roadmap-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestScrollAfterMount("engineering-roadmap-results");
     void generateEngineering(method, engineeringForm, engineeringInterpretation);
   };
 
@@ -908,7 +928,7 @@ export function QuandaApp() {
         ? "Basic programming knowledge of variables, conditions, loops, and functions; new to Godot and GDScript."
         : "Biết kiến thức lập trình cơ bản như variable, condition, loop và function; mới bắt đầu sử dụng Godot và GDScript.",
       deploymentTarget: locale === "en" ? "Playable Windows build" : "Bản build Windows có thể chơi được",
-      deadline: "2026-09-01",
+      deadline: dateFromToday(14),
       hoursPerDay: 2,
       daysPerWeek: 6,
       constraints: locale === "en"
@@ -947,6 +967,8 @@ export function QuandaApp() {
     request: RoadmapRequest,
     options: { newJourney?: boolean } = { newJourney: true },
   ) => {
+    if (analysisInFlight.current) return;
+    analysisInFlight.current = true;
     beginAnalyticsJourney("design", request, options);
     setForm(request);
     setIsAnalyzing(true);
@@ -1041,6 +1063,7 @@ export function QuandaApp() {
     } finally {
       window.clearTimeout(timeout);
       setIsAnalyzing(false);
+      analysisInFlight.current = false;
     }
   };
 
@@ -1048,6 +1071,8 @@ export function QuandaApp() {
     review: CreativeDnaReviewRecord,
     project: RoadmapRequest = form,
   ) => {
+    if (matchingInFlight.current) return;
+    matchingInFlight.current = true;
     setIsMatchingTutorials(true);
     setMatchingError(null);
     setRoadmap(null);
@@ -1083,17 +1108,13 @@ export function QuandaApp() {
           (match) => Boolean(match.selectedTutorialId),
         ).length,
       });
-      window.setTimeout(() => {
-        document.querySelector("#learning-path-review")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 50);
+      requestScrollAfterMount("learning-path-review");
     } catch {
       setMatchingError(t.learning.errorMessage);
     } finally {
       window.clearTimeout(timeout);
       setIsMatchingTutorials(false);
+      matchingInFlight.current = false;
     }
   };
 
@@ -1106,6 +1127,8 @@ export function QuandaApp() {
       void matchTutorials(creativeDnaReview);
       return;
     }
+    if (roadmapInFlight.current) return;
+    roadmapInFlight.current = true;
     beginAnalyticsJourney("design", request);
     setForm(request);
     setIsLoading(true);
@@ -1215,7 +1238,7 @@ export function QuandaApp() {
           [finalRoadmap.id]: [],
         }));
         setCalendarTasks((current) =>
-          syncRoadmapCalendarTasks(current, finalRoadmap, request.deadline),
+          syncRoadmapCalendarTasks(current, finalRoadmap, request.deadline, [], undefined, { hoursPerDay: request.hoursPerDay, daysPerWeek: request.daysPerWeek }),
         );
         trackEvent(
           finalRoadmap.source === "fallback"
@@ -1227,13 +1250,9 @@ export function QuandaApp() {
             stageCount: finalRoadmap.stages.length,
           },
         );
-        window.setTimeout(() => {
-          document.querySelector("#roadmap-results")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }, 50);
+        requestScrollAfterMount("roadmap-results");
       }
+      roadmapInFlight.current = false;
     }
   };
 
@@ -1542,7 +1561,7 @@ export function QuandaApp() {
 
         {projectPath === "agentic_engineering" && (
           <EngineeringProjectForm
-            isSubmitting={!isHydrated || Boolean(engineeringInterpretation) || Boolean(engineeringRoadmap)}
+            isSubmitting={!isHydrated || isEngineeringInterpreting || Boolean(engineeringInterpretation) || Boolean(engineeringRoadmap)}
             onChange={(next) => {
               setEngineeringForm(next);
               setEngineeringInterpretation(null);
@@ -1561,7 +1580,8 @@ export function QuandaApp() {
         )}
 
         <div aria-live="polite">
-          {projectPath === "agentic_engineering" && engineeringError && <div className="api-error" role="status"><strong>{t.engineering.notice}</strong><p>{engineeringError}</p></div>}
+          {projectPath === "agentic_engineering" && isEngineeringInterpreting && <p className="workflow-status" role="status">{t.engineering.loading}</p>}
+          {projectPath === "agentic_engineering" && engineeringError && <div className="api-error" role="status"><strong>{t.engineering.notice}</strong><p>{engineeringError}</p><button className="button button-primary" disabled={isEngineeringInterpreting} onClick={() => void interpretEngineering(engineeringForm)} type="button">{t.engineering.retry}</button></div>}
           {projectPath === "design" && isAnalyzing && <LoadingAnalysis t={t} />}
           {projectPath === "design" && isMatchingTutorials && <LoadingLearningPath t={t} />}
           {projectPath === "design" && analysisError && (
@@ -1701,6 +1721,7 @@ export function QuandaApp() {
               current.filter((task) => task.id !== taskId),
             )
           }
+          onRestoreTask={(task) => setCalendarTasks((current) => [...current, task])}
           onToggleTask={toggleCalendarTask}
           onNavigate={(direction) =>
             trackEvent("calendar_navigation_used", {
@@ -1742,6 +1763,7 @@ export function QuandaApp() {
                   current.filter((task) => task.id !== taskId),
                 )
               }
+              onRestoreTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
               onNavigate={(direction) =>
                 trackEvent("calendar_navigation_used", {
                   workflow: "agentic_engineering",
@@ -1783,6 +1805,7 @@ export function QuandaApp() {
                   current.filter((task) => task.id !== taskId),
                 )
               }
+              onRestoreTask={(task) => setEngineeringCalendarTasks((current) => [...current, task])}
               onNavigate={(direction) =>
                 trackEvent("calendar_navigation_used", {
                   workflow: "agentic_engineering",
