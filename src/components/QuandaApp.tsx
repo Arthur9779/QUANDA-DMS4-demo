@@ -888,7 +888,7 @@ export function QuandaApp() {
     clearPreparationState(window.localStorage);
     writePreparationMethod(window.localStorage, method);
     if (method === "guided_tutorials") {
-      requestScrollAfterMount("engineering-guided-plan");
+      requestScrollAfterMount("evidence-backed-route-choice");
       trackEvent("engineering_plan_generate_started", {
         workflow: "agentic_engineering",
         preparationMethod: method,
@@ -1739,7 +1739,7 @@ export function QuandaApp() {
 
         {projectPath === "agentic_engineering" && engineeringGuidedPlan && preparationMethod === "guided_tutorials" && (
           <>
-            {guidedRouteEvaluation && <RouteEvaluationCard evaluation={guidedRouteEvaluation} t={t} />}
+            {guidedRouteEvaluation && <RouteEvaluationCard evaluation={guidedRouteEvaluation} id="evidence-backed-route-choice" t={t} />}
             <EngineeringGuidedPlan
               plan={engineeringGuidedPlan}
               t={t}
