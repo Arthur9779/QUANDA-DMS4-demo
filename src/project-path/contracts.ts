@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Locale, OutputType } from "@/src/types";
 import { RouteEvaluationSchema } from "@/src/route-planning/contracts";
+import { ReferenceImageFindingSchema } from "@/src/reference-image/contracts";
 
 export const ProjectPathSchema = z.enum(["design", "agentic_engineering"]);
 export type ProjectPath = z.infer<typeof ProjectPathSchema>;
@@ -36,6 +37,7 @@ export const EngineeringPlatformSchema = z.enum([
   "other",
 ]);
 export type EngineeringPlatform = z.infer<typeof EngineeringPlatformSchema>;
+const EngineeringSelectablePlatformSchema = EngineeringPlatformSchema.exclude(["other"]);
 
 export const EngineeringProjectSchema = z
   .object({
@@ -50,6 +52,9 @@ export const EngineeringProjectSchema = z
     projectLocation: z.string().trim().max(500).optional(),
     definitionOfDone: z.string().trim().min(5).max(2_000),
     targetPlatform: EngineeringPlatformSchema,
+    targetPlatforms: EngineeringSelectablePlatformSchema.array().max(8).optional(),
+    customTargetPlatforms: z.array(z.string().trim().min(1).max(120)).max(12).optional(),
+    referenceFindings: z.array(ReferenceImageFindingSchema).max(8).optional(),
     technologies: z.string().trim().max(500).optional(),
     currentExperience: z.string().trim().min(2).max(1_200),
     deploymentTarget: z.string().trim().max(500).optional(),
@@ -80,6 +85,7 @@ export type EngineeringProject = z.infer<typeof EngineeringProjectSchema>;
 export const EngineeringInterpretationSchema = z.object({
   path: z.literal("agentic_engineering"),
   productType: z.string().min(1).max(240),
+  visualReferenceFindings: z.array(ReferenceImageFindingSchema).max(8).optional(),
   startingPoint: EngineeringStartingPointSchema,
   coreFeatures: z.array(z.string().min(1).max(500)).min(1).max(12),
   suggestedTechnologyStack: z.array(z.string().min(1).max(120)).max(12),

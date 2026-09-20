@@ -59,4 +59,26 @@ describe("agentic engineering workflow", () => {
     expect(roadmap.warnings[0]).toContain("review diff");
     expect(roadmap.routeEvaluation?.explanation).toContain("sáu tiêu chí");
   });
+
+  it("preserves multiple custom targets and approved visual references", () => {
+    const multiTarget = EngineeringProjectSchema.parse({
+      ...project,
+      targetPlatform: "other",
+      targetPlatforms: ["web_application", "game"],
+      customTargetPlatforms: ["Console build"],
+      referenceFindings: [{
+        id: "reference-1234abcd",
+        label: "High contrast interface",
+        category: "visual_quality",
+        evidence: "The reference uses strong contrast between foreground and background.",
+        confidence: 0.9,
+      }],
+    });
+    const interpretation = interpretEngineeringProject(multiTarget);
+
+    expect(interpretation.productType).toContain("web application");
+    expect(interpretation.productType).toContain("game");
+    expect(interpretation.productType).toContain("Console build");
+    expect(interpretation.visualReferenceFindings).toHaveLength(1);
+  });
 });

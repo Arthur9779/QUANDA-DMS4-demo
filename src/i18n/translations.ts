@@ -107,6 +107,15 @@ export interface Translation {
     definitionPlaceholder: string;
     platform: string;
     platformOptions: LabelOption[];
+    platformCustomizeLabel: string;
+    platformCustomizeHint: string;
+    selectedCustomPlatforms: string;
+    customPlatformSearchLabel: string;
+    customPlatformSearchPlaceholder: string;
+    customPlatformSearchHint: string;
+    addCustomPlatform: string;
+    removeCustomPlatform: string;
+    customPlatformHint: string;
     technologies: string;
     technologiesPlaceholder: string;
     experience: string;
@@ -634,6 +643,15 @@ const en: Translation = {
       { value: "plugin_extension", label: "Plugin / extension" },
       { value: "other", label: "Other technical system" },
     ],
+    platformCustomizeLabel: "Choose all target platforms that apply",
+    platformCustomizeHint: "Select more than one when the technical system targets multiple environments, then add a custom target if needed.",
+    selectedCustomPlatforms: "Custom target platforms",
+    customPlatformSearchLabel: "Add another target platform",
+    customPlatformSearchPlaceholder: "Try a console build, embedded device, browser extension…",
+    customPlatformSearchHint: "Type a target platform or technical system that is not listed above.",
+    addCustomPlatform: "Add target: {name}",
+    removeCustomPlatform: "Remove custom target",
+    customPlatformHint: "This target will be included in the engineering brief.",
     technologies: "Preferred tools and technologies",
     technologiesPlaceholder: "For example: Next.js, TypeScript, PostgreSQL (optional)",
     experience: "Current technical experience",
@@ -1225,6 +1243,15 @@ const vi: Translation = {
       { value: "plugin_extension", label: "Plugin / extension" },
       { value: "other", label: "Hệ thống kỹ thuật khác" },
     ],
+    platformCustomizeLabel: "Chọn tất cả nền tảng mục tiêu phù hợp",
+    platformCustomizeHint: "Chọn nhiều nền tảng khi hệ thống kỹ thuật chạy ở nhiều môi trường, rồi thêm mục tiêu tùy chỉnh nếu cần.",
+    selectedCustomPlatforms: "Nền tảng mục tiêu tùy chỉnh",
+    customPlatformSearchLabel: "Thêm nền tảng mục tiêu khác",
+    customPlatformSearchPlaceholder: "Ví dụ: bản build console, thiết bị nhúng, browser extension…",
+    customPlatformSearchHint: "Nhập nền tảng hoặc hệ thống kỹ thuật chưa có trong danh sách.",
+    addCustomPlatform: "Thêm mục tiêu: {name}",
+    removeCustomPlatform: "Xóa mục tiêu tùy chỉnh",
+    customPlatformHint: "Mục tiêu này sẽ được đưa vào đề bài kỹ thuật.",
     technologies: "Công cụ và công nghệ muốn dùng",
     technologiesPlaceholder: "Ví dụ: Next.js, TypeScript, PostgreSQL (không bắt buộc)",
     experience: "Kinh nghiệm kỹ thuật hiện tại",
