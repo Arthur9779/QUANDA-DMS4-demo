@@ -87,6 +87,27 @@ describe("design application path scoring", () => {
     expect(decision.alternatives.every((path) => path.applicationIds.includes("custom:touchdesigner"))).toBe(true);
   });
 
+  it("scores a customized multi-output brief against every selected deliverable", () => {
+    const decision = scoreDesignApplicationPaths(
+      {
+        ...project,
+        outputType: "other",
+        outputTypes: ["graphic", "video"],
+        projectBrief: "Create a graphic design system and a short video animation using Illustrator and After Effects.",
+        currentExperience: "I am new to Illustrator and After Effects.",
+      },
+      creativeDna,
+    );
+
+    expect(decision.recommended.applicationIds.some((id) =>
+      ["illustrator", "photoshop", "procreate"].includes(id),
+    )).toBe(true);
+    expect(decision.recommended.applicationIds.some((id) =>
+      ["after-effects", "davinci-resolve", "premiere-pro", "blender"].includes(id),
+    )).toBe(true);
+    expect(decision.recommended.viable).toBe(true);
+  });
+
   it("renders the scored route before learning choices without exposing internal path IDs", () => {
     const decision = scoreDesignApplicationPaths(project, creativeDna);
     const markup = renderToStaticMarkup(

@@ -3,6 +3,7 @@ export interface OntologyProjectQueryInput {
   currentExperience?: string;
   requiredApplications?: string[];
   outputType?: string;
+  outputTypes?: string[];
   qualityTarget?: string;
   tutorialLanguage?: "en" | "vi" | "either";
 }
@@ -25,7 +26,10 @@ export function buildOntologyRetrievalQuery(
     sections.push(`EXPLICIT REQUIRED APPLICATIONS\n${applications.join(", ")}`);
   }
 
-  const outputType = clean(input.outputType, 240);
+  const outputType = clean(
+    input.outputTypes?.length ? input.outputTypes.join(", ") : input.outputType,
+    240,
+  );
   if (outputType) sections.push(`DELIVERABLE / OUTPUT\n${outputType}`);
 
   const qualityTarget = clean(input.qualityTarget, 240);

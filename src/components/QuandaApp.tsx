@@ -431,7 +431,7 @@ export function QuandaApp() {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [engineeringInterpretation, engineeringInterpretationConfirmed, engineeringGuidedPlan, engineeringRoadmap, learningPlan, roadmap]);
+  }, [creativeDnaReview, engineeringInterpretation, engineeringInterpretationConfirmed, engineeringGuidedPlan, engineeringRoadmap, learningPlan, roadmap]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -1040,6 +1040,7 @@ export function QuandaApp() {
       };
       setForm(planningRequest);
       setCreativeDnaReview(confirmedReview);
+      requestScrollAfterMount("application-path-comparison");
       announceWorkflowStage("review");
       writeCreativeDnaReview(window.localStorage, confirmedReview);
       trackEvent("creative_dna_review_viewed", {
@@ -1080,12 +1081,7 @@ export function QuandaApp() {
       workflow: "design",
       language: project.tutorialLanguage,
     });
-    requestAnimationFrame(() => {
-      document.querySelector("#learning-path-loading")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    });
+    requestScrollAfterMount("application-path-comparison");
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 30_000);
     try {
@@ -1108,7 +1104,6 @@ export function QuandaApp() {
           (match) => Boolean(match.selectedTutorialId),
         ).length,
       });
-      requestScrollAfterMount("learning-path-review");
     } catch {
       setMatchingError(t.learning.errorMessage);
     } finally {
@@ -1619,7 +1614,6 @@ export function QuandaApp() {
               </button>
             </div>
           )}
-          {projectPath === "design" && isLoading && <LoadingRoadmap t={t} />}
           {projectPath === "design" && error && (
             <div className="api-error" role="alert">
               <strong>{t.form.errorsTitle}</strong>
@@ -1673,6 +1667,12 @@ export function QuandaApp() {
                 t={t}
               />
           )}
+
+        {projectPath === "design" && learningPlan &&
+          creativeDnaReview?.confirmed &&
+          !creativeDnaIsStale &&
+          !learningPlanIsStale &&
+          isLoading && <LoadingRoadmap t={t} />}
 
         {projectPath === "design" && roadmap &&
           roadmap.projectInputFingerprint === projectInputFingerprint && (

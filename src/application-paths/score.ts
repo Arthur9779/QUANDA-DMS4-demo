@@ -27,6 +27,7 @@ interface DesignApplicationPathInput {
   currentExperience: string;
   requiredApplications: string[];
   outputType: string;
+  outputTypes?: string[];
   targetQuality: "basic" | "portfolio" | "unsure";
   tutorialLanguage: "en" | "vi" | "either";
   deadline?: string;
@@ -93,6 +94,13 @@ const normalized = (value: string) => normalizeOntologyLabel(value).replace(/[-_
 const unique = <T,>(values: T[]) => [...new Set(values)];
 const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 
+function selectedOutputTypes(input: DesignApplicationPathInput): string[] {
+  const selected = input.outputType === "other"
+    ? input.outputTypes ?? []
+    : [input.outputType];
+  return unique(selected.length > 0 ? selected : ["other"]);
+}
+
 function activeCreativeText(creativeDna: CreativeDNA): string {
   return normalized([
     creativeDna.projectIntent,
@@ -121,7 +129,9 @@ function inferredApplicationIds(input: DesignApplicationPathInput, creativeDna: 
 function primaryApplicationIds(input: DesignApplicationPathInput, creativeDna: CreativeDNA): string[] {
   const text = normalized(`${input.projectBrief} ${activeCreativeText(creativeDna)}`);
   const inferred = inferredApplicationIds(input, creativeDna);
-  const defaults = [...(OUTPUT_PRIMARY_APPS[input.outputType] ?? OUTPUT_PRIMARY_APPS.other)];
+  const defaults = selectedOutputTypes(input).flatMap(
+    (outputType) => OUTPUT_PRIMARY_APPS[outputType] ?? OUTPUT_PRIMARY_APPS.other,
+  );
   const boosted = defaults.sort((left, right) => {
     const leftDefinition = getApplicationDefinition(left);
     const rightDefinition = getApplicationDefinition(right);
@@ -136,16 +146,18 @@ function primaryApplicationIds(input: DesignApplicationPathInput, creativeDna: C
 function complementaryApplication(primaryId: string, input: DesignApplicationPathInput): string | null {
   const primary = getApplicationDefinition(primaryId);
   const text = normalized(input.projectBrief);
-  if (["video", "3d"].includes(input.outputType) && primary?.category !== "video") return "davinci-resolve";
-  if (input.outputType === "video" && primaryId === "after-effects") return "premiere-pro";
-  if (input.outputType === "graphic" && ["illustrator", "procreate"].includes(primaryId)) return "photoshop";
-  if (input.outputType === "audio" && primaryId === "fl-studio") return "audacity";
-  if (input.outputType === "uiux" && primaryId === "figma" && /motion|animat|transition|microinteraction/.test(text)) return "after-effects";
+  const outputTypes = selectedOutputTypes(input);
+  if (outputTypes.some((type) => ["video", "3d"].includes(type)) && primary?.category !== "video") return "davinci-resolve";
+  if (outputTypes.includes("video") && primaryId === "after-effects") return "premiere-pro";
+  if (outputTypes.includes("graphic") && ["illustrator", "procreate"].includes(primaryId)) return "photoshop";
+  if (outputTypes.includes("audio") && primaryId === "fl-studio") return "audacity";
+  if (outputTypes.includes("uiux") && primaryId === "figma" && /motion|animat|transition|microinteraction/.test(text)) return "after-effects";
   return null;
 }
 
 function routeSeeds(input: DesignApplicationPathInput, creativeDna: CreativeDNA): RouteSeed[] {
   const primaryIds = primaryApplicationIds(input, creativeDna);
+  const outputTypes = selectedOutputTypes(input);
   const hard = unique(input.requiredApplications);
   const seeds: RouteSeed[] = [];
   const add = (applicationIds: string[]) => {
@@ -159,8 +171,8 @@ function routeSeeds(input: DesignApplicationPathInput, creativeDna: CreativeDNA)
     const primary = hard[0];
     const complement = complementaryApplication(primary, input);
     if (complement && !hard.includes(complement)) add([...hard, complement]);
-    if (["video", "3d"].includes(input.outputType) && !hard.includes("premiere-pro")) add([...hard, "premiere-pro"]);
-    if (input.outputType === "video" && !hard.includes("davinci-resolve")) add([...hard, "davinci-resolve"]);
+    if (outputTypes.some((type) => ["video", "3d"].includes(type)) && !hard.includes("premiere-pro")) add([...hard, "premiere-pro"]);
+    if (outputTypes.includes("video") && !hard.includes("davinci-resolve")) add([...hard, "davinci-resolve"]);
     for (const primary of primaryIds) {
       if (!hard.includes(primary)) add([...hard, primary]);
     }
@@ -187,9 +199,10 @@ function requirementScore(applicationIds: string[], hardRequired: string[]): num
   return hardRequired.every((requiredId) => applicationIds.includes(requiredId)) ? 100 : 0;
 }
 
-function coversCoreDeliverable(
+function coversCoreDeliverableForType(
   applicationIds: string[],
   input: DesignApplicationPathInput,
+  outputType: string,
 ): boolean {
   const definitions = applicationIds.map((id) => getApplicationDefinition(id));
   const brief = normalized(input.projectBrief);
@@ -199,37 +212,50 @@ function coversCoreDeliverable(
     isCustomApplicationId(id) && applicationMentioned(brief, id),
   );
 
-  if (input.outputType === "video") {
+  if (outputType === "video") {
     const needsMotionCreation = /animat|motion graphics|moving image|kinetic|frame by frame/.test(brief);
     if (!needsMotionCreation) return hasCategory("video") || hasNamedCustomTool;
     return applicationIds.some((id) =>
       ["after-effects", "blender", "procreate"].includes(id),
     ) || hasNamedCustomTool;
   }
-  if (input.outputType === "3d") return hasCategory("3d") || hasNamedCustomTool;
-  if (input.outputType === "uiux") return hasCategory("uiux") || hasNamedCustomTool;
-  if (input.outputType === "audio") return hasCategory("audio") || hasNamedCustomTool;
-  if (input.outputType === "graphic" || input.outputType === "photo") {
+  if (outputType === "3d") return hasCategory("3d") || hasNamedCustomTool;
+  if (outputType === "uiux") return hasCategory("uiux") || hasNamedCustomTool;
+  if (outputType === "audio") return hasCategory("audio") || hasNamedCustomTool;
+  if (outputType === "graphic" || outputType === "photo") {
     return hasCategory("graphics") || hasCategory("drawing") || hasNamedCustomTool;
   }
   return true;
 }
 
+function coversCoreDeliverable(
+  applicationIds: string[],
+  input: DesignApplicationPathInput,
+): boolean {
+  return selectedOutputTypes(input).every((outputType) =>
+    coversCoreDeliverableForType(applicationIds, input, outputType),
+  );
+}
+
 function deliverableFit(applicationIds: string[], input: DesignApplicationPathInput): number {
   const text = normalized(input.projectBrief);
-  const fitByCategory = OUTPUT_CATEGORY_FIT[input.outputType] ?? OUTPUT_CATEGORY_FIT.other;
-  let score = Math.max(...applicationIds.map((id) => {
-    const definition = getApplicationDefinition(id);
-    if (!definition) return applicationMentioned(text, id) ? 90 : 68;
-    const base = fitByCategory[definition.category] ?? 35;
-    const useMatches = definition.commonUses.filter((use) => text.includes(normalized(use))).length;
-    return base + Math.min(12, useMatches * 4);
-  }));
+  const scoreByOutput = selectedOutputTypes(input).map((outputType) => {
+    const fitByCategory = OUTPUT_CATEGORY_FIT[outputType] ?? OUTPUT_CATEGORY_FIT.other;
+    return Math.max(...applicationIds.map((id) => {
+      const definition = getApplicationDefinition(id);
+      if (!definition) return applicationMentioned(text, id) ? 90 : 68;
+      const base = fitByCategory[definition.category] ?? 35;
+      const useMatches = definition.commonUses.filter((use) => text.includes(normalized(use))).length;
+      return base + Math.min(12, useMatches * 4);
+    }));
+  });
+  let score = scoreByOutput.reduce((total, value) => total + value, 0) / scoreByOutput.length;
   const first = getApplicationDefinition(applicationIds[0]);
   const last = getApplicationDefinition(applicationIds.at(-1) ?? "");
-  if (["video", "3d"].includes(input.outputType) && first?.category !== "video" && last?.category === "video") score += 10;
-  if (input.outputType === "graphic" && applicationIds.includes("photoshop") && applicationIds.some((id) => ["illustrator", "procreate"].includes(id))) score += 7;
-  if (input.outputType === "audio" && applicationIds.includes("fl-studio") && applicationIds.includes("audacity")) score += 7;
+  const outputTypes = selectedOutputTypes(input);
+  if (outputTypes.some((type) => ["video", "3d"].includes(type)) && first?.category !== "video" && last?.category === "video") score += 10;
+  if (outputTypes.includes("graphic") && applicationIds.includes("photoshop") && applicationIds.some((id) => ["illustrator", "procreate"].includes(id))) score += 7;
+  if (outputTypes.includes("audio") && applicationIds.includes("fl-studio") && applicationIds.includes("audacity")) score += 7;
   return clamp(score);
 }
 
@@ -284,7 +310,11 @@ function tutorialCoverage(applicationIds: string[], input: DesignApplicationPath
 function productionEstimate(input: DesignApplicationPathInput, applicationCount: number): number {
   const baseByOutput: Record<string, number> = { video: 320, "3d": 260, graphic: 190, uiux: 230, audio: 190, photo: 160, other: 240 };
   const qualityMultiplier = input.targetQuality === "portfolio" ? 1.25 : input.targetQuality === "basic" ? 0.78 : 1;
-  return Math.round((baseByOutput[input.outputType] ?? baseByOutput.other) * qualityMultiplier + Math.max(0, applicationCount - 1) * 35);
+  const base = selectedOutputTypes(input).reduce(
+    (total, outputType) => total + (baseByOutput[outputType] ?? baseByOutput.other),
+    0,
+  );
+  return Math.round(base * qualityMultiplier + Math.max(0, applicationCount - 1) * 35);
 }
 
 function learningEstimate(applicationIds: string[], input: DesignApplicationPathInput): number {

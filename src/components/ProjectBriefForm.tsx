@@ -4,7 +4,7 @@ import { ArrowRight, Clock3, LockKeyhole, Sparkles } from "lucide-react";
 import { useState } from "react";
 import type { Translation } from "@/src/i18n/translations";
 import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
-import type { RoadmapRequest } from "@/src/types";
+import type { OutputType, RoadmapRequest } from "@/src/types";
 import { toLocalDateKey } from "@/src/lib/date";
 import { ApplicationPicker } from "./ApplicationPicker";
 import { ReferenceImageInput } from "./ReferenceImageInput";
@@ -33,6 +33,21 @@ export function ProjectBriefForm({
     key: Key,
     nextValue: RoadmapRequest[Key],
   ) => onChange({ ...value, [key]: nextValue });
+
+  const updateOutputType = (outputType: OutputType) => {
+    onChange({
+      ...value,
+      outputType,
+      outputTypes: outputType === "other" ? value.outputTypes : undefined,
+    });
+  };
+
+  const toggleOutputType = (outputType: OutputType) => {
+    const selected = new Set(value.outputTypes ?? []);
+    if (selected.has(outputType)) selected.delete(outputType);
+    else selected.add(outputType);
+    onChange({ ...value, outputType: "other", outputTypes: [...selected] });
+  };
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -212,7 +227,7 @@ export function ProjectBriefForm({
             <select
               id="outputType"
               onChange={(event) =>
-                update("outputType", event.target.value as RoadmapRequest["outputType"])
+                updateOutputType(event.target.value as OutputType)
               }
               value={value.outputType}
             >
@@ -222,6 +237,32 @@ export function ProjectBriefForm({
             </select>
           </div>
         </div>
+
+        {value.outputType === "other" && (
+          <fieldset className="output-type-customizer" aria-describedby="output-type-customize-hint">
+            <legend>{t.form.outputTypeCustomizeLabel} <small>{t.form.optional}</small></legend>
+            <p className="application-support-copy" id="output-type-customize-hint">
+              {t.form.outputTypeCustomizeHint}
+            </p>
+            <div className="choice-row">
+              {t.form.outputOptions
+                .filter((option) => option.value !== "other")
+                .map((option) => {
+                  const outputType = option.value as OutputType;
+                  return (
+                    <label className="choice-card" key={option.value}>
+                      <input
+                        checked={value.outputTypes?.includes(outputType) ?? false}
+                        onChange={() => toggleOutputType(outputType)}
+                        type="checkbox"
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  );
+                })}
+            </div>
+          </fieldset>
+        )}
 
         <fieldset aria-describedby="application-support-copy">
           <legend>{t.form.applications} <small>{t.form.optional}</small></legend>

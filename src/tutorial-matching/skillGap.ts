@@ -7,9 +7,10 @@ import { SkillGapSchema, TutorialNeedSchema } from "@/src/contracts/knowledge";
 import { getApplicationName } from "@/src/data/applications";
 import { normalizeOntologyLabel } from "@/src/ontology/normalization";
 import { getOntologyConcept, ontologyHasId } from "@/src/ontology/runtime";
+import type { RuntimeOntologyNode } from "@/src/ontology/contracts";
 import { stableHash } from "@/src/tutorial-matching/hash";
 import { canonicalSkillIdForTopic } from "@/src/tutorial-matching/skillTaxonomy";
-import type { RoadmapRequest } from "@/src/types";
+import { selectedOutputTypes, type RoadmapRequest } from "@/src/types";
 
 interface SkillDefinition {
   id: string;
@@ -389,7 +390,7 @@ function workflowDefinitions(
   project: RoadmapRequest,
   requiredText: string,
 ): SkillDefinition[] {
-  const projectContext = `${requiredText} ${normalizeOntologyLabel(project.outputType)}`;
+  const projectContext = `${requiredText} ${normalizeOntologyLabel(selectedOutputTypes(project).join(" "))}`;
   return project.requiredApplications.flatMap((softwareId) =>
     (APPLICATION_WORKFLOWS[softwareId] ?? CUSTOM_APPLICATION_WORKFLOW).flatMap((step) => {
       if (step.onlyWhen && !step.onlyWhen.test(projectContext)) return [];
@@ -430,6 +431,7 @@ function conceptDefinitions(
     if (isRequiredSoftware) return [];
     const family = normalizeOntologyLabel(node.family).replace(/[^a-z0-9]+/g, " ").trim();
     const explicitlyChosen = concept.source === "explicit_requirement" || concept.source === "user_added";
+    if (!explicitlyChosen && !conceptHasProjectEvidence(project, concept, node)) return [];
     if (!ACTIONABLE_FAMILIES.has(family) && !explicitlyChosen) return [];
     if (NON_PROJECT_FAMILIES.test(node.family) && !explicitlyChosen) return [];
     if (DIRECTION_ONLY_CATEGORIES.test(node.category)) return [];
@@ -578,19 +580,59 @@ function skillKnowledge(
 }
 
 function inputText(project: RoadmapRequest, creativeDna: CreativeDNA): string {
+  const groundedConcepts = creativeDna.concepts.filter((concept) => {
+    if (concept.status === "user_rejected") return false;
+    if (concept.source === "explicit_requirement" || concept.source === "user_added") {
+      return true;
+    }
+    const node = concept.ontologyId ? getOntologyConcept(concept.ontologyId) : undefined;
+    return Boolean(node && conceptHasProjectEvidence(project, concept, node));
+  });
   return normalizeOntologyLabel(
     [
       project.projectBrief,
+      selectedOutputTypes(project).join(" "),
       creativeDna.projectIntent,
       ...project.requiredApplications.flatMap((id) => [id, getApplicationName(id)]),
-      ...creativeDna.concepts
-        .filter((concept) => concept.status !== "user_rejected")
-        .map((concept) => concept.label),
+      ...groundedConcepts.map((concept) => concept.label),
       ...creativeDna.unknownConcepts
-        .filter((concept) => concept.status !== "user_rejected")
+        .filter((concept) =>
+          concept.status !== "user_rejected" &&
+          (concept.source === "explicit_requirement" ||
+            hasProjectEvidence(project, concept.raw, concept.evidence?.excerpt)),
+        )
         .map((concept) => concept.raw),
     ].join(" "),
   );
+}
+
+function conceptHasProjectEvidence(
+  project: RoadmapRequest,
+  concept: CreativeDNA["concepts"][number],
+  node: RuntimeOntologyNode,
+): boolean {
+  return hasProjectEvidence(
+    project,
+    [node.label, ...node.aliases].join(" "),
+    concept.evidence?.excerpt,
+  );
+}
+
+function hasProjectEvidence(
+  project: RoadmapRequest,
+  label: string,
+  evidenceExcerpt?: string,
+): boolean {
+  const projectText = normalizeOntologyLabel([
+    project.projectBrief,
+    selectedOutputTypes(project).join(" "),
+    ...project.requiredApplications.map((id) => [id, getApplicationName(id)].join(" ")),
+  ].join(" "));
+  const evidence = normalizeOntologyLabel(evidenceExcerpt ?? "");
+  const briefText = normalizeOntologyLabel(project.projectBrief);
+  const labelEvidence = containsAny(projectText, [label]);
+  const excerptEvidence = Boolean(evidence && (briefText.includes(evidence) || projectText.includes(evidence)));
+  return labelEvidence || excerptEvidence;
 }
 
 function expandPrerequisites(
@@ -715,6 +757,12 @@ export function buildTutorialNeeds(
 ): TutorialNeed[] {
   const aestheticIds = creativeDna.concepts.flatMap((concept) =>
     concept.status !== "user_rejected" && concept.ontologyId &&
+    (concept.source === "explicit_requirement" ||
+      concept.source === "user_added" ||
+      (() => {
+        const node = getOntologyConcept(concept.ontologyId);
+        return Boolean(node && conceptHasProjectEvidence(project, concept, node));
+      })()) &&
     /aesthetic|style|movement|visual/i.test(`${concept.family} ${concept.category}`)
       ? [concept.ontologyId]
       : [],

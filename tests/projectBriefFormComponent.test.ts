@@ -43,6 +43,8 @@ describe("ProjectBriefForm application picker", () => {
     const markup = renderForm(request);
     expect(markup).toContain("Search applications");
     expect(markup).toContain("Suggestions are restricted to applications");
+    expect(markup).toContain("Other/customize");
+    expect(markup.match(/type=\"checkbox\"/g)?.length).toBe(6);
     expect(markup).not.toContain("Adobe Photoshop</span>");
     expect(markup).not.toContain(">Other</span>");
   });
