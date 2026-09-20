@@ -267,6 +267,13 @@ export interface Translation {
     removeApplication: string;
     addCustomApplication: string;
     customApplicationHint: string;
+    selectedCustomOutputs: string;
+    customOutputSearchLabel: string;
+    customOutputSearchPlaceholder: string;
+    customOutputSearchHint: string;
+    addCustomOutput: string;
+    removeCustomOutput: string;
+    customOutputHint: string;
     outputType: string;
     outputTypeCustomizeLabel: string;
     outputTypeCustomizeHint: string;
@@ -794,6 +801,13 @@ const en: Translation = {
     removeApplication: "Remove application",
     addCustomApplication: "Add “{name}” as an application",
     customApplicationHint: "Use the exact application name required by your assignment.",
+    selectedCustomOutputs: "Custom outputs",
+    customOutputSearchLabel: "Add another desired output",
+    customOutputSearchPlaceholder: "Try: interactive installation, printed booklet...",
+    customOutputSearchHint: "Type an output that is not listed above, then add it to the project.",
+    addCustomOutput: "Add “{name}” as a desired output",
+    removeCustomOutput: "Remove custom output",
+    customOutputHint: "Use a short name that describes the deliverable.",
     outputType: "Desired output type",
     outputTypeCustomizeLabel: "Choose all output types that apply",
     outputTypeCustomizeHint: "Select more than one when the project combines deliverables, such as graphic design and video / animation.",
@@ -1378,6 +1392,13 @@ const vi: Translation = {
     removeApplication: "Xóa ứng dụng",
     addCustomApplication: "Thêm “{name}” làm ứng dụng",
     customApplicationHint: "Dùng đúng tên ứng dụng mà bài tập yêu cầu.",
+    selectedCustomOutputs: "Đầu ra tùy chỉnh",
+    customOutputSearchLabel: "Thêm đầu ra mong muốn khác",
+    customOutputSearchPlaceholder: "Ví dụ: sắp đặt tương tác, booklet in...",
+    customOutputSearchHint: "Nhập đầu ra chưa có trong danh sách rồi thêm vào dự án.",
+    addCustomOutput: "Thêm “{name}” làm đầu ra mong muốn",
+    removeCustomOutput: "Xóa đầu ra tùy chỉnh",
+    customOutputHint: "Dùng tên ngắn mô tả sản phẩm cần bàn giao.",
     outputType: "Loại sản phẩm mong muốn",
     outputTypeCustomizeLabel: "Chọn tất cả loại đầu ra phù hợp",
     outputTypeCustomizeHint: "Chọn nhiều loại nếu dự án kết hợp các đầu ra như thiết kế đồ họa và video / hoạt hình.",

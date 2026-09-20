@@ -21,9 +21,10 @@ import {
 import { normalizeCreativeDna } from "@/src/project-analysis/normalizeCreativeDna";
 
 function outputContext(request: ProjectAnalysisRequest): string {
-  return request.outputTypes?.length
-    ? request.outputTypes.join(", ")
-    : request.outputType;
+  return [
+    request.outputTypes?.length ? request.outputTypes.join(", ") : request.outputType,
+    ...(request.customOutputs ?? []),
+  ].join(", ");
 }
 
 interface ProjectOntologyRetriever {

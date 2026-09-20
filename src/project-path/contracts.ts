@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Locale } from "@/src/types";
+import type { Locale, OutputType } from "@/src/types";
 import { RouteEvaluationSchema } from "@/src/route-planning/contracts";
 
 export const ProjectPathSchema = z.enum(["design", "agentic_engineering"]);
@@ -42,6 +42,9 @@ export const EngineeringProjectSchema = z
     path: z.literal("agentic_engineering"),
     interfaceLanguage: z.enum(["en", "vi"]),
     technicalBrief: z.string().trim().min(30).max(3_000),
+    outputType: z.enum(["video", "3d", "graphic", "uiux", "audio", "photo", "other"] satisfies OutputType[]).optional(),
+    outputTypes: z.enum(["video", "3d", "graphic", "uiux", "audio", "photo", "other"] satisfies OutputType[]).array().max(7).optional(),
+    customOutputs: z.array(z.string().trim().min(1).max(120)).max(12).optional(),
     startingPoint: EngineeringStartingPointSchema,
     repositoryUrl: z.string().trim().max(500).optional(),
     projectLocation: z.string().trim().max(500).optional(),

@@ -57,4 +57,11 @@ describe("ProjectBriefForm application picker", () => {
     expect(markup).toContain("Remove application: TouchDesigner");
     expect(markup).toContain("Remove application: Canva");
   });
+
+  it("renders custom desired output search and selected values", () => {
+    const markup = renderForm({ ...request, customOutputs: ["Printed booklet"] });
+    expect(markup).toContain("Add another desired output");
+    expect(markup).toContain("Try: interactive installation, printed booklet...");
+    expect(markup).toContain("Remove custom output: Printed booklet");
+  });
 });

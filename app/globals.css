@@ -789,6 +789,110 @@ a:focus-visible {
   margin-top: 12px;
 }
 
+.custom-output-picker {
+  margin-top: 18px;
+}
+
+.selected-custom-outputs {
+  background: rgba(230, 239, 220, 0.72);
+  border: 1px solid rgba(71, 98, 42, 0.22);
+  border-radius: 15px;
+  padding: 13px 14px;
+}
+
+.selected-custom-outputs > strong {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+
+.selected-custom-outputs > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selected-custom-outputs button,
+.custom-output-result > button {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+}
+
+.selected-custom-outputs button {
+  background: var(--dark);
+  border: 1px solid var(--dark);
+  border-radius: 999px;
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 750;
+  gap: 7px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 7px 10px 7px 13px;
+  text-align: left;
+}
+
+.selected-custom-outputs button svg {
+  flex: 0 0 auto;
+}
+
+.custom-output-search-field {
+  margin-top: 16px;
+  max-width: none;
+}
+
+.custom-output-search-field > span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.custom-output-result {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 3px;
+}
+
+.custom-output-result > button {
+  background: rgba(248, 235, 207, 0.42);
+  border: 1px dashed var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  gap: 16px;
+  justify-content: space-between;
+  padding: 11px 13px;
+  text-align: left;
+  width: 100%;
+}
+
+.custom-output-result > button:hover,
+.custom-output-result > button:focus-visible {
+  background: var(--green-soft);
+  border-color: var(--green);
+}
+
+.custom-output-result > button:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.custom-output-result > button span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.custom-output-result > button small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
 .error-summary {
   padding: 18px 20px;
   border: 1px solid #c77b74;
