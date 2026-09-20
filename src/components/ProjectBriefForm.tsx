@@ -7,6 +7,7 @@ import { RoadmapRequestSchema } from "@/src/schemas/roadmapRequest";
 import type { OutputType, RoadmapRequest } from "@/src/types";
 import { toLocalDateKey } from "@/src/lib/date";
 import { ApplicationPicker } from "./ApplicationPicker";
+import { OutputTypeCustomizer } from "./OutputTypeCustomizer";
 import { ReferenceImageInput } from "./ReferenceImageInput";
 import type { ReferenceImageFinding } from "@/src/reference-image/contracts";
 
@@ -39,14 +40,8 @@ export function ProjectBriefForm({
       ...value,
       outputType,
       outputTypes: outputType === "other" ? value.outputTypes : undefined,
+      customOutputs: outputType === "other" ? value.customOutputs : undefined,
     });
-  };
-
-  const toggleOutputType = (outputType: OutputType) => {
-    const selected = new Set(value.outputTypes ?? []);
-    if (selected.has(outputType)) selected.delete(outputType);
-    else selected.add(outputType);
-    onChange({ ...value, outputType: "other", outputTypes: [...selected] });
   };
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -239,29 +234,11 @@ export function ProjectBriefForm({
         </div>
 
         {value.outputType === "other" && (
-          <fieldset className="output-type-customizer" aria-describedby="output-type-customize-hint">
-            <legend>{t.form.outputTypeCustomizeLabel} <small>{t.form.optional}</small></legend>
-            <p className="application-support-copy" id="output-type-customize-hint">
-              {t.form.outputTypeCustomizeHint}
-            </p>
-            <div className="choice-row">
-              {t.form.outputOptions
-                .filter((option) => option.value !== "other")
-                .map((option) => {
-                  const outputType = option.value as OutputType;
-                  return (
-                    <label className="choice-card" key={option.value}>
-                      <input
-                        checked={value.outputTypes?.includes(outputType) ?? false}
-                        onChange={() => toggleOutputType(outputType)}
-                        type="checkbox"
-                      />
-                      <span>{option.label}</span>
-                    </label>
-                  );
-                })}
-            </div>
-          </fieldset>
+          <OutputTypeCustomizer
+            onChange={(next) => onChange({ ...value, ...next })}
+            t={t}
+            value={value}
+          />
         )}
 
         <fieldset aria-describedby="application-support-copy">

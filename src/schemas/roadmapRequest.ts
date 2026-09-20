@@ -29,6 +29,10 @@ export const RoadmapRequestSchema = z.object({
     .array(z.enum(["video", "3d", "graphic", "uiux", "audio", "photo", "other"]))
     .max(7)
     .optional(),
+  customOutputs: z
+    .array(z.string().trim().min(1).max(120))
+    .max(12)
+    .optional(),
   targetQuality: z.enum(["basic", "portfolio", "unsure"]),
 });
 

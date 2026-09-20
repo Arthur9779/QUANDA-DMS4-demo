@@ -91,9 +91,10 @@ function fieldValue(
     case "requiredApplications":
       return request.requiredApplications.join(", ");
     case "outputType":
-      return request.outputTypes?.length
-        ? request.outputTypes.join(", ")
-        : request.outputType;
+      return [
+        request.outputTypes?.length ? request.outputTypes.join(", ") : request.outputType,
+        ...(request.customOutputs ?? []),
+      ].join(", ");
     default:
       return "";
   }
@@ -349,15 +350,19 @@ function deterministicConstraints(
     }),
   );
   constraints.push({
-    label: `Deliverable: ${request.outputTypes?.length ? request.outputTypes.join(", ") : request.outputType}`,
+    label: `Deliverable: ${[
+      request.outputTypes?.length ? request.outputTypes.join(", ") : request.outputType,
+      ...(request.customOutputs ?? []),
+    ].join(", ")}`,
     kind: "deliverable",
     source: "explicit_requirement",
     status: "unconfirmed",
       evidence: {
         sourceField: "outputType",
-        excerpt: request.outputTypes?.length
-          ? request.outputTypes.join(", ")
-          : request.outputType,
+        excerpt: [
+          request.outputTypes?.length ? request.outputTypes.join(", ") : request.outputType,
+          ...(request.customOutputs ?? []),
+        ].join(", "),
       },
   });
   if (request.targetQuality !== "unsure") {

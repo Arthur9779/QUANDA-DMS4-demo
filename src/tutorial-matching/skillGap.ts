@@ -390,7 +390,10 @@ function workflowDefinitions(
   project: RoadmapRequest,
   requiredText: string,
 ): SkillDefinition[] {
-  const projectContext = `${requiredText} ${normalizeOntologyLabel(selectedOutputTypes(project).join(" "))}`;
+  const projectContext = `${requiredText} ${normalizeOntologyLabel([
+    selectedOutputTypes(project).join(" "),
+    ...(project.customOutputs ?? []),
+  ].join(" "))}`;
   return project.requiredApplications.flatMap((softwareId) =>
     (APPLICATION_WORKFLOWS[softwareId] ?? CUSTOM_APPLICATION_WORKFLOW).flatMap((step) => {
       if (step.onlyWhen && !step.onlyWhen.test(projectContext)) return [];
@@ -592,6 +595,7 @@ function inputText(project: RoadmapRequest, creativeDna: CreativeDNA): string {
     [
       project.projectBrief,
       selectedOutputTypes(project).join(" "),
+      ...(project.customOutputs ?? []),
       creativeDna.projectIntent,
       ...project.requiredApplications.flatMap((id) => [id, getApplicationName(id)]),
       ...groundedConcepts.map((concept) => concept.label),
@@ -626,6 +630,7 @@ function hasProjectEvidence(
   const projectText = normalizeOntologyLabel([
     project.projectBrief,
     selectedOutputTypes(project).join(" "),
+    ...(project.customOutputs ?? []),
     ...project.requiredApplications.map((id) => [id, getApplicationName(id)].join(" ")),
   ].join(" "));
   const evidence = normalizeOntologyLabel(evidenceExcerpt ?? "");

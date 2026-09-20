@@ -5,6 +5,8 @@ import { useState } from "react";
 import type { Translation } from "@/src/i18n/translations";
 import { EngineeringProjectSchema, type EngineeringProject } from "@/src/project-path/contracts";
 import { toLocalDateKey } from "@/src/lib/date";
+import type { OutputType } from "@/src/types";
+import { OutputTypeCustomizer } from "./OutputTypeCustomizer";
 
 interface EngineeringProjectFormProps {
   value: EngineeringProject;
@@ -17,6 +19,13 @@ interface EngineeringProjectFormProps {
 export function EngineeringProjectForm({ value, t, isSubmitting, onChange, onSubmit }: EngineeringProjectFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const update = <Key extends keyof EngineeringProject>(key: Key, next: EngineeringProject[Key]) => onChange({ ...value, [key]: next });
+  const outputType = value.outputType ?? "other";
+  const updateOutputType = (outputType: OutputType) => onChange({
+    ...value,
+    outputType,
+    outputTypes: outputType === "other" ? value.outputTypes : undefined,
+    customOutputs: outputType === "other" ? value.customOutputs : undefined,
+  });
   const requiredExisting = value.startingPoint !== "new_project";
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,6 +65,13 @@ export function EngineeringProjectForm({ value, t, isSubmitting, onChange, onSub
           <div className="field"><label htmlFor="engineeringStartingPoint">{t.engineering.startingPoint}</label><select id="engineeringStartingPoint" onChange={(event) => update("startingPoint", event.target.value as EngineeringProject["startingPoint"])} value={value.startingPoint}>{t.engineering.startingOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
           <div className="field"><label htmlFor="engineeringPlatform">{t.engineering.platform}</label><select id="engineeringPlatform" onChange={(event) => update("targetPlatform", event.target.value as EngineeringProject["targetPlatform"])} value={value.targetPlatform}>{t.engineering.platformOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
         </div>
+        <div className="field field-wide">
+          <div className="label-row"><label htmlFor="engineeringOutputType">{t.form.outputType}</label><span>{t.form.optional}</span></div>
+          <select id="engineeringOutputType" onChange={(event) => updateOutputType(event.target.value as OutputType)} value={outputType}>
+            {t.form.outputOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </select>
+        </div>
+        {outputType === "other" && <OutputTypeCustomizer onChange={(next) => onChange({ ...value, ...next })} t={t} value={{ ...value, outputType }} />}
         {requiredExisting && <div className="form-grid"><div className="field"><label htmlFor="engineeringRepository">{t.engineering.repository}</label><input aria-invalid={Boolean(errors.repositoryUrl)} id="engineeringRepository" placeholder={t.engineering.repositoryPlaceholder} value={value.repositoryUrl ?? ""} onChange={(event) => update("repositoryUrl", event.target.value)} />{errors.repositoryUrl && <p className="field-error">{errors.repositoryUrl}</p>}</div><div className="field"><label htmlFor="engineeringLocation">{t.engineering.location}</label><input id="engineeringLocation" placeholder={t.engineering.locationPlaceholder} value={value.projectLocation ?? ""} onChange={(event) => update("projectLocation", event.target.value)} /></div></div>}
         <div className="field field-wide"><div className="label-row"><label htmlFor="engineeringDone">{t.engineering.definitionOfDone}</label><span>{t.form.required}</span></div><textarea aria-describedby={errors.definitionOfDone ? "engineering-done-error" : undefined} aria-invalid={Boolean(errors.definitionOfDone)} id="engineeringDone" placeholder={t.engineering.definitionPlaceholder} rows={4} value={value.definitionOfDone} onChange={(event) => update("definitionOfDone", event.target.value)} />{errors.definitionOfDone && <p className="field-error" id="engineering-done-error">{errors.definitionOfDone}</p>}</div>
         <div className="form-grid"><div className="field"><label htmlFor="engineeringTech">{t.engineering.technologies}</label><input id="engineeringTech" placeholder={t.engineering.technologiesPlaceholder} value={value.technologies ?? ""} onChange={(event) => update("technologies", event.target.value)} /></div><div className="field"><label htmlFor="engineeringDeployment">{t.engineering.deployment}</label><input id="engineeringDeployment" placeholder={t.engineering.deploymentPlaceholder} value={value.deploymentTarget ?? ""} onChange={(event) => update("deploymentTarget", event.target.value)} /></div></div>

@@ -34,7 +34,13 @@ export type OutputType =
   | "photo"
   | "other";
 
-export interface RoadmapRequest {
+export interface DesiredOutputSelection {
+  outputType: OutputType;
+  outputTypes?: OutputType[];
+  customOutputs?: string[];
+}
+
+export interface RoadmapRequest extends DesiredOutputSelection {
   interfaceLanguage: Locale;
   projectBrief: string;
   deadline: string;
@@ -43,9 +49,6 @@ export interface RoadmapRequest {
   daysPerWeek: number;
   tutorialLanguage: TutorialLanguage;
   requiredApplications: string[];
-  outputType: OutputType;
-  /** Additional deliverable types selected through Other/customize. */
-  outputTypes?: OutputType[];
   targetQuality: TargetQuality;
 }
 

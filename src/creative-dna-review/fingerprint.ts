@@ -10,6 +10,7 @@ function stableProjectInput(request: RoadmapRequest): string {
     requiredApplications: [...request.requiredApplications].sort(),
     outputType: request.outputType,
     outputTypes: [...(request.outputTypes ?? [])].sort(),
+    customOutputs: [...(request.customOutputs ?? [])].sort(),
     targetQuality: request.targetQuality,
   });
 }
