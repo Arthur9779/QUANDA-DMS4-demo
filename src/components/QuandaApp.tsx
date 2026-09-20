@@ -147,9 +147,7 @@ function emptyEngineeringForm(locale: Locale, brief = ""): EngineeringProject {
     path: "agentic_engineering",
     interfaceLanguage: locale,
     technicalBrief: brief,
-    outputType: "other",
-    outputTypes: [],
-    customOutputs: [],
+    referenceFindings: [],
     startingPoint: hints.startingPoint,
     repositoryUrl: hints.repositoryUrl,
     projectLocation: "",
@@ -1572,6 +1570,17 @@ export function QuandaApp() {
               clearPreparationState(window.localStorage);
             }}
             onSubmit={(request) => void interpretEngineering(request)}
+            onApprovedReferenceFindingsChange={(findings) => {
+              setEngineeringForm((current) => ({ ...current, referenceFindings: findings }));
+              setEngineeringInterpretation(null);
+              setEngineeringInterpretationConfirmed(false);
+              setPreparationMethod(null);
+              setEngineeringGuidedPlan(null);
+              setEngineeringRoadmap(null);
+              setEngineeringCompletion([]);
+              setEngineeringCalendarTasks((current) => removeEngineeringCalendarTasks(current));
+              clearPreparationState(window.localStorage);
+            }}
             t={t}
             value={engineeringForm}
           />

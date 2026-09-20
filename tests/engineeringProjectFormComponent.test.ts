@@ -11,17 +11,17 @@ const project = EngineeringProjectSchema.parse({
   technicalBrief: "Build a small web application for a university project.",
   startingPoint: "new_project",
   definitionOfDone: "The main workflow works and is tested.",
-  targetPlatform: "web_application",
+  targetPlatform: "other",
+  targetPlatforms: ["web_application", "game"],
+  customTargetPlatforms: ["Console build"],
   currentExperience: "Beginner developer",
   deadline: "2026-09-30",
   hoursPerDay: 2,
   daysPerWeek: 5,
-  outputType: "other",
-  customOutputs: ["Interactive demo"],
 });
 
-describe("EngineeringProjectForm desired output", () => {
-  it("provides the same customizable desired-output control", () => {
+describe("EngineeringProjectForm target platform controls", () => {
+  it("uses target platform customization instead of a desired-output control", () => {
     const markup = renderToStaticMarkup(
       React.createElement(EngineeringProjectForm, {
         isSubmitting: false,
@@ -31,8 +31,10 @@ describe("EngineeringProjectForm desired output", () => {
         value: project,
       }),
     );
-    expect(markup).toContain('id="engineeringOutputType"');
-    expect(markup).toContain("Add another desired output");
-    expect(markup).toContain("Remove custom output: Interactive demo");
+    expect(markup).not.toContain('id="engineeringOutputType"');
+    expect(markup).toContain("Choose all target platforms that apply");
+    expect(markup).toContain('id="custom-target-platform-search"');
+    expect(markup).toContain("Remove custom target: Console build");
+    expect(markup).toContain("Visual reference");
   });
 });

@@ -29,7 +29,13 @@ function stackFor(project: EngineeringProject): string[] {
   const explicit = project.technologies ? project.technologies.split(/[,;\n]/).map((item) => item.trim()).filter(Boolean) : [];
   return [...new Set(explicit)].slice(0, 10);
 }
-function platformLabel(project: EngineeringProject): string { return (project.interfaceLanguage === "vi" ? platformLabelsVi : platformLabels)[project.targetPlatform]; }
+function platformLabel(project: EngineeringProject): string {
+  const labels = project.interfaceLanguage === "vi" ? platformLabelsVi : platformLabels;
+  const selected = (project.targetPlatforms ?? []).map((platform) => labels[platform]);
+  const custom = project.customTargetPlatforms ?? [];
+  if (project.targetPlatform !== "other" || (selected.length === 0 && custom.length === 0)) return labels[project.targetPlatform];
+  return ([...selected, ...custom].join(", ").slice(0, 240)) || labels.other;
+}
 function repositoryContext(project: EngineeringProject): string {
   const vi = project.interfaceLanguage === "vi";
   if (project.repositoryUrl) return vi ? `Sử dụng repository tại ${project.repositoryUrl}.` : `Use the repository at ${project.repositoryUrl}.`;
@@ -49,6 +55,7 @@ export function interpretEngineeringProject(input: unknown): EngineeringInterpre
   if (project.existingErrors) risks.push(vi ? `Blocker cần tái hiện trước: ${project.existingErrors}` : `Known blocker to reproduce first: ${project.existingErrors}`);
   return EngineeringInterpretationSchema.parse({
     path: "agentic_engineering", productType: platformLabel(project), startingPoint: project.startingPoint,
+    visualReferenceFindings: project.referenceFindings ?? [],
     coreFeatures: features.length > 0 ? features : [project.technicalBrief], suggestedTechnologyStack: stack,
     repositoryContext: repositoryContext(project),
     dataAndApiRequirements: /\b(api|database|data|backend|auth|search|integration)\b/i.test(project.technicalBrief)

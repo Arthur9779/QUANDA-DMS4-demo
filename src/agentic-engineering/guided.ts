@@ -73,7 +73,7 @@ export function generateEngineeringGuidedPlan(
         title: vi ? "Kiểm tra preview và bàn giao" : "Review the preview and hand off",
         outcome: vi ? `Bạn tự chấp nhận hoặc từ chối sản phẩm dựa trên definition of done, mục tiêu ${project.deploymentTarget || "bàn giao đã chọn"} và hạn ${project.deadline}.` : `You accept or reject the deliverable against the definition of done, the ${project.deploymentTarget || "selected handoff target"}, and the ${project.deadline} deadline.`,
         whyItMatters: vi ? "Preview, quyền truy cập và quyết định bàn giao là trách nhiệm của con người." : "Preview behaviour, access decisions, and final acceptance remain human responsibilities.",
-        checks: vi ? [`Mở preview hoặc artifact trên thiết bị mục tiêu ${project.targetPlatform}.`, `Đánh dấu từng tiêu chí hoàn thành trước ${project.deadline} và ghi limitation còn lại.`, `Xác nhận các giới hạn: ${constraints}`] : [`Open the preview or artifact on the ${project.targetPlatform} target.`, `Check each acceptance criterion before ${project.deadline} and record remaining limitations.`, `Confirm the stated constraints: ${constraints}`],
+        checks: vi ? [`Mở preview hoặc artifact trên mục tiêu ${interpretation.productType}.`, `Đánh dấu từng tiêu chí hoàn thành trước ${project.deadline} và ghi limitation còn lại.`, `Xác nhận các giới hạn: ${constraints}`] : [`Open the preview or artifact on the ${interpretation.productType} target.`, `Check each acceptance criterion before ${project.deadline} and record remaining limitations.`, `Confirm the stated constraints: ${constraints}`],
         resources: [],
       },
     ],
