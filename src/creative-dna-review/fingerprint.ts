@@ -9,6 +9,7 @@ function stableProjectInput(request: RoadmapRequest): string {
     daysPerWeek: request.daysPerWeek,
     requiredApplications: [...request.requiredApplications].sort(),
     outputType: request.outputType,
+    outputTypes: [...(request.outputTypes ?? [])].sort(),
     targetQuality: request.targetQuality,
   });
 }

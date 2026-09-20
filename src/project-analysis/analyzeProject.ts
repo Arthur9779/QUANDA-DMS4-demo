@@ -20,6 +20,12 @@ import {
 } from "@/src/project-analysis/geminiClassifier";
 import { normalizeCreativeDna } from "@/src/project-analysis/normalizeCreativeDna";
 
+function outputContext(request: ProjectAnalysisRequest): string {
+  return request.outputTypes?.length
+    ? request.outputTypes.join(", ")
+    : request.outputType;
+}
+
 interface ProjectOntologyRetriever {
   searchWithDiagnostics(request: {
     query: string;
@@ -64,7 +70,7 @@ function localRetrievalResult(
       projectBrief: request.projectBrief,
       currentExperience: request.currentExperience,
       requiredApplications,
-      outputType: request.outputType,
+      outputType: outputContext(request),
       qualityTarget: request.targetQuality,
     }),
     requiredApplications,
@@ -83,7 +89,7 @@ async function retrieveCandidates(
     projectBrief: request.projectBrief,
     currentExperience: request.currentExperience,
     requiredApplications,
-    outputType: request.outputType,
+    outputType: outputContext(request),
     qualityTarget: request.targetQuality,
   });
   const retriever =

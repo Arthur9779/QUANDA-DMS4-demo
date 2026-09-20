@@ -228,6 +228,21 @@ describe("contextual skill-gap analysis", () => {
     expect(gaps.some((gap) => gap.label === "Object and keyframe animation")).toBe(true);
   });
 
+  it("does not turn an ungrounded AI concept into a project learning need", () => {
+    const dna = creativeDna("A product animation in Blender");
+    dna.concepts.push({
+      ontologyId: "audio-and-music.audio-reactive-technique.fft",
+      label: "Audio input and FFT",
+      family: "Audio and Music",
+      category: "Audio Reactive Technique",
+      source: "ai_inferred",
+      status: "user_confirmed",
+      confidence: 0.88,
+    });
+    const gaps = deriveSkillGaps(project(), dna);
+    expect(gaps.some((gap) => gap.label === "Audio input and FFT")).toBe(false);
+  });
+
   it("provides a production-to-export decomposition for every built-in application", () => {
     for (const application of applications) {
       const applicationProject = project({

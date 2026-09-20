@@ -44,7 +44,18 @@ export interface RoadmapRequest {
   tutorialLanguage: TutorialLanguage;
   requiredApplications: string[];
   outputType: OutputType;
+  /** Additional deliverable types selected through Other/customize. */
+  outputTypes?: OutputType[];
   targetQuality: TargetQuality;
+}
+
+export function selectedOutputTypes(
+  request: Pick<RoadmapRequest, "outputType" | "outputTypes">,
+): OutputType[] {
+  const selected = request.outputType === "other"
+    ? request.outputTypes ?? []
+    : [request.outputType];
+  return [...new Set(selected.length > 0 ? selected : ["other"])] as OutputType[];
 }
 
 export interface RoadmapStage {

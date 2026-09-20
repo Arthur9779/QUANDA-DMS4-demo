@@ -35,10 +35,19 @@ test("creates and restores a bilingual demo roadmap", async ({ page }, testInfo)
   await page.getByRole("button", { name: "Choose my workflow" }).click();
   await page.getByLabel("Current experience").fill("Photoshop intermediate; completely new to Blender.");
   await page.getByRole("button", { name: "Understand my project" }).click();
+  const applicationPath = page.locator("#application-path-comparison");
+  await expect(applicationPath).toBeVisible();
   await expect(page.locator("#learning-path-review")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.querySelector("#application-path-comparison")?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY)).toBeLessThan(200);
   await expect(page.locator("#creative-dna-review")).toHaveCount(0);
   await page.getByRole("button", { name: "Continue to my roadmap" }).click();
 
+  const roadmapLoading = page.locator("#roadmap-loading");
+  await expect(roadmapLoading).toBeVisible();
+  expect(await roadmapLoading.evaluate((element) => {
+    const learning = document.querySelector("#learning-path-review");
+    return Boolean(learning && (learning.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING));
+  })).toBe(true);
   await expect(page.locator("#roadmap-results")).toBeVisible();
   await expect(page.locator(".stage-card")).toHaveCount(8);
   await expect(page.locator(".tutorial-card").first()).toBeVisible();

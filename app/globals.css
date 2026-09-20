@@ -781,6 +781,14 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+.output-type-customizer {
+  margin-top: 22px;
+}
+
+.output-type-customizer .choice-row {
+  margin-top: 12px;
+}
+
 .error-summary {
   padding: 18px 20px;
   border: 1px solid #c77b74;
@@ -3083,7 +3091,9 @@ footer {
   .route-evidence-toggle::after,
   .route-evidence-toggle svg,
   .engineering-task-content,
-  .route-details-content {
+  .route-details-content,
+  .route-alternative-details,
+  .route-alternative-header .icon-button {
     animation: none;
     transition: none;
   }
@@ -3780,12 +3790,14 @@ footer {
 .route-alternative { margin-top: 12px; }
 .route-alternative-header > strong { color: var(--green); font-size: 1.5rem; white-space: nowrap; }
 .route-alternative-header .icon-button { grid-column: 2; grid-row: 1 / span 2; }
-.route-alternative-details { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
+.route-alternative-header .icon-button { transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
+.route-alternative-header .icon-button:hover, .route-alternative-header .icon-button:focus-visible { background: var(--green-soft); border-color: var(--palm); color: var(--orange); }
+.route-alternative-details { animation: disclosure-fade-in 180ms ease-out both; border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
 .route-alternative-details ol { color: var(--muted); padding-left: 22px; }
 .route-alternative-details .route-score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .route-rejection { background: #fff1e9; border-left: 3px solid var(--amber); padding: 10px 12px; }
 .route-details summary::-webkit-details-marker { display: none; }
-.route-evidence-toggle { align-items: center; color: var(--green); display: inline-flex; gap: 7px; list-style: none; position: relative; transition: color 160ms ease; }
+.route-evidence-toggle { align-items: center; color: var(--green); display: inline-flex; gap: 7px; line-height: 1.35; list-style: none; padding: 8px 32px 8px 0; position: relative; transition: color 160ms ease; }
 .route-evidence-toggle::after { background: currentColor; bottom: -5px; content: ""; height: 2px; left: 0; position: absolute; right: 24px; transform: scaleX(0); transform-origin: right; transition: transform 180ms ease; }
 .route-evidence-toggle:hover, .route-evidence-toggle:focus-visible { color: var(--orange); }
 .route-evidence-toggle:hover::after, .route-evidence-toggle:focus-visible::after { transform: scaleX(1); transform-origin: left; }

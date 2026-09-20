@@ -22,6 +22,7 @@ export const ProjectAnalysisRequestSchema = z.object({
     .max(12)
     .default([]),
   outputType: z.string().trim().min(1).max(120),
+  outputTypes: z.array(z.string().trim().min(1).max(120)).max(7).optional(),
   targetQuality: z.enum(["basic", "portfolio", "unsure"]),
   tutorialLanguage: z.enum(["en", "vi", "either"]),
   deadline: z.string().date().optional(),

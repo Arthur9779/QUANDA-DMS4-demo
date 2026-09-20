@@ -268,6 +268,8 @@ export interface Translation {
     addCustomApplication: string;
     customApplicationHint: string;
     outputType: string;
+    outputTypeCustomizeLabel: string;
+    outputTypeCustomizeHint: string;
     targetQuality: string;
     submit: string;
     availableStudyTime: string;
@@ -793,6 +795,8 @@ const en: Translation = {
     addCustomApplication: "Add “{name}” as an application",
     customApplicationHint: "Use the exact application name required by your assignment.",
     outputType: "Desired output type",
+    outputTypeCustomizeLabel: "Choose all output types that apply",
+    outputTypeCustomizeHint: "Select more than one when the project combines deliverables, such as graphic design and video / animation.",
     targetQuality: "Target quality",
     submit: "Understand my project",
     availableStudyTime: "Available study time",
@@ -819,7 +823,7 @@ const en: Translation = {
       { value: "uiux", label: "UI/UX prototype" },
       { value: "audio", label: "Audio project" },
       { value: "photo", label: "Photography" },
-      { value: "other", label: "Other" },
+      { value: "other", label: "Other/customize" },
     ],
     qualityOptions: [
       { value: "basic", label: "Basic submission" },
@@ -1375,6 +1379,8 @@ const vi: Translation = {
     addCustomApplication: "Thêm “{name}” làm ứng dụng",
     customApplicationHint: "Dùng đúng tên ứng dụng mà bài tập yêu cầu.",
     outputType: "Loại sản phẩm mong muốn",
+    outputTypeCustomizeLabel: "Chọn tất cả loại đầu ra phù hợp",
+    outputTypeCustomizeHint: "Chọn nhiều loại nếu dự án kết hợp các đầu ra như thiết kế đồ họa và video / hoạt hình.",
     targetQuality: "Mức chất lượng",
     submit: "Phân tích dự án của tôi",
     availableStudyTime: "Thời gian học hiện có",
@@ -1401,7 +1407,7 @@ const vi: Translation = {
       { value: "uiux", label: "Bản mẫu UI/UX" },
       { value: "audio", label: "Dự án âm thanh" },
       { value: "photo", label: "Nhiếp ảnh" },
-      { value: "other", label: "Khác" },
+      { value: "other", label: "Khác/tùy chỉnh" },
     ],
     qualityOptions: [
       { value: "basic", label: "Bài nộp cơ bản" },
